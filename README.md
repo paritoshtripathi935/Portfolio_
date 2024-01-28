@@ -1,4 +1,4 @@
-# Project Title
+# Project Title: Flask Portfolio Website
 
 ## Table of Contents
 
@@ -9,38 +9,56 @@
 
 ## About <a name = "about"></a>
 
-Write about 1-2 paragraphs describing the purpose of your project.
+This project aims to create a personal portfolio website using Flask, a web framework in Python. The portfolio website will showcase the developer's skills, projects, and experience. The use of Flask allows for easy customization and dynamic content updates.
 
 ## Getting Started <a name = "getting_started"></a>
 
-These instructions will get you a copy of the project up and running on your local machine for development and testing purposes. See [deployment](#deployment) for notes on how to deploy the project on a live system.
+These instructions will guide you on setting up the project on your local machine for development and testing purposes.
 
 ### Prerequisites
 
-What things you need to install the software and how to install them.
+To run the project, you need to have the following installed:
 
+- Python
+- Flask
+
+You can install Flask using the following command:
+
+```bash
+pip install Flask
 ```
-Give examples
-```
+Installing
+Follow these steps to get the development environment up and running:
 
-### Installing
+1. Clone the repository to your local machine:
 
-A step by step series of examples that tell you how to get a development env running.
-
-Say what the step will be
-
-```
-Give the example
-```
-
-And repeat
-
-```
-until finished
+```bash
+git clone https://github.com/your-username/flask-portfolio.git
 ```
 
-End with an example of getting some data out of the system or using it for a little demo.
+# Navigate to the project directory:
+cd flask-portfolio
+
+# Install the required dependencies:
+```
+pip install -r requirements.txt
+```
+
+# Run the Flask application:
+```
+python app.py
+```
+
+The application should now be running locally. Open your web browser and go to http://localhost:5000 to view the portfolio website.
 
 ## Usage <a name = "usage"></a>
 
-Add notes about how to use the system.
+The portfolio website serves as a showcase of the developer's skills and projects. Customize the content by editing the templates and static files in the project. Update the `portfolio_data.json` file to include information about your projects and experiences.
+
+## Contributing
+
+If you'd like to contribute to this project, please follow the guidelines outlined in the [CONTRIBUTING.md](CONTRIBUTING.md) file.
+
+Feel free to fork the repository, make your changes, and submit a pull request. Your contributions are highly appreciated!
+
+
