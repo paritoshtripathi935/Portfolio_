@@ -2,20 +2,8 @@
 ## Images <a name="images"></a>
 
 ### Homepage
-![Homepage](screenshots/homepage.png)
+![Homepage](homepage.png)
 *Description: This is the homepage of my portfolio website, showcasing a clean and user-friendly design.*
-
-### Projects Section
-![Projects Section](screenshots/projects.png)
-*Description: A section highlighting some of the key projects with brief descriptions.*
-
-### Skills Section
-![Skills Section](screenshots/skills.png)
-*Description: A snapshot of the skills section, displaying the developer's technical proficiency.*
-
-### Contact Form
-![Contact Form](screenshots/contact_form.png)
-*Description: The contact form for easy communication with visitors.*
 
 ## Table of Contents
 
