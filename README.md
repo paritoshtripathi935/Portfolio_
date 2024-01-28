@@ -1,8 +1,6 @@
 # Project Title: Flask Portfolio Website
 ## Images <a name="images"></a>
 
-Include images or screenshots related to your portfolio website here. You can provide a brief description for each image.
-
 ### Homepage
 ![Homepage](screenshots/homepage.png)
 *Description: This is the homepage of my portfolio website, showcasing a clean and user-friendly design.*
@@ -74,7 +72,7 @@ The application should now be running locally. Open your web browser and go to h
 
 ## Usage <a name = "usage"></a>
 
-The portfolio website serves as a showcase of the developer's skills and projects. Customize the content by editing the templates and static files in the project. Update the `portfolio_data.json` file to include information about your projects and experiences.
+The portfolio website serves as a showcase of the developer's skills and projects. Customize the content by editing the templates and static files in the project. Update the `.json` files in static folder to include information about your projects and experiences.
 
 ## Contributing
 
