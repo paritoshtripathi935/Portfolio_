@@ -1,4 +1,23 @@
 # Project Title: Flask Portfolio Website
+## Images <a name="images"></a>
+
+Include images or screenshots related to your portfolio website here. You can provide a brief description for each image.
+
+### Homepage
+![Homepage](screenshots/homepage.png)
+*Description: This is the homepage of my portfolio website, showcasing a clean and user-friendly design.*
+
+### Projects Section
+![Projects Section](screenshots/projects.png)
+*Description: A section highlighting some of the key projects with brief descriptions.*
+
+### Skills Section
+![Skills Section](screenshots/skills.png)
+*Description: A snapshot of the skills section, displaying the developer's technical proficiency.*
+
+### Contact Form
+![Contact Form](screenshots/contact_form.png)
+*Description: The contact form for easy communication with visitors.*
 
 ## Table of Contents
 
@@ -33,11 +52,13 @@ Follow these steps to get the development environment up and running:
 1. Clone the repository to your local machine:
 
 ```bash
-git clone https://github.com/your-username/flask-portfolio.git
+git clone https://github.com/paritoshtripathi935/portfolio-flask
 ```
 
 # Navigate to the project directory:
+```
 cd flask-portfolio
+```
 
 # Install the required dependencies:
 ```
