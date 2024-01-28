@@ -57,6 +57,11 @@ python app.py
 ```
 
 The application should now be running locally. Open your web browser and go to http://localhost:5000 to view the portfolio website.
+## Deployment 
+
+```
+http://paritoshtripathi.pythonanywhere.com/
+```
 
 ## Usage <a name = "usage"></a>
 
