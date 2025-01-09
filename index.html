@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Paritosh Tripathi - Software Engineer & Data Magician</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="animations.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Playfair+Display:wght@400;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="loading-overlay">
+        <div class="loading-spinner"></div>
+    </div>
+
+    <div class="noise-overlay"></div>
+    
+    <header class="main-header">
+        <nav>
+            <div class="logo animate-fade-in delay-300">पारितोष त्रिपाठी</div>
+            <div class="nav-links animate-fade-in delay-400">
+                <a href="index.html" class="nav-link active">Home</a>
+                <a href="about.html" class="nav-link">about</a>
+                <a href="experience.html" class="nav-link">experience</a>
+                <a href="contact.html" class="nav-link">contact</a>
+            </div>
+        </nav>
+    </header>
+
+    <main>
+        <section class="hero">
+            <div class="background-slideshow animate-fade-in">
+                <div class="slide active">
+                    <img src="https://images.unsplash.com/photo-1548013146-72479768bada" alt="Hawa Mahal" />
+                </div>
+                <div class="slide">
+                    <img src="https://images.unsplash.com/photo-1587474260584-136574528ed5" alt="Qutub Minar" />
+                </div>
+                <div class="slide">
+                    <img src="https://images.unsplash.com/photo-1514222134-b57cbb8ce073" alt="Modern Architecture" />
+                </div>
+            </div>
+            <div class="hero-content">
+                <div class="title-container animate-slide-left delay-200">
+                    <h1>
+                        <span class="vertical-text">SOFTWARE</span>
+                        <div class="main-title">
+                            <span class="outline-text">ENGINEER</span>
+                        </div>
+                    </h1>
+                </div>
+                <div class="hero-text animate-slide-right delay-300">
+                    <p class="description">SYSTEMS SOFTWARE ENGINEER AT HEADSPIN, SPECIALIZING IN DEVICE ENGINEERING AND AUTOMATION. EXPERIENCED IN BUILDING SCALABLE CLOUD SOLUTIONS, ML SYSTEMS, AND EVENT-DRIVEN ARCHITECTURES. FORMER FOUNDING TEAM MEMBER AT ANAKIN (YC S21).</p>
+                    <div class="status">
+                        <span class="status-dot"></span>
+                        <span class="status-text">Open to interesting collaborations</span>
+                    </div>
+                </div>
+                <button class="cta-button animate-fade-in delay-400">
+                    <span class="button-text">CONTACT ME</span>
+                    <span class="button-icon">→</span>
+                </button>
+            </div>
+        </section>
+
+    </main>
+
+    <script>
+        // Loading animation
+        window.addEventListener('load', () => {
+            // Remove loading overlay
+            setTimeout(() => {
+                document.querySelector('.loading-overlay').classList.add('fade-out');
+            }, 1000);
+
+            // Trigger hero content animations
+            const heroContent = document.querySelector('.hero-content');
+            heroContent.style.visibility = 'visible';
+            
+            // Add animation classes with delays
+            setTimeout(() => {
+                document.querySelector('.title-container').classList.add('animate-slide-left', 'delay-200');
+                document.querySelector('.hero-text').classList.add('animate-slide-right', 'delay-300');
+                document.querySelector('.cta-button').classList.add('animate-fade-in', 'delay-400');
+            }, 1200);
+        });
+
+        // Slideshow functionality
+        const slides = document.querySelectorAll('.slide');
+        let currentSlide = 0;
+        
+        function showSlide(index) {
+            slides.forEach(slide => slide.classList.remove('active'));
+            slides[index].classList.add('active');
+        }
+        
+        function nextSlide() {
+            currentSlide = (currentSlide + 1) % slides.length;
+            showSlide(currentSlide);
+        }
+        
+        // Initialize slideshow
+        setInterval(nextSlide, 5000);
+        
+        // Smooth Scroll
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                document.querySelector(this.getAttribute('href')).scrollIntoView({
+                    behavior: 'smooth'
+                });
+            });
+        });
+
+        // Intersection Observer for scroll animations
+        const observerOptions = {
+            threshold: 0.2
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('animate-fade-in');
+                }
+            });
+        }, observerOptions);
+
+        // Observe elements for scroll animations
+        document.querySelectorAll('.experience-card, .achievement-card').forEach(item => {
+            observer.observe(item);
+        });
+    </script>
+</body>
+</html> 
