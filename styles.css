@@ -81,13 +81,17 @@ body {
 }
 
 .hero-content {
-    max-width: 1200px;
+    max-width: 1000px;
     width: 100%;
-    padding: 2rem;
-    background: rgba(42, 42, 42, 0.3);
-    border-radius: 20px;
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    backdrop-filter: blur(10px);
+    padding: 3rem;
+    background: linear-gradient(
+        135deg,
+        rgba(18, 18, 18, 0.8) 0%,
+        rgba(18, 18, 18, 0.6) 100%
+    );
+    border-radius: 24px;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    backdrop-filter: blur(6px);
 }
 
 * {
@@ -220,12 +224,17 @@ nav {
 .hero-content {
     position: relative;
     z-index: 2;
-    max-width: 1200px;
-    margin: 0;
-    padding: 0 2rem;
-    margin-left: 4rem;
-    visibility: visible;
-    opacity: 1;
+    max-width: 1000px;
+    margin: 0 auto; /* Center horizontally */
+    padding: 3rem;
+    background: linear-gradient(
+        135deg,
+        rgba(18, 18, 18, 0.8) 0%,
+        rgba(18, 18, 18, 0.6) 100%
+    );
+    border-radius: 24px;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    backdrop-filter: blur(6px);
 }
 
 .title-container {
@@ -285,12 +294,13 @@ h1 {
 }
 
 .description {
-    font-size: clamp(1rem, 1.5vw, 1.2rem);
-    line-height: 1.6;
-    color: var(--color-white);
-    margin-bottom: 1.5rem;
-    letter-spacing: 1px;
-    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7);
+    font-size: clamp(1rem, 1.2vw, 1.1rem);
+    line-height: 1.8;
+    color: rgba(255, 255, 255, 0.9);
+    margin-bottom: 2rem;
+    font-weight: 400;
+    max-width: 85%;
+    letter-spacing: 0.5px;
 }
 
 /* Ensure text is visible against background */
@@ -299,10 +309,6 @@ h1 {
     z-index: 2;
 }
 
-/* Add contrast to text */
-.hero-text .description {
-    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
-}
 
 .status {
     display: flex;
@@ -507,7 +513,7 @@ h1 {
 
     .hero-content {
         margin-left: 1rem;
-        padding: 0 1rem;
+        padding: 1rem;
     }
 
     .title-container {
@@ -527,4 +533,4 @@ h1 {
     .experience-card {
         padding: 1.5rem;
     }
-} 
+}
