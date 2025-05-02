@@ -1,0 +1,20 @@
+modules = ["web"]
+run = "index.html"
+
+[nix]
+channel = "stable-24_05"
+
+[deployment]
+run = ["sh", "-c", "index.html"]
+
+[workflows]
+runButton = "Run Website"
+
+[[workflows.workflow]]
+name = "Run Website"
+author = 8769028
+mode = "sequential"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "python -m http.server 5000"
