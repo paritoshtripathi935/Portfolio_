@@ -5,14 +5,16 @@
 }
 
 .about-hero {
-    height: 60vh;
+    height: 65vh;
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
     position: relative;
-    margin-bottom: 4rem;
+    margin-bottom: 5rem;
     overflow: hidden;
+    border-bottom: 1px solid rgba(255, 140, 0, 0.2);
+    box-shadow: inset 0 -100px 100px -50px rgba(0, 0, 0, 0.5);
 }
 
 .gaming-background {
@@ -105,22 +107,28 @@
 .about-title {
     font-size: clamp(3rem, 8vw, 6rem);
     font-weight: 900;
-    margin-bottom: 1rem;
+    margin-bottom: 1.5rem;
     text-transform: uppercase;
     letter-spacing: -2px;
     position: relative;
     z-index: 2;
-    text-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
+    background: linear-gradient(135deg, var(--color-white) 0%, rgba(255, 255, 255, 0.8) 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    text-shadow: none;
+    filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.5));
 }
 
 .about-subtitle {
     font-size: clamp(1rem, 2vw, 1.5rem);
     color: var(--color-saffron);
     text-transform: uppercase;
-    letter-spacing: 2px;
+    letter-spacing: 3px;
     position: relative;
     z-index: 2;
-    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+    font-weight: 600;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5), 0 0 20px rgba(255, 140, 0, 0.3);
 }
 
 .about-content {
@@ -136,14 +144,33 @@
 }
 
 .about-section {
-    margin-bottom: 2rem;
+    margin-bottom: 3rem;
+    padding: 2.5rem;
+    background: linear-gradient(
+        135deg,
+        rgba(26, 26, 26, 0.6) 0%,
+        rgba(42, 42, 42, 0.4) 100%
+    );
+    border-radius: 20px;
+    border: 1px solid rgba(255, 140, 0, 0.1);
+    backdrop-filter: blur(10px);
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: var(--shadow-sm);
+}
+
+.about-section:hover {
+    border-color: rgba(255, 140, 0, 0.25);
+    box-shadow: var(--shadow-md), 0 0 30px rgba(255, 140, 0, 0.15);
+    transform: translateY(-5px);
 }
 
 .about-section h2 {
-    font-size: 2rem;
-    margin-bottom: 1.5rem;
+    font-size: 2.2rem;
+    margin-bottom: 2rem;
     color: var(--color-saffron);
     position: relative;
+    display: inline-block;
+    font-weight: 700;
 }
 
 .about-section h2::after {
@@ -151,40 +178,80 @@
     position: absolute;
     bottom: -10px;
     left: 0;
-    width: 60px;
-    height: 4px;
-    background: var(--color-saffron);
+    width: 100%;
+    height: 3px;
+    background: linear-gradient(90deg, var(--color-saffron), transparent);
+    border-radius: 2px;
 }
 
 .about-section p {
     font-size: 1.1rem;
-    line-height: 1.6;
+    line-height: 1.8;
     color: rgba(255, 255, 255, 0.9);
+    margin-bottom: 1rem;
 }
 
 .education-item,
 .contribution-item,
-.project-item {
+.project-item,
+.expertise-item,
+.achievement-item {
     margin-bottom: 2rem;
     padding: 2rem;
-    background: rgba(255, 255, 255, 0.05);
-    border-radius: 8px;
-    transition: transform 0.3s ease;
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.08) 0%, rgba(255, 255, 255, 0.03) 100%);
+    border-radius: 16px;
+    border: 1px solid rgba(255, 140, 0, 0.15);
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    overflow: hidden;
+    box-shadow: var(--shadow-sm);
+}
+
+.education-item::before,
+.contribution-item::before,
+.project-item::before,
+.expertise-item::before,
+.achievement-item::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 4px;
+    height: 0;
+    background: linear-gradient(180deg, var(--color-saffron), var(--color-saffron-light));
+    transition: height 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .education-item:hover,
 .contribution-item:hover,
-.project-item:hover {
+.project-item:hover,
+.expertise-item:hover,
+.achievement-item:hover {
     transform: translateY(-5px);
-    background: rgba(255, 255, 255, 0.08);
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.12) 0%, rgba(255, 255, 255, 0.06) 100%);
+    border-color: rgba(255, 140, 0, 0.3);
+    box-shadow: var(--shadow-md), 0 0 20px rgba(255, 140, 0, 0.2);
+}
+
+.education-item:hover::before,
+.contribution-item:hover::before,
+.project-item:hover::before,
+.expertise-item:hover::before,
+.achievement-item:hover::before {
+    height: 100%;
 }
 
 .education-item h3,
 .contribution-item h3,
-.project-item h3 {
+.project-item h3,
+.expertise-item h3,
+.achievement-item h3 {
     font-size: 1.5rem;
-    margin-bottom: 0.5rem;
+    margin-bottom: 0.75rem;
     color: var(--color-white);
+    font-weight: 600;
+    position: relative;
+    padding-left: 1rem;
 }
 
 .education-period,
