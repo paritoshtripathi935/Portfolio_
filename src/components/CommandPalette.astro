@@ -1,0 +1,298 @@
+---
+import { site } from "../data/site";
+
+type Item = {
+  id: string;
+  title: string;
+  subtitle: string;
+  group: string;
+  href?: string;
+  action?: "copy-email" | "external" | "internal";
+  keywords?: string;
+};
+
+const items: Item[] = [
+  // Navigation
+  { id: "nav-home", title: "Home", subtitle: "Top of the page", group: "Navigation", href: "/", keywords: "top start hero" },
+  { id: "nav-work", title: "Selected work", subtitle: "Case studies", group: "Navigation", href: "/#work", keywords: "projects case studies" },
+  { id: "nav-engineering", title: "Engineering", subtitle: "What I work on by domain", group: "Navigation", href: "/#engineering" },
+  { id: "nav-timeline", title: "Timeline", subtitle: "Where I've been", group: "Navigation", href: "/#timeline", keywords: "experience companies history" },
+  { id: "nav-projects", title: "Side projects", subtitle: "GitHub repos", group: "Navigation", href: "/#projects", keywords: "github" },
+  { id: "nav-contact", title: "Contact", subtitle: "Get in touch", group: "Navigation", href: "/#contact", keywords: "email reach" },
+  // Experience
+  { id: "exp-parspec", title: "Parspec — Software Engineer II", subtitle: "Apr 2025 → Present · 43 epics", group: "Experience", href: "/experience/parspec", keywords: "current role parspec backend rest" },
+  { id: "exp-anakin", title: "Anakin (YC S21) — Software Engineer I", subtitle: "Aug 2022 → Dec 2024 · founding team", group: "Experience", href: "/experience/anakin", keywords: "yc anakin founding distributed pipeline" },
+  // Case studies
+  { id: "case-hermes", title: "Hermes", subtitle: "Per-branch ephemeral environments — Parspec", group: "Case studies", href: "/work/hermes", keywords: "ephemeral env codebuild ecs alb route53" },
+  { id: "case-inventory", title: "Inventory Service", subtitle: "Saga + per-SKU locks — Parspec", group: "Case studies", href: "/work/inventory-service", keywords: "saga dynamodb redis distributed lock" },
+  { id: "case-product-finder", title: "Product Finder", subtitle: "Soft-filtering search engine — Parspec", group: "Case studies", href: "/work/product-finder", keywords: "search elasticsearch ranking vector ml soft filter" },
+  { id: "case-compiler", title: "Generic Compiler Service", subtitle: "Config-driven data pipeline — Anakin", group: "Case studies", href: "/work/generic-compiler", keywords: "fastapi sqs jsonpath compiler pipeline" },
+  { id: "case-orchestration", title: "Android Device Orchestration & Automation Platform", subtitle: "Hybrid Pixel + Genymotion automation — Anakin", group: "Case studies", href: "/work/device-orchestration", keywords: "android frida genymotion mobile automation" },
+  // Actions
+  { id: "act-resume", title: "Open resume", subtitle: "Opens in a new tab", group: "Actions", href: site.resume, action: "external", keywords: "cv download pdf drive" },
+  { id: "act-email", title: "Copy email", subtitle: site.email, group: "Actions", action: "copy-email", keywords: "mail contact" },
+  { id: "act-mail", title: "Email me", subtitle: `mailto:${site.email}`, group: "Actions", href: `mailto:${site.email}`, action: "external", keywords: "compose contact" },
+  { id: "act-github", title: "GitHub", subtitle: "@paritoshtripathi935", group: "Actions", href: site.github, action: "external", keywords: "repos code" },
+  { id: "act-linkedin", title: "LinkedIn", subtitle: "Connect", group: "Actions", href: site.linkedin, action: "external", keywords: "linkedin profile network" },
+];
+---
+
+<button
+  id="cmdk-trigger"
+  type="button"
+  aria-label="Open command palette"
+  class="hidden md:inline-flex items-center gap-2 px-3 h-9 rounded-md border border-[var(--color-border)] hover:border-[var(--color-border-strong)] text-xs text-[var(--color-ink-muted)] hover:text-[var(--color-ink)] bg-[var(--color-surface)] transition-colors"
+>
+  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+    <circle cx="11" cy="11" r="8"></circle>
+    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+  </svg>
+  <span>Search</span>
+  <kbd class="font-mono text-[10px] px-1.5 py-0.5 rounded bg-[var(--color-surface-2)] text-[var(--color-ink-faint)] border border-[var(--color-border)]">⌘K</kbd>
+</button>
+
+<button
+  id="cmdk-trigger-mobile"
+  type="button"
+  aria-label="Open command palette"
+  class="md:hidden inline-flex items-center justify-center w-9 h-9 rounded-md border border-[var(--color-border)] text-[var(--color-ink-muted)] bg-[var(--color-surface)]"
+>
+  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+    <circle cx="11" cy="11" r="8"></circle>
+    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+  </svg>
+</button>
+
+<div
+  id="cmdk-overlay"
+  class="fixed inset-0 z-[100] hidden items-start justify-center pt-[12vh] px-4 bg-black/60 backdrop-blur-sm"
+  role="dialog"
+  aria-modal="true"
+  aria-label="Command palette"
+>
+  <div
+    id="cmdk-panel"
+    class="w-full max-w-xl rounded-2xl border border-[var(--color-border-strong)] bg-[var(--color-surface)] shadow-2xl overflow-hidden flex flex-col max-h-[70vh]"
+  >
+    <div class="flex items-center gap-3 px-4 py-3 border-b border-[var(--color-border)]">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-[var(--color-ink-faint)]" aria-hidden="true">
+        <circle cx="11" cy="11" r="8"></circle>
+        <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+      </svg>
+      <input
+        id="cmdk-input"
+        type="text"
+        autocomplete="off"
+        spellcheck="false"
+        placeholder="Type to search — pages, case studies, actions"
+        class="flex-1 bg-transparent outline-none text-[var(--color-ink)] placeholder:text-[var(--color-ink-faint)] text-sm"
+      />
+      <kbd class="font-mono text-[10px] px-1.5 py-0.5 rounded bg-[var(--color-surface-2)] text-[var(--color-ink-faint)] border border-[var(--color-border)]">esc</kbd>
+    </div>
+
+    <div id="cmdk-results" class="flex-1 overflow-y-auto py-2"></div>
+
+    <div class="flex items-center justify-between px-4 py-2 border-t border-[var(--color-border)] text-[10px] font-mono text-[var(--color-ink-faint)] uppercase tracking-wider">
+      <span class="flex items-center gap-3">
+        <span class="flex items-center gap-1"><kbd class="px-1 rounded bg-[var(--color-surface-2)] border border-[var(--color-border)]">↑↓</kbd> nav</span>
+        <span class="flex items-center gap-1"><kbd class="px-1 rounded bg-[var(--color-surface-2)] border border-[var(--color-border)]">↵</kbd> select</span>
+      </span>
+      <span id="cmdk-toast" class="text-[var(--color-saffron)] hidden">copied</span>
+    </div>
+  </div>
+</div>
+
+<script is:inline define:vars={{ items }}>
+  const setupCmdk = (items) => {
+    const overlay = document.getElementById("cmdk-overlay");
+    const panel = document.getElementById("cmdk-panel");
+    const input = document.getElementById("cmdk-input");
+    const list = document.getElementById("cmdk-results");
+    const toast = document.getElementById("cmdk-toast");
+    const triggers = [
+      document.getElementById("cmdk-trigger"),
+      document.getElementById("cmdk-trigger-mobile"),
+    ].filter(Boolean);
+
+    if (!overlay || !panel || !input || !list) return;
+    if (overlay.dataset.bound === "1") return;
+    overlay.dataset.bound = "1";
+
+    let open = false;
+    let active = 0;
+    let filtered = items.slice();
+
+    const score = (item, q) => {
+      if (!q) return 1;
+      const hay = (
+        item.title +
+        " " +
+        item.subtitle +
+        " " +
+        item.group +
+        " " +
+        (item.keywords || "")
+      ).toLowerCase();
+      const tokens = q.toLowerCase().split(/\s+/).filter(Boolean);
+      let s = 0;
+      for (const t of tokens) {
+        const idx = hay.indexOf(t);
+        if (idx === -1) return 0;
+        s += idx === 0 ? 4 : hay[idx - 1] === " " ? 2 : 1;
+      }
+      if (item.title.toLowerCase().startsWith(q.toLowerCase())) s += 6;
+      return s;
+    };
+
+    const render = () => {
+      list.innerHTML = "";
+      if (filtered.length === 0) {
+        const empty = document.createElement("div");
+        empty.className = "px-4 py-8 text-center text-sm text-[var(--color-ink-faint)]";
+        empty.textContent = "No matches.";
+        list.appendChild(empty);
+        return;
+      }
+      let lastGroup = "";
+      filtered.forEach((item, i) => {
+        if (item.group !== lastGroup) {
+          lastGroup = item.group;
+          const h = document.createElement("div");
+          h.className =
+            "px-4 pt-3 pb-1 font-mono text-[10px] uppercase tracking-wider text-[var(--color-ink-faint)]";
+          h.textContent = item.group;
+          list.appendChild(h);
+        }
+        const row = document.createElement("button");
+        row.type = "button";
+        row.dataset.index = String(i);
+        row.className =
+          "w-full flex items-center justify-between gap-3 px-4 py-2.5 text-left transition-colors " +
+          (i === active
+            ? "bg-[var(--color-surface-2)] text-[var(--color-ink)]"
+            : "text-[var(--color-ink-muted)] hover:bg-[var(--color-surface-2)]");
+        row.innerHTML = `
+          <div class="min-w-0 flex-1">
+            <div class="text-sm truncate ${i === active ? "text-[var(--color-saffron)]" : ""}">${item.title}</div>
+            <div class="text-xs text-[var(--color-ink-faint)] truncate">${item.subtitle}</div>
+          </div>
+          <span class="font-mono text-[10px] text-[var(--color-ink-faint)] shrink-0">↵</span>
+        `;
+        row.addEventListener("click", () => execute(i));
+        row.addEventListener("mousemove", () => {
+          if (active !== i) {
+            active = i;
+            render();
+          }
+        });
+        list.appendChild(row);
+      });
+    };
+
+    const filter = (q) => {
+      filtered = items
+        .map((it) => ({ it, s: score(it, q) }))
+        .filter((x) => x.s > 0)
+        .sort((a, b) => b.s - a.s)
+        .map((x) => x.it);
+      active = 0;
+      render();
+    };
+
+    const showToast = (msg) => {
+      if (!toast) return;
+      toast.textContent = msg;
+      toast.classList.remove("hidden");
+      setTimeout(() => toast.classList.add("hidden"), 1400);
+    };
+
+    const execute = async (i) => {
+      const item = filtered[i];
+      if (!item) return;
+      if (item.action === "copy-email") {
+        try {
+          await navigator.clipboard.writeText(item.subtitle);
+          showToast("copied");
+          setTimeout(close, 600);
+        } catch {
+          showToast("copy failed");
+        }
+        return;
+      }
+      if (item.href) {
+        if (item.action === "external") {
+          window.open(item.href, "_blank", "noopener");
+        } else {
+          window.location.href = item.href;
+        }
+        close();
+      }
+    };
+
+    const openPalette = () => {
+      open = true;
+      overlay.classList.remove("hidden");
+      overlay.classList.add("flex");
+      input.value = "";
+      filter("");
+      requestAnimationFrame(() => input.focus());
+    };
+    const close = () => {
+      open = false;
+      overlay.classList.add("hidden");
+      overlay.classList.remove("flex");
+    };
+
+    triggers.forEach((t) => t.addEventListener("click", openPalette));
+
+    document.addEventListener("keydown", (e) => {
+      const isMac = navigator.platform.toLowerCase().includes("mac");
+      const cmd = isMac ? e.metaKey : e.ctrlKey;
+      if (cmd && e.key.toLowerCase() === "k") {
+        e.preventDefault();
+        open ? close() : openPalette();
+        return;
+      }
+      if (!open) return;
+      if (e.key === "Escape") {
+        e.preventDefault();
+        close();
+      } else if (e.key === "ArrowDown") {
+        e.preventDefault();
+        active = Math.min(active + 1, filtered.length - 1);
+        render();
+        scrollActive();
+      } else if (e.key === "ArrowUp") {
+        e.preventDefault();
+        active = Math.max(active - 1, 0);
+        render();
+        scrollActive();
+      } else if (e.key === "Enter") {
+        e.preventDefault();
+        execute(active);
+      }
+    });
+
+    const scrollActive = () => {
+      const row = list.querySelector(`button[data-index="${active}"]`);
+      if (row && typeof row.scrollIntoView === "function") {
+        row.scrollIntoView({ block: "nearest" });
+      }
+    };
+
+    overlay.addEventListener("click", (e) => {
+      if (e.target === overlay) close();
+    });
+
+    input.addEventListener("input", (e) => {
+      filter(e.target.value);
+    });
+  };
+
+  if (!window.__cmdkBound) {
+    window.__cmdkBound = true;
+    window.__cmdkItems = items;
+    document.addEventListener("astro:page-load", () => setupCmdk(window.__cmdkItems));
+  }
+  setupCmdk(window.__cmdkItems || items);
+</script>

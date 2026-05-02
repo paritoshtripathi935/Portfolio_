@@ -1,0 +1,228 @@
+---
+import Base from "../../layouts/Base.astro";
+import CaseStudyHeader from "../../components/CaseStudyHeader.astro";
+import CaseStudyTOC from "../../components/CaseStudyTOC.astro";
+import BarChart from "../../components/charts/BarChart.astro";
+import ArchDiagram from "../../components/charts/ArchDiagram.astro";
+
+const tocItems = [
+  { id: "problem", label: "The problem" },
+  { id: "architecture", label: "Architecture" },
+  { id: "decisions", label: "Three core decisions" },
+  { id: "production", label: "What it ran in 12 months" },
+  { id: "rebuilds", label: "Rebuild distribution" },
+  { id: "stack", label: "Stack" },
+];
+
+const rebuildDistribution = [
+  { label: "1 rebuild", value: "81 envs · 50%", fill: 81 / 81 },
+  { label: "2–5 rebuilds", value: "32 envs · 20%", fill: 32 / 81 },
+  { label: "6–20 rebuilds", value: "33 envs · 21%", fill: 33 / 81 },
+  { label: "20+ rebuilds", value: "15 envs · 9%", fill: 15 / 81, accent: true },
+];
+
+const buildTime = [
+  { label: "Average", value: "3.8 min", fill: 3.8 / 4.8 },
+  { label: "p95", value: "4.8 min", fill: 4.8 / 4.8, accent: true },
+];
+
+const stats = [
+  { value: "1,567", label: "image builds" },
+  { value: "98.5%", label: "build success" },
+  { value: "88.1%", label: "end-to-end" },
+  { value: "7×", label: "DAU growth" },
+];
+
+const pipeline = [
+  { step: "1", name: "Clone", detail: "Repo clone with on-disk cache to skip cold checkouts." },
+  { step: "2", name: "Build", detail: "AWS CodeBuild kicks off a Docker image build, tagged with the env-specific IMAGE_TAG." },
+  { step: "3", name: "Push", detail: "Image goes to ECR; cleanup keeps the repo from drifting." },
+  { step: "4", name: "Run", detail: "ECS Fargate task spins up with the freshly built image." },
+  { step: "5", name: "Route", detail: "ALB host-header routing rule attached to a shared listener — no per-env load balancer." },
+  { step: "6", name: "DNS", detail: "Route53 record created (or updated in place) to keep the URL stable." },
+  { step: "7", name: "Track", detail: "Lifecycle row in Postgres with stage timestamps. Survives process restarts." },
+  { step: "8", name: "Reconcile", detail: "Background loop polls ECS state every 30s and reconciles the DB." },
+];
+---
+
+<Base
+  title="Hermes — per-branch ephemeral environments · Paritosh Tripathi"
+  description="Architecture and metrics for Hermes, the FastAPI control-plane service that provisions per-branch ephemeral environments on AWS in under 4 minutes."
+>
+  <CaseStudyHeader
+    slug="hermes"
+    eyebrow="Apr 2025 → Apr 2026 · Production"
+    title="Hermes"
+    blurb="A FastAPI control-plane service that provisions per-branch ephemeral environments on AWS — clone to live URL in under four minutes, host-header routed on a shared ALB."
+    stats={stats}
+  />
+
+  <CaseStudyTOC items={tocItems} />
+  <article class="max-w-4xl mx-auto px-6 prose-invert">
+    <h2 id="problem">The problem</h2>
+    <p>
+      Engineers were spending hours per branch wiring up an AWS-side environment to test their PR. The team had ~14 active developers; the queue was a meeting, not a system. Hermes turned the entire flow into a self-service API call: push to a PR, get back a stable URL.
+    </p>
+
+    <h2 id="architecture">Architecture</h2>
+    <p>
+      Hermes is a control-plane service — it doesn't serve user traffic, it orchestrates AWS resources. One FastAPI process, one Postgres database, and a reconciliation loop holding it all together.
+    </p>
+
+    <ArchDiagram
+      title="Provisioning pipeline · 8 stages"
+      caption="Each stage is idempotent. Failure at any step leaves the system in a state the reconciler can recover from on the next pass."
+    >
+      <svg viewBox="0 0 920 320" class="w-full h-auto" role="img" aria-label="Hermes architecture">
+        <style>
+          .h-node { fill: #1a1a1a; stroke: rgba(255,255,255,0.12); }
+          .h-node-accent { fill: #1a1a1a; stroke: #ff8c00; }
+          .h-store { fill: #121212; stroke: rgba(80,227,194,0.35); }
+          .h-label { fill: #ededed; font: 500 12px "JetBrains Mono", ui-monospace, monospace; }
+          .h-sub { fill: rgba(237,237,237,0.55); font: 400 10px "JetBrains Mono", ui-monospace, monospace; }
+          .h-arrow { stroke: rgba(255,255,255,0.25); stroke-width: 1.5; fill: none; }
+          .h-arrow-accent { stroke: #ff8c00; stroke-width: 1.5; fill: none; stroke-dasharray: 4 4; }
+        </style>
+        <defs>
+          <marker id="h-ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+            <path d="M0,0 L10,5 L0,10 z" fill="rgba(255,255,255,0.4)"></path>
+          </marker>
+          <marker id="h-ah-saf" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+            <path d="M0,0 L10,5 L0,10 z" fill="#ff8c00"></path>
+          </marker>
+        </defs>
+
+        <rect x="20" y="20" width="120" height="50" rx="8" class="h-node" />
+        <text x="80" y="42" text-anchor="middle" class="h-label">PR push</text>
+        <text x="80" y="58" text-anchor="middle" class="h-sub">github webhook</text>
+
+        <rect x="170" y="20" width="140" height="50" rx="8" class="h-node-accent" />
+        <text x="240" y="42" text-anchor="middle" class="h-label">Hermes API</text>
+        <text x="240" y="58" text-anchor="middle" class="h-sub">FastAPI · ECS</text>
+
+        <rect x="340" y="20" width="120" height="50" rx="8" class="h-node" />
+        <text x="400" y="42" text-anchor="middle" class="h-label">CodeBuild</text>
+        <text x="400" y="58" text-anchor="middle" class="h-sub">docker build</text>
+
+        <rect x="490" y="20" width="100" height="50" rx="8" class="h-node" />
+        <text x="540" y="42" text-anchor="middle" class="h-label">ECR</text>
+        <text x="540" y="58" text-anchor="middle" class="h-sub">image push</text>
+
+        <rect x="620" y="20" width="140" height="50" rx="8" class="h-node" />
+        <text x="690" y="42" text-anchor="middle" class="h-label">ECS Fargate</text>
+        <text x="690" y="58" text-anchor="middle" class="h-sub">task started</text>
+
+        <rect x="170" y="120" width="140" height="50" rx="8" class="h-node-accent" />
+        <text x="240" y="142" text-anchor="middle" class="h-label">ALB rule</text>
+        <text x="240" y="158" text-anchor="middle" class="h-sub">host-header routing</text>
+
+        <rect x="340" y="120" width="120" height="50" rx="8" class="h-node" />
+        <text x="400" y="142" text-anchor="middle" class="h-label">Route53</text>
+        <text x="400" y="158" text-anchor="middle" class="h-sub">stable DNS</text>
+
+        <rect x="490" y="120" width="270" height="50" rx="8" class="h-node" />
+        <text x="625" y="142" text-anchor="middle" class="h-label">{`{env}.dev.parspec.xyz`}</text>
+        <text x="625" y="158" text-anchor="middle" class="h-sub">URL stable across re-creates</text>
+
+        <rect x="170" y="220" width="200" height="60" rx="8" class="h-store" />
+        <text x="270" y="246" text-anchor="middle" class="h-label">Postgres</text>
+        <text x="270" y="262" text-anchor="middle" class="h-sub">lifecycle state · 30s reconciler</text>
+
+        <rect x="400" y="220" width="200" height="60" rx="8" class="h-store" />
+        <text x="500" y="246" text-anchor="middle" class="h-label">Secrets Manager</text>
+        <text x="500" y="262" text-anchor="middle" class="h-sub">per-env secrets</text>
+
+        <rect x="630" y="220" width="200" height="60" rx="8" class="h-store" />
+        <text x="730" y="246" text-anchor="middle" class="h-label">CloudWatch</text>
+        <text x="730" y="262" text-anchor="middle" class="h-sub">build · runtime metrics</text>
+
+        <path class="h-arrow" marker-end="url(#h-ah)" d="M140 45 L170 45" />
+        <path class="h-arrow" marker-end="url(#h-ah)" d="M310 45 L340 45" />
+        <path class="h-arrow" marker-end="url(#h-ah)" d="M460 45 L490 45" />
+        <path class="h-arrow" marker-end="url(#h-ah)" d="M590 45 L620 45" />
+        <path class="h-arrow-accent" marker-end="url(#h-ah-saf)" d="M240 70 L240 120" />
+        <path class="h-arrow" marker-end="url(#h-ah)" d="M310 145 L340 145" />
+        <path class="h-arrow" marker-end="url(#h-ah)" d="M460 145 L490 145" />
+        <path class="h-arrow-accent" marker-end="url(#h-ah-saf)" d="M240 170 L240 220 L270 220" />
+      </svg>
+    </ArchDiagram>
+
+    <div class="my-8 rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] p-6 not-prose">
+      <div class="font-mono text-xs uppercase tracking-wider text-[var(--color-ink-faint)] mb-4">
+        Stage by stage
+      </div>
+      <ol class="space-y-3">
+        {
+          pipeline.map((p) => (
+            <li class="flex gap-4">
+              <span class="font-mono text-xs text-[var(--color-saffron)] w-6 shrink-0 pt-1">{p.step}</span>
+              <div>
+                <div class="font-mono text-sm text-[var(--color-ink)]">{p.name}</div>
+                <div class="text-sm text-[var(--color-ink-muted)] leading-relaxed">{p.detail}</div>
+              </div>
+            </li>
+          ))
+        }
+      </ol>
+    </div>
+
+    <h2 id="decisions">Three Core Decisions</h2>
+
+    <h3>1. Host-header routing on a shared ALB, not one ALB per env</h3>
+    <p>
+      The naive design is one ALB per environment. That's clean but the cost is linear in env count — at 14 developers iterating you're paying for ~30 ALBs at any given moment. Hermes uses a single shared ALB with one listener and a host-header rule per environment. Cost is essentially flat in env count; latency is unchanged.
+    </p>
+
+    <h3>2. URL stability across re-creates</h3>
+    <p>
+      A PR is iterative. The most-iterated environment in the dataset absorbed <strong>222 rebuilds at 100% success</strong> over its lifetime. If every rebuild churned a new URL, every Jira link and reviewer bookmark would rot.
+    </p>
+    <p>
+      So Hermes detects existing ALB rules and Route53 records on collision and updates them in place. <code>{`{env}.dev.parspec.xyz`}</code> stays valid across the full PR lifecycle. This single design call is what made 9.7 average rebuilds per env (p95 37, peak 222) practical instead of chaos.
+    </p>
+
+    <h3>3. Reconciliation loop survives process restarts</h3>
+    <p>
+      The in-memory <code>active_deployments</code> dict is fast but volatile. Postgres is the durable record, and an <code>EnvironmentMonitor</code> boot scan plus a <code>TaskLifecycleService</code> reconciler that polls ECS every 30s closes the gap. Restart Hermes and lifecycle tracking picks up exactly where it left off — no orphan tasks, no leaked routing rules.
+    </p>
+
+    <h2 id="production">What it ran in 12 months</h2>
+    <ul>
+      <li><strong>135</strong> environments fully provisioned end-to-end (DB-tracked, post-cleanup) over <strong>161</strong> envs that ever ran a build.</li>
+      <li><strong>1,567</strong> CodeBuild image builds — average <strong>9.7 rebuilds per env</strong>, p95 <strong>37</strong>, peak <strong>222</strong> on a single env.</li>
+      <li><strong>98.5%</strong> image-build success across all 1,567 builds.</li>
+      <li><strong>88.1%</strong> end-to-end provisioning success across the 8-stage pipeline.</li>
+      <li><strong>29</strong> unique developers; <strong>73</strong> unique branches; <strong>66</strong> Jira tickets accelerated.</li>
+      <li><strong>93.3%</strong> of provisioned environments linked back to a Jira ticket.</li>
+      <li>Monthly active developers: 2 (Sep 2025) → 14 (Apr 2026) — <strong>7×</strong> growth.</li>
+      <li>Conservatively, <strong>~270 dev-hours saved</strong> at 2h/env.</li>
+    </ul>
+
+    <BarChart
+      title="Build time"
+      rows={buildTime}
+      caption="Devs aren't blocked waiting for env spin-up. p95 stays close to the mean — no fat tail."
+    />
+
+    <h2 id="rebuilds">Rebuild distribution</h2>
+    <p>
+      Half the envs are one-shot. A third rebuild 6–20 times. Fifteen rebuild more than 20 times. That long tail is the proof that the system absorbs real iterative dev workflows — not just demos that get spun up once for a screenshot.
+    </p>
+
+    <BarChart
+      title="Rebuild distribution across 161 envs"
+      rows={rebuildDistribution}
+      caption="The 20+ bucket includes the most-iterated environment, which absorbed 222 rebuilds at 100% success."
+    />
+
+    <h2 id="stack">Stack</h2>
+    <ul>
+      <li>FastAPI control plane, Postgres for lifecycle state</li>
+      <li>AWS CodeBuild for image builds, ECR for storage</li>
+      <li>ECS Fargate for runtime, shared ALB with host-header routing</li>
+      <li>Route53 for stable per-env DNS</li>
+      <li>Secrets Manager for per-env secrets</li>
+      <li>CloudWatch for build/runtime metrics</li>
+    </ul>
+  </article>
+</Base>

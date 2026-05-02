@@ -1,0 +1,79 @@
+---
+import SectionHeader from "./SectionHeader.astro";
+import { experience } from "../data/experience";
+---
+
+<section id="timeline" class="max-w-6xl mx-auto px-6 py-24 scroll-mt-20">
+  <SectionHeader
+    eyebrow="Timeline"
+    title="Where I've been"
+    blurb="Click a role for the full writeup — bullets, stack, and the case studies it produced."
+  />
+
+  <div class="relative">
+    <div
+      class="flex gap-5 overflow-x-auto snap-x snap-mandatory pb-6 -mx-6 px-6 scroll-smooth"
+      style="scrollbar-width: thin;"
+    >
+      {
+        experience.map((x) => (
+          <a
+            href={`/experience/${x.slug}`}
+            class="spotlight reveal group snap-start shrink-0 w-[88%] md:w-[460px] rounded-2xl border border-[var(--color-border)] hover:border-[var(--color-border-strong)] bg-[var(--color-surface)] p-6 md:p-7 transition-colors block"
+          >
+            <div class="flex items-center justify-between gap-4">
+              <div
+                class="font-mono text-[11px] uppercase tracking-wider text-[var(--color-ink-faint)]"
+                transition:name={`exp-${x.slug}-period`}
+              >
+                {x.period}
+              </div>
+              {x.current && (
+                <span class="font-mono text-[10px] uppercase tracking-wider text-[var(--color-saffron)] border border-[var(--color-saffron)] rounded-full px-2 py-0.5">
+                  current
+                </span>
+              )}
+            </div>
+            <h3
+              class="mt-3 font-serif text-2xl text-[var(--color-ink)] group-hover:text-[var(--color-saffron)] transition-colors"
+              transition:name={`exp-${x.slug}-role`}
+            >
+              {x.role}
+            </h3>
+            <div
+              class="text-[var(--color-saffron)] font-medium"
+              transition:name={`exp-${x.slug}-company`}
+            >
+              {x.company}
+            </div>
+
+            <ul class="mt-5 space-y-2.5">
+              {x.bullets.slice(0, 4).map((b) => (
+                <li class="text-sm text-[var(--color-ink-muted)] leading-relaxed pl-4 relative before:content-['→'] before:absolute before:left-0 before:text-[var(--color-saffron)]/70">
+                  {b}
+                </li>
+              ))}
+            </ul>
+
+            <div class="mt-5 flex flex-wrap gap-1.5">
+              {x.stack.map((s) => (
+                <span class="font-mono text-[10px] px-1.5 py-0.5 rounded border border-[var(--color-border)] text-[var(--color-ink-muted)]">
+                  {s}
+                </span>
+              ))}
+            </div>
+
+            <div class="mt-5 inline-flex items-center gap-2 text-xs font-mono text-[var(--color-ink-muted)] group-hover:text-[var(--color-saffron)] transition-colors">
+              Read full writeup
+              <span class="transition-transform group-hover:translate-x-1">→</span>
+            </div>
+          </a>
+        ))
+      }
+    </div>
+
+    <div class="mt-2 flex items-center gap-2 text-xs font-mono text-[var(--color-ink-faint)]">
+      <span>← scroll →</span>
+    </div>
+  </div>
+</section>

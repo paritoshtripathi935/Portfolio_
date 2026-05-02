@@ -1,0 +1,73 @@
+---
+type Item = { id: string; label: string };
+type Props = {
+  items: Item[];
+};
+
+const { items } = Astro.props;
+---
+
+<nav
+  id="case-toc"
+  aria-label="Case study sections"
+  class="hidden xl:block fixed left-6 top-1/2 -translate-y-1/2 z-40 max-h-[70vh] overflow-y-auto pr-2"
+>
+  <div class="font-mono text-[10px] uppercase tracking-[0.2em] text-[var(--color-saffron)] mb-3">
+    On this page
+  </div>
+  <ul class="space-y-2 border-l border-[var(--color-border)]">
+    {
+      items.map((it) => (
+        <li>
+          <a
+            href={`#${it.id}`}
+            data-toc-link={it.id}
+            class="block pl-3 -ml-px border-l border-transparent text-xs leading-snug text-[var(--color-ink-muted)] hover:text-[var(--color-ink)] transition-colors max-w-[200px]"
+          >
+            {it.label}
+          </a>
+        </li>
+      ))
+    }
+  </ul>
+</nav>
+
+<script is:inline>
+  const setupCaseToc = () => {
+    const links = document.querySelectorAll<HTMLAnchorElement>("[data-toc-link]");
+    if (!links.length) return;
+    const targets = Array.from(links)
+      .map((l) => document.getElementById(l.dataset.tocLink!))
+      .filter((el): el is HTMLElement => !!el);
+    if (!targets.length) return;
+
+    const setActive = (id: string) => {
+      links.forEach((l) => {
+        const isActive = l.dataset.tocLink === id;
+        l.classList.toggle("text-[var(--color-saffron)]", isActive);
+        l.classList.toggle("font-medium", isActive);
+        l.classList.toggle("border-[var(--color-saffron)]", isActive);
+        l.classList.toggle("text-[var(--color-ink-muted)]", !isActive);
+      });
+    };
+
+    let active = "";
+    const onScroll = () => {
+      const y = window.scrollY + 120;
+      let current = targets[0].id;
+      for (const t of targets) {
+        if (t.offsetTop <= y) current = t.id;
+        else break;
+      }
+      if (current !== active) {
+        active = current;
+        setActive(current);
+      }
+    };
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+  };
+
+  setupCaseToc();
+  document.addEventListener("astro:page-load", setupCaseToc);
+</script>

@@ -1,0 +1,355 @@
+---
+import { site } from "../data/site";
+
+const filesystem = {
+  "about.md": [
+    "Backend / distributed systems engineer based in Bangalore.",
+    "",
+    "Currently Software Engineer II at Parspec (the platform that distributors and",
+    "electrical contractors use to quote, submit, and fulfill construction projects).",
+    "Owned 43 epics in 12 months across REST APIs, ERP integrations, search, security,",
+    "performance, async infra, and order management.",
+    "",
+    "Before Parspec — founding-team Software Engineer I at Anakin (YC S21).",
+    "Built a 150 GB/day pipeline and an Android device-orchestration platform from",
+    "scratch, plus reusable microservice patterns adopted by 6 teams.",
+    "",
+    "Type 'ls work' to see specific projects, or 'help' for the full command list.",
+  ],
+  "skills.txt": [
+    "Languages    : Python · Go · Java · TypeScript · SQL",
+    "Frameworks   : FastAPI · Django · DRF · gRPC",
+    "Cloud        : AWS (ECS · SQS · S3 · EventBridge · RDS Aurora · CodeBuild)",
+    "Datastores   : DynamoDB · PostgreSQL · MongoDB · Redis · OpenSearch · BigQuery",
+    "Infra        : Docker · Kubernetes · Jenkins",
+    "Observability: CloudWatch · Grafana · Looker Studio",
+    "RE Tooling   : Frida · JADX · mitmproxy · HTTP Toolkit",
+    "Concepts     : Distributed Systems · Event-Driven · Sagas · HA",
+  ],
+  "contact.md": [
+    `email     : ${site.email}`,
+    `github    : ${site.github}`,
+    `linkedin  : ${site.linkedin}`,
+    "status    : open to interesting collaborations",
+    "",
+    "Type 'email' to compose, or 'open <link>' to jump.",
+  ],
+};
+
+const work = [
+  { name: "hermes", path: "/work/hermes", desc: "per-branch ephemeral environments" },
+  { name: "inventory-service", path: "/work/inventory-service", desc: "saga + per-SKU locks" },
+  { name: "generic-compiler", path: "/work/generic-compiler", desc: "config-driven data pipeline" },
+  { name: "device-orchestration", path: "/work/device-orchestration", desc: "android automation platform" },
+];
+
+const externals = {
+  resume: { href: site.resume, label: "resume" },
+  github: { href: site.github, label: "github" },
+  linkedin: { href: site.linkedin, label: "linkedin" },
+  email: { href: `mailto:${site.email}`, label: "email" },
+};
+---
+
+<div class="reveal mt-8 mb-10 rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] overflow-hidden font-mono text-sm shadow-lg">
+  <!-- Window chrome -->
+  <div class="flex items-center gap-2 px-3 py-2 border-b border-[var(--color-border)] bg-[var(--color-surface-2)]">
+    <span class="flex gap-1.5">
+      <span class="w-2.5 h-2.5 rounded-full bg-[#ff5f57]"></span>
+      <span class="w-2.5 h-2.5 rounded-full bg-[#febc2e]"></span>
+      <span class="w-2.5 h-2.5 rounded-full bg-[#28c840]"></span>
+    </span>
+    <span class="ml-2 text-[11px] text-[var(--color-ink-faint)]">paritosh@portfolio · ~</span>
+    <span class="ml-auto text-[10px] text-[var(--color-ink-faint)] hidden sm:inline">type 'help'</span>
+  </div>
+
+  <!-- Body -->
+  <div
+    id="term-body"
+    class="p-4 max-h-[280px] overflow-y-auto cursor-text leading-relaxed"
+  >
+    <div id="term-output"></div>
+    <div class="flex items-baseline gap-2">
+      <span class="text-[var(--color-saffron)] shrink-0">~ $</span>
+      <input
+        id="term-input"
+        type="text"
+        autocomplete="off"
+        autocapitalize="off"
+        spellcheck="false"
+        class="flex-1 bg-transparent outline-none text-[var(--color-ink)] caret-[var(--color-saffron)]"
+        aria-label="Terminal command input"
+      />
+    </div>
+  </div>
+</div>
+
+<script is:inline define:vars={{ filesystem, work, externals, site }}>
+  const setupTerminal = () => {
+    const body = document.getElementById("term-body");
+    const out = document.getElementById("term-output");
+    const input = document.getElementById("term-input");
+    if (!body || !out || !input) return;
+    if (body.dataset.bound === "1") return;
+    body.dataset.bound = "1";
+
+    const history = [];
+    let histIdx = -1;
+
+    const esc = (s) =>
+      String(s).replace(/[&<>"']/g, (c) => ({
+        "&": "&amp;",
+        "<": "&lt;",
+        ">": "&gt;",
+        '"': "&quot;",
+        "'": "&#39;",
+      })[c]);
+
+    const print = (html) => {
+      const div = document.createElement("div");
+      div.innerHTML = html;
+      out.appendChild(div);
+      body.scrollTop = body.scrollHeight;
+    };
+
+    const printPrompt = (cmd) => {
+      print(`<div><span class="text-[var(--color-saffron)]">~ $</span> <span>${esc(cmd)}</span></div>`);
+    };
+
+    const printLines = (lines) => {
+      const html = lines.map((l) => `<div>${esc(l) || "&nbsp;"}</div>`).join("");
+      print(`<div class="text-[var(--color-ink-muted)]">${html}</div>`);
+    };
+
+    const error = (msg) => {
+      print(`<div class="text-[#ff6b6b]">${esc(msg)}</div>`);
+    };
+
+    const ok = (msg) => {
+      print(`<div class="text-[var(--color-ink-muted)]">${esc(msg)}</div>`);
+    };
+
+    const link = (label, href, external = true) =>
+      `<a href="${href}" ${external ? 'target="_blank" rel="noopener"' : ""} class="text-[var(--color-saffron)] underline decoration-dotted underline-offset-2 hover:text-[var(--color-saffron-light)]">${esc(label)}</a>`;
+
+    const help = [
+      ["help", "show this list"],
+      ["whoami", "who is paritosh"],
+      ["ls [work|projects|.]", "list things"],
+      ["cat <file>", "read about.md, skills.txt, contact.md"],
+      ["open <name>", "open a case study, resume, github, linkedin, email"],
+      ["resume", "open resume in a new tab"],
+      ["email", "compose email"],
+      ["clear", "clear the screen"],
+    ];
+
+    const printHelp = () => {
+      const html = help
+        .map(
+          ([cmd, desc]) =>
+            `<div class="grid grid-cols-[1fr_2fr] gap-3"><span class="text-[var(--color-saffron)]">${esc(cmd)}</span><span class="text-[var(--color-ink-muted)]">${esc(desc)}</span></div>`,
+        )
+        .join("");
+      print(html);
+    };
+
+    const printWhoami = () => {
+      printLines([
+        "Paritosh Tripathi · Software Engineer II at Parspec",
+        "Backend / distributed systems · Python · Go · AWS",
+        "Previously founding team at Anakin (YC S21).",
+        "",
+        "Try: 'ls work', 'cat about.md', 'help'",
+      ]);
+    };
+
+    const printLs = (arg) => {
+      const target = (arg || ".").trim();
+      if (target === "work" || target === "work/") {
+        const html = work
+          .map(
+            (w) =>
+              `<div class="grid grid-cols-[180px_1fr] gap-3"><span>${link(w.name, w.path, false)}</span><span class="text-[var(--color-ink-faint)]">${esc(w.desc)}</span></div>`,
+          )
+          .join("");
+        print(html);
+        return;
+      }
+      if (target === "projects" || target === "projects/") {
+        ok("Side projects live on the home page — try 'open github' or scroll to /#projects.");
+        return;
+      }
+      if (target === "." || target === "/" || target === "~") {
+        printLines([
+          "about.md     skills.txt    contact.md",
+          "work/        projects/     resume.pdf",
+        ]);
+        return;
+      }
+      error(`ls: ${target}: No such directory`);
+    };
+
+    const printCat = (arg) => {
+      if (!arg) {
+        error("cat: missing operand. try 'cat about.md'");
+        return;
+      }
+      const file = arg.trim();
+      if (filesystem[file]) {
+        printLines(filesystem[file]);
+        return;
+      }
+      if (file === "resume.pdf") {
+        ok("resume.pdf is binary. try 'open resume' to view it.");
+        return;
+      }
+      error(`cat: ${file}: No such file`);
+    };
+
+    const openTarget = (arg) => {
+      if (!arg) {
+        error("open: missing operand. try 'open hermes' or 'open github'");
+        return;
+      }
+      const q = arg.trim().toLowerCase();
+      // Externals
+      if (q === "resume" || q === "resume.pdf") {
+        ok("opening resume …");
+        window.open(externals.resume.href, "_blank", "noopener");
+        return;
+      }
+      if (externals[q]) {
+        ok(`opening ${externals[q].label} …`);
+        window.open(externals[q].href, q === "email" ? "_self" : "_blank", "noopener");
+        return;
+      }
+      // Case studies — exact then fuzzy
+      const exact = work.find((w) => w.name === q);
+      if (exact) {
+        ok(`opening ${exact.name} …`);
+        window.location.href = exact.path;
+        return;
+      }
+      const partial = work.find((w) => w.name.includes(q) || q.includes(w.name.split("-")[0]));
+      if (partial) {
+        ok(`opening ${partial.name} …`);
+        window.location.href = partial.path;
+        return;
+      }
+      error(`open: '${arg}' not found. try 'ls work' or 'help'`);
+    };
+
+    const run = (raw) => {
+      const cmd = raw.trim();
+      if (!cmd) return;
+      printPrompt(cmd);
+      history.push(cmd);
+      histIdx = history.length;
+      const [head, ...rest] = cmd.split(/\s+/);
+      const arg = rest.join(" ");
+      switch (head.toLowerCase()) {
+        case "help":
+        case "?":
+          printHelp();
+          break;
+        case "whoami":
+          printWhoami();
+          break;
+        case "ls":
+        case "dir":
+          printLs(arg);
+          break;
+        case "cat":
+        case "less":
+        case "more":
+          printCat(arg);
+          break;
+        case "open":
+        case "xdg-open":
+        case "start":
+          openTarget(arg);
+          break;
+        case "resume":
+        case "cv":
+          openTarget("resume");
+          break;
+        case "email":
+        case "mail":
+          openTarget("email");
+          break;
+        case "github":
+          openTarget("github");
+          break;
+        case "linkedin":
+          openTarget("linkedin");
+          break;
+        case "clear":
+        case "cls":
+          out.innerHTML = "";
+          break;
+        case "echo":
+          ok(arg);
+          break;
+        case "date":
+          ok(new Date().toString());
+          break;
+        case "pwd":
+          ok("/home/paritosh");
+          break;
+        case "exit":
+        case "quit":
+          ok("nice try. you can't quit this one.");
+          break;
+        case "sudo":
+          error("paritosh is not in the sudoers file. this incident will be reported.");
+          break;
+        case "rm":
+          error("rm: permission denied");
+          break;
+        default:
+          error(`${head}: command not found. type 'help'`);
+      }
+    };
+
+    // Boot sequence
+    const reduce = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const boot = () => {
+      run("whoami");
+    };
+    if (reduce) {
+      boot();
+    } else {
+      // Tiny delay so the page settles first
+      setTimeout(boot, 350);
+    }
+
+    input.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") {
+        e.preventDefault();
+        const v = input.value;
+        input.value = "";
+        run(v);
+      } else if (e.key === "ArrowUp") {
+        if (history.length === 0) return;
+        e.preventDefault();
+        histIdx = Math.max(0, histIdx - 1);
+        input.value = history[histIdx] ?? "";
+      } else if (e.key === "ArrowDown") {
+        e.preventDefault();
+        histIdx = Math.min(history.length, histIdx + 1);
+        input.value = history[histIdx] ?? "";
+      } else if (e.key === "l" && (e.ctrlKey || e.metaKey)) {
+        e.preventDefault();
+        out.innerHTML = "";
+      }
+    });
+
+    body.addEventListener("click", () => input.focus());
+  };
+
+  setupTerminal();
+  if (!window.__terminalBound) {
+    window.__terminalBound = true;
+    document.addEventListener("astro:page-load", setupTerminal);
+  }
+</script>

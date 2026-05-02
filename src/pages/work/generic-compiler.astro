@@ -1,0 +1,218 @@
+---
+import Base from "../../layouts/Base.astro";
+import CaseStudyHeader from "../../components/CaseStudyHeader.astro";
+import CaseStudyTOC from "../../components/CaseStudyTOC.astro";
+import BarChart from "../../components/charts/BarChart.astro";
+import ArchDiagram from "../../components/charts/ArchDiagram.astro";
+
+const tocItems = [
+  { id: "problem", label: "The problem" },
+  { id: "architecture", label: "Architecture" },
+  { id: "production", label: "What it ran in production" },
+  { id: "design", label: "Why the design held up" },
+  { id: "stack", label: "Stack" },
+];
+
+const stats = [
+  { value: "200 GB", label: "peak day" },
+  { value: "100+", label: "concurrent tasks" },
+  { value: "3d → 4h", label: "client onboarding" },
+  { value: "99.95%", label: "availability" },
+];
+
+// Onboarding time: 3 days = 72h, target 4h. Show as relative bars where 72h is the max.
+const onboarding = [
+  { label: "Before", value: "~72 h", fill: 1 },
+  { label: "After", value: "≤ 4 h", fill: 4 / 72, accent: true },
+];
+
+const dataVolume = [
+  { label: "Average day", value: "100+ GB", fill: 100 / 200 },
+  { label: "Peak day", value: "200 GB", fill: 1, accent: true },
+];
+---
+
+<Base
+  title="Generic Compiler Service · Paritosh Tripathi"
+  description="A config-driven Generic Compiler Service in Python/FastAPI for transforming unstructured data into structured datasets. Factory Pattern + JSONPath configs + dual-queue SQS, processing 100-200 GB/day."
+>
+  <CaseStudyHeader
+    slug="generic-compiler"
+    eyebrow="Aug 2022 → Dec 2024 · Anakin (YC S21)"
+    title="Generic Compiler Service"
+    blurb="A config-driven service that replaced multiple per-team custom compilers. Parses, transforms, and validates heterogeneous input data into structured datasets — entirely from JSONPath-driven config, no code change required to onboard a new client."
+    stats={stats}
+  />
+
+  <CaseStudyTOC items={tocItems} />
+  <article class="max-w-4xl mx-auto px-6 prose-invert">
+    <h2 id="problem">The problem</h2>
+    <p>
+      Each team at Anakin had spun up its own custom compiler — different conventions, different validation rules, different storage paths. Every new client meant a 3-day engineering onboarding. The compilers diverged faster than they could be maintained, and bugs in one didn't get fixed in the others.
+    </p>
+    <p>
+      I built one Generic Compiler Service to replace them. Heterogeneous in, structured out, all driven by a JSONPath-style configuration that ops could edit without redeploying.
+    </p>
+
+    <h2 id="architecture">Architecture</h2>
+    <ArchDiagram
+      title="Ingestion · compile · multi-sink"
+      caption="Configs hot-reload from MongoDB. WAL + S3 backup are written before the primary sink so a downstream outage never loses data."
+    >
+      <svg viewBox="0 0 920 380" class="w-full h-auto" role="img" aria-label="Generic Compiler Service architecture">
+        <style>
+          .g-node { fill: #1a1a1a; stroke: rgba(255,255,255,0.12); }
+          .g-node-accent { fill: #1a1a1a; stroke: #ff8c00; }
+          .g-store { fill: #121212; stroke: rgba(80,227,194,0.35); }
+          .g-label { fill: #ededed; font: 500 12px "JetBrains Mono", ui-monospace, monospace; }
+          .g-sub { fill: rgba(237,237,237,0.55); font: 400 10px "JetBrains Mono", ui-monospace, monospace; }
+          .g-arrow { stroke: rgba(255,255,255,0.25); stroke-width: 1.5; fill: none; }
+          .g-arrow-accent { stroke: #ff8c00; stroke-width: 1.5; fill: none; }
+        </style>
+        <defs>
+          <marker id="g-ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+            <path d="M0,0 L10,5 L0,10 z" fill="rgba(255,255,255,0.4)"></path>
+          </marker>
+          <marker id="g-ah-saf" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+            <path d="M0,0 L10,5 L0,10 z" fill="#ff8c00"></path>
+          </marker>
+        </defs>
+
+        <rect x="20" y="30" width="180" height="50" rx="10" class="g-node" />
+        <text x="110" y="52" text-anchor="middle" class="g-label">Primary SQS</text>
+        <text x="110" y="68" text-anchor="middle" class="g-sub">live ingestion</text>
+
+        <rect x="20" y="100" width="180" height="50" rx="10" class="g-node" />
+        <text x="110" y="122" text-anchor="middle" class="g-label">Recompile SQS</text>
+        <text x="110" y="138" text-anchor="middle" class="g-sub">replay after config fix</text>
+
+        <rect x="20" y="170" width="180" height="50" rx="10" class="g-node-accent" />
+        <text x="110" y="192" text-anchor="middle" class="g-label">DLQ · 15d</text>
+        <text x="110" y="208" text-anchor="middle" class="g-sub">bulk replay safe</text>
+
+        <rect x="240" y="30" width="240" height="190" rx="14" class="g-node-accent" />
+        <text x="360" y="60" text-anchor="middle" class="g-label">Compiler Service</text>
+        <text x="360" y="78" text-anchor="middle" class="g-sub">FastAPI · Factory Pattern</text>
+        <line x1="260" y1="92" x2="460" y2="92" stroke="rgba(255,255,255,0.1)" />
+        <text x="360" y="112" text-anchor="middle" class="g-sub">parse</text>
+        <text x="360" y="130" text-anchor="middle" class="g-sub">transform</text>
+        <text x="360" y="148" text-anchor="middle" class="g-sub">validate</text>
+        <text x="360" y="166" text-anchor="middle" class="g-sub">sanitize</text>
+        <text x="360" y="184" text-anchor="middle" class="g-sub">write</text>
+        <text x="360" y="208" text-anchor="middle" class="g-sub">JSONPath-driven config</text>
+
+        <rect x="240" y="260" width="240" height="50" rx="10" class="g-store" />
+        <text x="360" y="282" text-anchor="middle" class="g-label">MongoDB · configs</text>
+        <text x="360" y="298" text-anchor="middle" class="g-sub">hot reload, in-memory cache</text>
+
+        <rect x="520" y="20" width="180" height="50" rx="10" class="g-node" />
+        <text x="610" y="42" text-anchor="middle" class="g-label">WAL · 48h</text>
+        <text x="610" y="58" text-anchor="middle" class="g-sub">recovery on outage</text>
+
+        <rect x="520" y="90" width="180" height="50" rx="10" class="g-node" />
+        <text x="610" y="112" text-anchor="middle" class="g-label">S3 backup</text>
+        <text x="610" y="128" text-anchor="middle" class="g-sub">always-on</text>
+
+        <rect x="730" y="20" width="170" height="50" rx="10" class="g-store" />
+        <text x="815" y="42" text-anchor="middle" class="g-label">MongoDB sink</text>
+        <text x="815" y="58" text-anchor="middle" class="g-sub">document outputs</text>
+
+        <rect x="730" y="90" width="170" height="50" rx="10" class="g-store" />
+        <text x="815" y="112" text-anchor="middle" class="g-label">BigQuery sink</text>
+        <text x="815" y="128" text-anchor="middle" class="g-sub">analytics outputs</text>
+
+        <rect x="730" y="160" width="170" height="50" rx="10" class="g-store" />
+        <text x="815" y="182" text-anchor="middle" class="g-label">S3 sink</text>
+        <text x="815" y="198" text-anchor="middle" class="g-sub">file outputs</text>
+
+        <path class="g-arrow" marker-end="url(#g-ah)" d="M200 55 L240 90" />
+        <path class="g-arrow" marker-end="url(#g-ah)" d="M200 125 L240 130" />
+        <path class="g-arrow-accent" marker-end="url(#g-ah-saf)" d="M200 195 L240 175" />
+        <path class="g-arrow" d="M360 220 L360 260" />
+        <path class="g-arrow-accent" marker-end="url(#g-ah-saf)" d="M480 90 L520 50" />
+        <path class="g-arrow-accent" marker-end="url(#g-ah-saf)" d="M480 110 L520 110" />
+        <path class="g-arrow" marker-end="url(#g-ah)" d="M700 45 L730 45" />
+        <path class="g-arrow" marker-end="url(#g-ah)" d="M700 115 L730 115" />
+        <path class="g-arrow" marker-end="url(#g-ah)" d="M610 140 L815 160" />
+      </svg>
+    </ArchDiagram>
+
+    <h3>FastAPI microservice with a Factory Pattern</h3>
+    <ul>
+      <li>Modular pipeline stages: parse → transform → validate → sanitize → write</li>
+      <li>Each stage looked up at runtime from a registry — adding a new transformer is a class, not a service</li>
+      <li>Reusable across clients with different schemas because the pipeline itself is data, not code</li>
+    </ul>
+
+    <h3>JSONPath-driven configuration</h3>
+    <ul>
+      <li>Source-side selectors written in JSONPath, target-side schemas declared inline</li>
+      <li>Config-level <strong>sanitization hooks</strong> (<code>sanitizers.py</code>) for currency conversion, normalization, and enrichment lookups</li>
+      <li>Configs and validation schemas live in <strong>MongoDB</strong> with in-memory container caching — hot reloads without redeployment</li>
+    </ul>
+
+    <h3>Dual-queue SQS ingestion + DLQ</h3>
+    <ul>
+      <li><strong>Primary queue</strong> for the standard compilation flow</li>
+      <li><strong>Re-compilation queue</strong> for replaying missed or failed data after a config fix</li>
+      <li><strong>Dead Letter Queue</strong> with 15-day retention — safe recovery and bulk replay of failed events without losing the input</li>
+    </ul>
+
+    <h3>Autoscaling on AWS ECS</h3>
+    <p>
+      Tasks scaled dynamically on three signals — queue depth, incoming message rate, and container I/O utilization. The third one mattered most: queue-depth-only scaling overshoots when a small number of large messages stall a worker. Adding I/O as a scaling signal was what kept the p99 stable when message-size distribution shifted.
+    </p>
+
+    <h3>Multi-sink writes</h3>
+    <ul>
+      <li>Processed outputs land in <strong>MongoDB</strong>, <strong>BigQuery</strong>, or <strong>S3</strong> — sink chosen per-config</li>
+      <li>Full backup copy to S3 regardless of primary sink</li>
+      <li><strong>Write-ahead logs</strong> retained for 48 hours, enabling recovery during downstream storage failures</li>
+    </ul>
+
+    <h2 id="production">What it ran in production</h2>
+    <ul>
+      <li><strong>100 GB+ data daily</strong> on average; <strong>200 GB/day peak</strong></li>
+      <li><strong>100+ concurrent</strong> parallel processing tasks</li>
+      <li><strong>99.95%</strong> availability across the 28-month tenure</li>
+      <li>New-client onboarding cut from <strong>3 days → under 4 hours</strong> by standardizing ingestion + compilation + validation + storage in one service</li>
+    </ul>
+
+    <BarChart
+      title="Daily data volume processed"
+      rows={dataVolume}
+      caption="The peak was a real production day, not a stress test."
+    />
+
+    <BarChart
+      title="New-client onboarding time"
+      rows={onboarding}
+      caption="The ~18× reduction came from moving client-specific logic out of code and into hot-reloadable JSONPath configs in MongoDB."
+    />
+
+    <h2 id="design">Why the design held up</h2>
+
+    <h3>1. Config as data, not code</h3>
+    <p>
+      Everything client-specific lives in MongoDB — schema, JSONPath selectors, sanitizers, sink choice. Adding a client is a config commit, not a deploy. That's the only reason 3 days → 4 hours was achievable; if onboarding had stayed in code we'd have been bottlenecked on review and deploy cycles.
+    </p>
+
+    <h3>2. Re-compilation queue is a separate queue</h3>
+    <p>
+      Mixing replay traffic with live ingestion in one queue is how you turn a config fix into a production incident — replays compete with real-time data for worker capacity. Splitting the queue means replays drain at their own rate without affecting current SLAs.
+    </p>
+
+    <h3>3. WAL + S3 backup before the primary sink</h3>
+    <p>
+      Downstream storage <em>will</em> fail. Writing the WAL and S3 backup before the primary sink means a MongoDB or BigQuery outage doesn't lose the message — when the downstream comes back, the WAL replays. 48 hours was chosen as the window where a human is reliably going to have noticed an outage.
+    </p>
+
+    <h2 id="stack">Stack</h2>
+    <ul>
+      <li>Python, FastAPI</li>
+      <li>AWS SQS (primary + recompile + DLQ), ECS with autoscaling</li>
+      <li>MongoDB (configs + outputs), BigQuery (analytics outputs), S3 (backup + outputs)</li>
+      <li>Docker, Jenkins CI/CD</li>
+    </ul>
+  </article>
+</Base>

@@ -1,0 +1,145 @@
+---
+import SectionHeader from "./SectionHeader.astro";
+import Heatmap from "./charts/Heatmap.astro";
+import type { HeatmapAccount } from "./charts/Heatmap.astro";
+import WakatimeStats from "./charts/WakatimeStats.astro";
+import ProjectCard from "./ProjectCard.astro";
+import { projects } from "../data/projects";
+import { getReposByName, getMultiYearContributions } from "../lib/github";
+import {
+  getWakatimeStats,
+  getWakatimeAllTime,
+  getWakatimeSummaries,
+} from "../lib/wakatime";
+
+const personalAccount = "paritoshtripathi935";
+const heatmapAccounts: HeatmapAccount[] = [
+  { username: personalAccount, role: "personal" },
+  { username: "pamripose", role: "work" },
+];
+
+const currentYear = new Date().getFullYear();
+const yearOrder = [
+  "last",
+  ...Array.from({ length: 5 }, (_, i) => String(currentYear - i)),
+];
+
+const [repos, contributionsByYear, wakaStats, wakaAllTime, wakaSummaries] =
+  await Promise.all([
+    getReposByName(),
+    getMultiYearContributions(
+      heatmapAccounts.map((a) => a.username),
+      yearOrder,
+    ),
+    getWakatimeStats("last_30_days"),
+    getWakatimeAllTime(),
+    getWakatimeSummaries(365),
+  ]);
+const live = !!repos;
+
+const enriched = projects.map((p) => {
+  const slug = p.href.split("/").pop()!.toLowerCase();
+  const r = repos?.get(slug) ?? null;
+  return {
+    name: p.name,
+    blurb: p.blurb,
+    stars: r?.stars ?? p.stars ?? 0,
+    language: r?.language ?? p.language,
+    pushedAt: r?.pushedAt ?? null,
+    archived: r?.archived ?? false,
+    href: r?.htmlUrl ?? p.href,
+    liveUrl: r?.homepage ?? null,
+  };
+});
+
+const STARRED_CAP = 4;
+const starred = enriched
+  .filter((p) => p.stars > 0)
+  .sort((a, b) => b.stars - a.stars)
+  .slice(0, STARRED_CAP);
+
+const starredSet = new Set(starred.map((p) => p.name));
+const recent = enriched
+  .filter((p) => !starredSet.has(p.name))
+  .sort((a, b) => {
+    if (a.pushedAt && b.pushedAt) return b.pushedAt.localeCompare(a.pushedAt);
+    if (a.pushedAt) return -1;
+    if (b.pushedAt) return 1;
+    return 0;
+  });
+
+const lastSync = new Date().toISOString();
+---
+
+<section id="projects" class="max-w-6xl mx-auto px-6 py-24 scroll-mt-20">
+  <SectionHeader
+    eyebrow="On GitHub"
+    title="Activity & side projects"
+    blurb="Last 12 months of activity across both my personal and work accounts, plus the personal repos I've pushed in my own time."
+  />
+
+  {
+    Object.keys(contributionsByYear).length > 0 && (
+      <Heatmap
+        years={contributionsByYear}
+        yearOrder={yearOrder}
+        defaultYear="last"
+        accounts={heatmapAccounts}
+      />
+    )
+  }
+
+  {
+    wakaStats && (
+      <WakatimeStats
+        stats={wakaStats}
+        allTime={wakaAllTime}
+        summaries={wakaSummaries}
+      />
+    )
+  }
+
+  {starred.length > 0 && (
+    <>
+      <div class="mt-12 mb-6 flex items-baseline justify-between gap-4">
+        <h3 class="font-serif text-2xl md:text-3xl text-[var(--color-ink)]">Most starred</h3>
+        <span class="font-mono text-[10px] uppercase tracking-wider text-[var(--color-ink-faint)]">
+          sorted by stars desc
+        </span>
+      </div>
+      <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+        {starred.map((p) => <ProjectCard project={p} />)}
+      </div>
+    </>
+  )}
+
+  {recent.length > 0 && (
+    <>
+      <div class="mt-12 mb-6 flex items-baseline justify-between gap-4">
+        <h3 class="font-serif text-2xl md:text-3xl text-[var(--color-ink)]">Most recent</h3>
+        <span class="font-mono text-[10px] uppercase tracking-wider text-[var(--color-ink-faint)]">
+          sorted by last-pushed
+        </span>
+      </div>
+      <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+        {recent.map((p) => <ProjectCard project={p} />)}
+      </div>
+    </>
+  )}
+
+  <div class="mt-8 flex items-center justify-between gap-4 text-xs font-mono text-[var(--color-ink-faint)]">
+    <a
+      href={`https://github.com/${personalAccount}`}
+      target="_blank"
+      rel="noopener"
+      class="hover:text-[var(--color-saffron)] transition-colors"
+    >
+      All personal repos on GitHub ↗
+    </a>
+    <span>
+      {live ? "synced from github at build" : "github offline — showing static fallback"}
+      {" · "}
+      <time datetime={lastSync}>{lastSync.slice(0, 10)}</time>
+    </span>
+  </div>
+</section>

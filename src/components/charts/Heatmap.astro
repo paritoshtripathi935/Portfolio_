@@ -1,0 +1,237 @@
+---
+import type { YearContributions } from "../../lib/github";
+
+export type HeatmapAccount = { username: string; role?: "personal" | "work" };
+
+type Props = {
+  /** Map of year key -> { days, total }. Year keys: "last" or "YYYY". */
+  years: Record<string, YearContributions>;
+  /** Order in which year tabs render (left-to-right). */
+  yearOrder: string[];
+  /** Initially-selected year. */
+  defaultYear: string;
+  accounts: HeatmapAccount[];
+};
+
+const { years, yearOrder, defaultYear, accounts } = Astro.props;
+
+const labelFor = (y: string) => (y === "last" ? "Last 12 months" : y);
+---
+
+<figure class="my-4 rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] p-5 not-prose">
+  <div class="flex flex-wrap items-baseline justify-between gap-3 mb-4">
+    <div>
+      <div class="font-mono text-xs uppercase tracking-wider text-[var(--color-ink-faint)]">
+        GitHub activity
+      </div>
+      <div class="text-[var(--color-ink-muted)] text-sm mt-0.5 flex flex-wrap items-baseline gap-x-2">
+        <span>
+          <span data-hm-total class="text-[var(--color-saffron)] font-mono">
+            {years[defaultYear]?.total.toLocaleString() ?? 0}
+          </span>
+          <span> contributions combined across</span>
+        </span>
+        {
+          accounts.map((a, i) => (
+            <span class="inline-flex items-baseline gap-1">
+              {i > 0 && <span class="text-[var(--color-ink-faint)]">·</span>}
+              <a
+                href={`https://github.com/${a.username}`}
+                target="_blank"
+                rel="noopener"
+                class="font-mono hover:text-[var(--color-saffron)] transition-colors"
+              >
+                @{a.username}
+              </a>
+              {a.role && (
+                <span class="font-mono text-[10px] uppercase tracking-wider text-[var(--color-ink-faint)] border border-[var(--color-border)] rounded px-1.5 py-0.5">
+                  {a.role}
+                </span>
+              )}
+            </span>
+          ))
+        }
+      </div>
+    </div>
+
+    <div role="tablist" aria-label="GitHub activity year" class="flex flex-wrap gap-1">
+      {
+        yearOrder.map((y) => (
+          <button
+            type="button"
+            data-hm-year={y}
+            aria-selected={y === defaultYear}
+            class={`font-mono text-[11px] px-2.5 py-1 rounded-md border transition-colors ${
+              y === defaultYear
+                ? "border-[var(--color-saffron)] text-[var(--color-saffron)] bg-[var(--color-surface-2)]"
+                : "border-[var(--color-border)] text-[var(--color-ink-muted)] hover:text-[var(--color-ink)] hover:border-[var(--color-border-strong)]"
+            }`}
+          >
+            {labelFor(y)}
+          </button>
+        ))
+      }
+    </div>
+  </div>
+
+  <div class="overflow-x-auto pb-1">
+    <svg
+      data-hm-grid
+      class="block"
+      role="img"
+      aria-label="GitHub contribution heatmap"
+    >
+      <style>
+        .gh-cell { rx: 2; }
+        .gh-l-0 { fill: #1a1a1a; stroke: rgba(255,255,255,0.04); stroke-width: 0.5; }
+        .gh-l-1 { fill: rgba(255, 140, 0, 0.18); }
+        .gh-l-2 { fill: rgba(255, 140, 0, 0.40); }
+        .gh-l-3 { fill: rgba(255, 140, 0, 0.65); }
+        .gh-l-4 { fill: rgba(255, 169, 64, 0.95); }
+        .gh-pad { fill: transparent; }
+        .gh-month { fill: rgba(237,237,237,0.55); font: 400 9px "JetBrains Mono", ui-monospace, monospace; }
+        .gh-day { fill: rgba(237,237,237,0.45); font: 400 9px "JetBrains Mono", ui-monospace, monospace; }
+      </style>
+    </svg>
+  </div>
+
+  <div class="mt-3 flex items-center justify-end gap-2 text-[10px] font-mono text-[var(--color-ink-faint)] uppercase tracking-wider">
+    <span>Less</span>
+    <svg width="62" height="11" viewBox="0 0 62 11" aria-hidden="true">
+      <rect x="0" y="0" width="11" height="11" rx="2" class="gh-l-0" />
+      <rect x="13" y="0" width="11" height="11" rx="2" class="gh-l-1" />
+      <rect x="26" y="0" width="11" height="11" rx="2" class="gh-l-2" />
+      <rect x="39" y="0" width="11" height="11" rx="2" class="gh-l-3" />
+      <rect x="51" y="0" width="11" height="11" rx="2" class="gh-l-4" />
+    </svg>
+    <span>More</span>
+  </div>
+</figure>
+
+<script
+  is:inline
+  type="application/json"
+  data-hm-payload
+  set:html={JSON.stringify({ years, yearOrder, defaultYear })}
+/>
+
+<script is:inline>
+  const setupHeatmap = () => {
+    const payloadEl = document.querySelector("[data-hm-payload]");
+    const grid = document.querySelector("[data-hm-grid]");
+    const totalEl = document.querySelector("[data-hm-total]");
+    const tabs = document.querySelectorAll("[data-hm-year]");
+    if (!payloadEl || !grid || !tabs.length) return;
+    if (grid.dataset.bound === "1") return;
+    grid.dataset.bound = "1";
+
+    const payload = JSON.parse(payloadEl.textContent || "{}");
+    const years = payload.years || {};
+    const SVG_NS = "http://www.w3.org/2000/svg";
+
+    const render = (year) => {
+      const data = years[year];
+      if (!data) return;
+      const sorted = [...data.days].sort((a, b) => a.date.localeCompare(b.date));
+      const first = sorted.length ? new Date(sorted[0].date) : new Date();
+      const padStart = first.getUTCDay();
+      const padded = new Array(padStart).fill(null).concat(sorted);
+      const weeks = [];
+      for (let i = 0; i < padded.length; i += 7) weeks.push(padded.slice(i, i + 7));
+
+      const cellSize = 11;
+      const cellGap = 3;
+      const w = weeks.length * (cellSize + cellGap);
+      const h = 7 * (cellSize + cellGap);
+
+      const monthLabels = [];
+      let lastMonth = -1;
+      weeks.forEach((week, col) => {
+        const day = week.find((d) => d !== null);
+        if (!day) return;
+        const m = new Date(day.date).getUTCMonth();
+        if (m !== lastMonth) {
+          monthLabels.push({
+            col,
+            label: new Date(day.date).toLocaleString("en-US", { month: "short" }),
+          });
+          lastMonth = m;
+        }
+      });
+
+      grid.setAttribute("viewBox", `-32 -16 ${w + 40} ${h + 24}`);
+      grid.setAttribute("width", String(w + 40));
+      // Wipe everything except the <style> child
+      while (grid.lastChild && grid.lastChild.tagName !== "style") {
+        grid.removeChild(grid.lastChild);
+      }
+
+      const make = (tag, attrs, text) => {
+        const el = document.createElementNS(SVG_NS, tag);
+        for (const [k, v] of Object.entries(attrs)) el.setAttribute(k, String(v));
+        if (text != null) el.textContent = text;
+        return el;
+      };
+
+      monthLabels.forEach((m) => {
+        grid.appendChild(
+          make(
+            "text",
+            { x: m.col * (cellSize + cellGap) + 1, y: -4, class: "gh-month" },
+            m.label,
+          ),
+        );
+      });
+      grid.appendChild(make("text", { x: -26, y: 1 * (cellSize + cellGap) + cellSize - 1, class: "gh-day" }, "Mon"));
+      grid.appendChild(make("text", { x: -26, y: 3 * (cellSize + cellGap) + cellSize - 1, class: "gh-day" }, "Wed"));
+      grid.appendChild(make("text", { x: -22, y: 5 * (cellSize + cellGap) + cellSize - 1, class: "gh-day" }, "Fri"));
+
+      weeks.forEach((week, col) => {
+        week.forEach((day, row) => {
+          const x = col * (cellSize + cellGap);
+          const y = row * (cellSize + cellGap);
+          if (day === null) {
+            grid.appendChild(
+              make("rect", { x, y, width: cellSize, height: cellSize, class: "gh-pad gh-cell" }),
+            );
+            return;
+          }
+          const rect = make("rect", {
+            x,
+            y,
+            width: cellSize,
+            height: cellSize,
+            class: `gh-cell gh-l-${day.level}`,
+          });
+          const title = make(
+            "title",
+            {},
+            `${day.date} · ${day.count} contribution${day.count === 1 ? "" : "s"}`,
+          );
+          rect.appendChild(title);
+          grid.appendChild(rect);
+        });
+      });
+
+      if (totalEl) totalEl.textContent = (data.total || 0).toLocaleString();
+      tabs.forEach((t) => {
+        const isActive = t.dataset.hmYear === year;
+        t.setAttribute("aria-selected", String(isActive));
+        t.classList.toggle("border-[var(--color-saffron)]", isActive);
+        t.classList.toggle("text-[var(--color-saffron)]", isActive);
+        t.classList.toggle("bg-[var(--color-surface-2)]", isActive);
+        t.classList.toggle("border-[var(--color-border)]", !isActive);
+        t.classList.toggle("text-[var(--color-ink-muted)]", !isActive);
+      });
+    };
+
+    tabs.forEach((t) => {
+      t.addEventListener("click", () => render(t.dataset.hmYear));
+    });
+
+    render(payload.defaultYear);
+  };
+
+  setupHeatmap();
+  document.addEventListener("astro:page-load", setupHeatmap);
+</script>

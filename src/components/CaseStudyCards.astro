@@ -1,0 +1,124 @@
+---
+import SectionHeader from "./SectionHeader.astro";
+
+const cases = [
+  {
+    href: "/work/hermes",
+    eyebrow: "Apr 2025 → Apr 2026 · Parspec",
+    title: "Hermes",
+    subtitle: "Per-branch ephemeral environments. PR open to live URL in 3.8 min, host-header routed on a shared ALB.",
+    metrics: [
+      { v: "1,567", l: "builds" },
+      { v: "98.5%", l: "build success" },
+      { v: "88.1%", l: "end-to-end" },
+      { v: "7×", l: "DAU growth" },
+    ],
+    stack: ["FastAPI", "ECS Fargate", "ALB", "CodeBuild", "ECR", "Route53", "Postgres"],
+  },
+  {
+    href: "/work/inventory-service",
+    eyebrow: "May 2025 → Apr 2026 · Parspec",
+    title: "Inventory Service",
+    subtitle: "Saga with compensating transactions and Redis-backed per-SKU locks behind Parspec's inventory ingestion path.",
+    metrics: [
+      { v: "3.9M", l: "writes" },
+      { v: "7,800", l: "manufacturers" },
+      { v: "30%", l: "MoM growth" },
+      { v: "407K", l: "peak day" },
+    ],
+    stack: ["Django REST", "DynamoDB", "Redis", "Saga", "Per-SKU locks"],
+  },
+  {
+    href: "/work/product-finder",
+    eyebrow: "Apr 2025 → Apr 2026 · Parspec",
+    title: "Product Finder",
+    subtitle: "Soft-filtering search with weighted ranking, match-strength buckets, and ML image similarity. Held to per-tier p90 latency budgets.",
+    metrics: [
+      { v: "21%", l: "accuracy lift" },
+      { v: "1.5s", l: "p90 (top 50)" },
+      { v: "5×", l: "mounting weight" },
+      { v: "3", l: "match buckets" },
+    ],
+    stack: ["Elasticsearch", "OpenSearch", "Vector search", "Python", "ML similarity"],
+  },
+  {
+    href: "/work/generic-compiler",
+    eyebrow: "Aug 2022 → Dec 2024 · Anakin (YC S21)",
+    title: "Generic Compiler Service",
+    subtitle: "Config-driven FastAPI service that replaced multiple per-team custom compilers — JSONPath configs, dual-queue SQS + DLQ, multi-sink writes.",
+    metrics: [
+      { v: "200 GB", l: "peak day" },
+      { v: "100+", l: "concurrent tasks" },
+      { v: "3d → 4h", l: "client onboarding" },
+      { v: "99.95%", l: "availability" },
+    ],
+    stack: ["Python", "FastAPI", "SQS", "ECS", "MongoDB", "BigQuery", "S3"],
+  },
+  {
+    href: "/work/device-orchestration",
+    eyebrow: "Aug 2022 → Dec 2024 · Anakin (YC S21)",
+    title: "Android Device Orchestration & Automation Platform",
+    subtitle: "Hybrid Pixel + Genymotion automation platform with affinity scheduling and runtime Frida injection.",
+    metrics: [
+      { v: "10", l: "concurrent sessions" },
+      { v: "100+", l: "devices managed" },
+      { v: "Hybrid", l: "on-prem + cloud" },
+      { v: "Frida", l: "runtime hooks" },
+    ],
+    stack: ["Python", "Go", "ECS", "SQS", "PostgreSQL", "MongoDB", "Frida", "Genymotion"],
+  },
+];
+---
+
+<section id="work" class="max-w-6xl mx-auto px-6 py-24 scroll-mt-20">
+  <SectionHeader
+    eyebrow="Selected work"
+    title="Five systems I designed end-to-end"
+    blurb="Three from Parspec, two from Anakin's founding team. Click in for architecture, decisions, and the numbers."
+  />
+
+  <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+    {
+      cases.map((c) => {
+        const slug = c.href.split("/").pop()!;
+        return (
+        <a
+          href={c.href}
+          transition:name={`card-${slug}`}
+          class="spotlight reveal group block rounded-2xl border border-[var(--color-border)] hover:border-[var(--color-border-strong)] bg-[var(--color-surface)] p-7 transition-colors"
+        >
+          <div class="font-mono text-[11px] uppercase tracking-wider text-[var(--color-ink-faint)]" transition:name={`card-${slug}-eyebrow`}>
+            {c.eyebrow}
+          </div>
+          <h3 class="mt-3 font-serif text-2xl text-[var(--color-ink)] group-hover:text-[var(--color-saffron)] transition-colors leading-tight" transition:name={`card-${slug}-title`}>
+            {c.title}
+          </h3>
+          <p class="mt-3 text-sm text-[var(--color-ink-muted)] leading-relaxed">{c.subtitle}</p>
+
+          <dl class="mt-6 grid grid-cols-2 gap-4">
+            {c.metrics.map((m) => (
+              <div>
+                <dt class="font-mono text-base text-[var(--color-saffron)]">{m.v}</dt>
+                <dd class="text-[10px] uppercase tracking-wider text-[var(--color-ink-faint)] mt-0.5">{m.l}</dd>
+              </div>
+            ))}
+          </dl>
+
+          <div class="mt-6 flex flex-wrap gap-1.5">
+            {c.stack.map((s) => (
+              <span class="font-mono text-[11px] px-2 py-1 rounded-md border border-[var(--color-border)] text-[var(--color-ink-muted)]">
+                {s}
+              </span>
+            ))}
+          </div>
+
+          <div class="mt-6 inline-flex items-center gap-2 text-sm text-[var(--color-ink-muted)] group-hover:text-[var(--color-saffron)] transition-colors">
+            Read the case study
+            <span class="transition-transform group-hover:translate-x-1">→</span>
+          </div>
+        </a>
+        );
+      })
+    }
+  </div>
+</section>
