@@ -1,0 +1,30 @@
+[build]
+  command = "npm run build"
+  publish = "dist"
+
+[build.environment]
+  NODE_VERSION = "20"
+  # Astro reads .env from the build environment. Set the real values in
+  # Netlify → Site settings → Environment variables, NOT here.
+  # Required: WAKATIME_API_KEY (for the IDE activity panel)
+  # Optional: GITHUB_TOKEN  (avoids the 60-req/hr unauth limit on the
+  #                          GitHub heatmap + repo stats fetcher)
+
+# SPA-style fallback isn't needed (Astro emits real .html files), but
+# keep these in case anyone bookmarks a path that no longer exists.
+[[redirects]]
+  from = "/work/anakin"
+  to = "/work/generic-compiler"
+  status = 301
+
+# Caching for the immutable hashed assets Astro emits to /_astro/
+[[headers]]
+  for = "/_astro/*"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+# HTML pages: short cache, validate on every visit
+[[headers]]
+  for = "/*.html"
+  [headers.values]
+    Cache-Control = "public, max-age=0, must-revalidate"
