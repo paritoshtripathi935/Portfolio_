@@ -1,0 +1,20 @@
+---
+import { site } from "../data/site";
+const year = new Date().getFullYear();
+---
+
+<footer class="border-t border-[var(--color-border)] mt-32">
+  <div class="max-w-6xl mx-auto px-6 py-10 flex flex-col md:flex-row gap-6 md:items-center md:justify-between text-sm text-[var(--color-ink-muted)]">
+    <div class="flex items-center gap-3">
+      <span class="font-serif text-[var(--color-ink)]">{site.hindiName}</span>
+      <span class="text-[var(--color-ink-faint)]">/</span>
+      <span>{site.role}</span>
+    </div>
+    <div class="flex items-center gap-5">
+      <a href={site.github} target="_blank" rel="noopener" class="hover:text-[var(--color-saffron)] transition-colors">GitHub</a>
+      <a href={site.linkedin} target="_blank" rel="noopener" class="hover:text-[var(--color-saffron)] transition-colors">LinkedIn</a>
+      <a href={`mailto:${site.email}`} class="hover:text-[var(--color-saffron)] transition-colors">Email</a>
+    </div>
+    <div class="text-[var(--color-ink-faint)]">© {year}</div>
+  </div>
+</footer>

@@ -1,0 +1,41 @@
+---
+type Row = {
+  label: string;
+  value: string;
+  /** 0-1 fill ratio, computed by the caller */
+  fill: number;
+  /** optional muted accent on a specific row (e.g. peak) */
+  accent?: boolean;
+};
+
+type Props = {
+  title: string;
+  caption?: string;
+  rows: Row[];
+};
+
+const { title, caption, rows } = Astro.props;
+---
+
+<div class="my-8 rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] p-6 not-prose">
+  <div class="font-mono text-xs uppercase tracking-wider text-[var(--color-ink-faint)] mb-4">
+    {title}
+  </div>
+  <div class="space-y-3">
+    {
+      rows.map((r) => (
+        <div class="flex items-center gap-4">
+          <div class="text-xs text-[var(--color-ink-muted)] w-32 shrink-0 truncate">{r.label}</div>
+          <div class="flex-1 h-6 bg-[var(--color-surface-2)] rounded overflow-hidden">
+            <div
+              class={`h-full ${r.accent ? "bg-[var(--color-mint)]" : "bg-[var(--color-saffron)]"}`}
+              style={`width: ${Math.max(0, Math.min(100, r.fill * 100))}%`}
+            />
+          </div>
+          <div class="font-mono text-xs text-[var(--color-ink)] w-24 text-right shrink-0">{r.value}</div>
+        </div>
+      ))
+    }
+  </div>
+  {caption && <div class="mt-4 text-xs text-[var(--color-ink-faint)]">{caption}</div>}
+</div>

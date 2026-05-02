@@ -1,0 +1,45 @@
+---
+import SectionHeader from "./SectionHeader.astro";
+import { site } from "../data/site";
+---
+
+<section id="contact" class="max-w-6xl mx-auto px-6 py-24 scroll-mt-20">
+  <SectionHeader
+    eyebrow="Contact"
+    title="Let's talk."
+    blurb="The fastest way to reach me is email. I read every message — even the ones that look like recruiter spam."
+  />
+
+  <div class="grid md:grid-cols-3 gap-4">
+    <a
+      href={`mailto:${site.email}`}
+      class="spotlight group rounded-xl border border-[var(--color-border)] hover:border-[var(--color-border-strong)] bg-[var(--color-surface)] p-6 flex flex-col gap-2 transition-colors md:col-span-2"
+    >
+      <div class="font-mono text-xs uppercase tracking-wider text-[var(--color-ink-faint)]">Email</div>
+      <div class="font-serif text-2xl md:text-3xl text-[var(--color-ink)] group-hover:text-[var(--color-saffron)] transition-colors break-all">
+        {site.email}
+      </div>
+    </a>
+
+    <div class="grid grid-cols-1 gap-4">
+      <a
+        href={site.linkedin}
+        target="_blank"
+        rel="noopener"
+        class="spotlight rounded-xl border border-[var(--color-border)] hover:border-[var(--color-border-strong)] bg-[var(--color-surface)] p-5 flex items-center justify-between transition-colors"
+      >
+        <span class="text-[var(--color-ink)]">LinkedIn</span>
+        <span class="text-[var(--color-saffron)]">↗</span>
+      </a>
+      <a
+        href={site.github}
+        target="_blank"
+        rel="noopener"
+        class="spotlight rounded-xl border border-[var(--color-border)] hover:border-[var(--color-border-strong)] bg-[var(--color-surface)] p-5 flex items-center justify-between transition-colors"
+      >
+        <span class="text-[var(--color-ink)]">GitHub</span>
+        <span class="text-[var(--color-saffron)]">↗</span>
+      </a>
+    </div>
+  </div>
+</section>

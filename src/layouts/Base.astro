@@ -1,0 +1,102 @@
+---
+import "../styles/global.css";
+import { ClientRouter } from "astro:transitions";
+import Header from "../components/Header.astro";
+import Footer from "../components/Footer.astro";
+
+type Props = {
+  title?: string;
+  description?: string;
+};
+
+const {
+  title = "Paritosh Tripathi — Backend / distributed systems engineer",
+  description = "Software Engineer II at Parspec. Designed Hermes (per-branch ephemeral environments) and the saga + per-SKU lock pattern behind 3.9M+ inventory writes.",
+} = Astro.props;
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="generator" content={Astro.generator} />
+    <meta name="description" content={description} />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:type" content="website" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Playfair+Display:wght@400;700&family=JetBrains+Mono:wght@400;500&display=swap"
+      rel="stylesheet"
+    />
+    <ClientRouter />
+    <title>{title}</title>
+  </head>
+  <body class="grain min-h-screen">
+    <Header />
+    <slot />
+    <Footer />
+
+    <script>
+      // Re-run on every navigation since ClientRouter swaps DOM in place.
+      const init = () => {
+        document.querySelectorAll<HTMLElement>(".spotlight").forEach((el) => {
+          if ((el as any).__spotlightBound) return;
+          (el as any).__spotlightBound = true;
+          el.addEventListener("pointermove", (e) => {
+            const r = el.getBoundingClientRect();
+            el.style.setProperty("--spotlight-x", `${e.clientX - r.left}px`);
+            el.style.setProperty("--spotlight-y", `${e.clientY - r.top}px`);
+          });
+        });
+
+        const io = new IntersectionObserver(
+          (entries) => {
+            entries.forEach((e) => {
+              if (e.isIntersecting) {
+                e.target.classList.add("is-visible");
+                io.unobserve(e.target);
+              }
+            });
+          },
+          { threshold: 0.12, rootMargin: "0px 0px -60px 0px" },
+        );
+        document.querySelectorAll(".reveal:not(.is-visible)").forEach((r) => io.observe(r));
+
+        const stages = document.querySelectorAll<HTMLElement>(".stage-section[data-theme]");
+        if (stages.length) {
+          const dots = document.querySelectorAll<HTMLAnchorElement>(".stage-nav [data-stage-dot]");
+          const setActive = (theme: string) => {
+            document.documentElement.dataset.theme = theme;
+            dots.forEach((d) => {
+              d.dataset.active = d.dataset.stageDot === theme ? "true" : "false";
+            });
+          };
+          const stageIO = new IntersectionObserver(
+            (entries) => {
+              for (const e of entries) {
+                if (e.isIntersecting) {
+                  const theme = (e.target as HTMLElement).dataset.theme;
+                  if (theme) setActive(theme);
+                }
+              }
+            },
+            { rootMargin: "-45% 0px -45% 0px", threshold: 0 },
+          );
+          stages.forEach((s) => stageIO.observe(s));
+          // Set initial theme based on first section in viewport.
+          const first = stages[0].dataset.theme;
+          if (first) setActive(first);
+        } else {
+          delete document.documentElement.dataset.theme;
+        }
+      };
+
+      init();
+      document.addEventListener("astro:page-load", init);
+    </script>
+  </body>
+</html>

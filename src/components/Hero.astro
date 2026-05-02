@@ -1,0 +1,59 @@
+---
+import { site } from "../data/site";
+import Terminal from "./Terminal.astro";
+---
+
+<section class="relative max-w-6xl mx-auto px-6 pt-20 pb-24 md:pt-28 md:pb-32">
+  <div class="space-y-8">
+    <div class="reveal flex items-center gap-2 text-xs font-mono text-[var(--color-ink-muted)] tracking-wider uppercase">
+      <span class="relative flex h-2 w-2">
+        <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-[var(--color-saffron)] opacity-50"></span>
+        <span class="relative inline-flex rounded-full h-2 w-2 bg-[var(--color-saffron)]"></span>
+      </span>
+      <span>{site.status}</span>
+    </div>
+
+    <h1 class="reveal font-serif text-5xl md:text-7xl leading-[1.05] tracking-tight">
+      <span class="block text-[var(--color-ink)]">Backend &amp;</span>
+      <span class="block text-[var(--color-saffron)]">distributed&nbsp;systems</span>
+      <span class="block text-[var(--color-ink-muted)] italic">engineer.</span>
+    </h1>
+
+    <p class="reveal max-w-2xl text-lg text-[var(--color-ink-muted)] leading-relaxed">
+      I'm <span class="text-[var(--color-ink)]">{site.name}</span> — Software Engineer II at <a class="underline decoration-[var(--color-saffron)] underline-offset-4 decoration-2 hover:text-[var(--color-saffron)] transition-colors" href="https://parspec.io" target="_blank" rel="noopener">Parspec</a>. I build high-throughput, event-driven backend services — REST APIs, ERP integrations, distributed pipelines, and the platform infra that the rest of engineering uses every day. Previously Software Engineer I at <span class="text-[var(--color-ink)]">Anakin (YC&nbsp;S21)</span>.
+    </p>
+
+    <div class="reveal max-w-2xl flex items-baseline gap-3 text-sm">
+      <span class="font-mono text-[10px] uppercase tracking-[0.2em] text-[var(--color-saffron)] shrink-0">Now ›</span>
+      <span class="text-[var(--color-ink-muted)] leading-relaxed">{site.now}</span>
+    </div>
+
+    <Terminal />
+
+    <div class="reveal flex flex-wrap items-center gap-3 pt-2">
+      <a
+        href="/#work"
+        class="group inline-flex items-center gap-2 rounded-full bg-[var(--color-saffron)] hover:bg-[var(--color-saffron-light)] text-black font-medium px-5 py-2.5 transition-colors"
+      >
+        See selected work
+        <span class="transition-transform group-hover:translate-x-1">→</span>
+      </a>
+      <a
+        href={site.resume}
+        target="_blank"
+        rel="noopener"
+        class="inline-flex items-center gap-2 rounded-full border border-[var(--color-border-strong)] hover:border-[var(--color-saffron)] hover:text-[var(--color-saffron)] text-[var(--color-ink)] px-5 py-2.5 transition-colors"
+      >
+        Resume <span class="text-[var(--color-ink-faint)]">↗</span>
+      </a>
+      <a
+        href={site.github}
+        target="_blank"
+        rel="noopener"
+        class="inline-flex items-center gap-2 rounded-full text-[var(--color-ink-muted)] hover:text-[var(--color-ink)] px-3 py-2.5 transition-colors"
+      >
+        GitHub ↗
+      </a>
+    </div>
+  </div>
+</section>

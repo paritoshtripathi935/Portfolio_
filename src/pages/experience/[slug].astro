@@ -1,0 +1,108 @@
+---
+import Base from "../../layouts/Base.astro";
+import { experience } from "../../data/experience";
+
+export const getStaticPaths = () =>
+  experience.map((x) => ({ params: { slug: x.slug }, props: { entry: x } }));
+
+const { entry } = Astro.props;
+---
+
+<Base
+  title={`${entry.role} at ${entry.company} · Paritosh Tripathi`}
+  description={entry.summary}
+>
+  <header class="max-w-4xl mx-auto px-6 pt-16 pb-10">
+    <a
+      href="/#timeline"
+      class="inline-flex items-center gap-2 font-mono text-xs uppercase tracking-wider text-[var(--color-ink-muted)] hover:text-[var(--color-saffron)] transition-colors"
+    >
+      ← all experience
+    </a>
+
+    <div
+      class="mt-8 font-mono text-xs uppercase tracking-[0.2em] text-[var(--color-saffron)]"
+      transition:name={`exp-${entry.slug}-period`}
+    >
+      {entry.period}{entry.location && ` · ${entry.location}`}
+    </div>
+    <h1
+      class="mt-3 font-serif text-5xl md:text-6xl tracking-tight text-[var(--color-ink)]"
+      transition:name={`exp-${entry.slug}-role`}
+    >
+      {entry.role}
+    </h1>
+    <div
+      class="mt-2 text-xl text-[var(--color-saffron)] font-medium"
+      transition:name={`exp-${entry.slug}-company`}
+    >
+      {entry.company}
+    </div>
+    <p class="mt-5 text-lg text-[var(--color-ink-muted)] leading-relaxed max-w-2xl">
+      {entry.summary}
+    </p>
+
+    {
+      entry.highlights && (
+        <dl class="mt-10 grid grid-cols-2 md:grid-cols-4 gap-px bg-[var(--color-border)] border border-[var(--color-border)] rounded-xl overflow-hidden">
+          {entry.highlights.map((h) => (
+            <div class="bg-[var(--color-surface)] p-5">
+              <dt class="font-serif text-2xl text-[var(--color-saffron)]">{h.value}</dt>
+              <dd class="text-[10px] uppercase tracking-wider text-[var(--color-ink-faint)] mt-1">{h.label}</dd>
+            </div>
+          ))}
+        </dl>
+      )
+    }
+  </header>
+
+  <article class="max-w-4xl mx-auto px-6 prose-invert pb-12">
+    <h2>What I shipped</h2>
+    <ul>
+      {entry.bullets.map((b) => <li>{b}</li>)}
+    </ul>
+
+    <h2>Stack</h2>
+    <div class="not-prose flex flex-wrap gap-2 mt-3">
+      {
+        entry.stack.map((s) => (
+          <span class="font-mono text-xs px-2.5 py-1 rounded-md border border-[var(--color-border)] text-[var(--color-ink-muted)]">
+            {s}
+          </span>
+        ))
+      }
+    </div>
+
+    {
+      entry.caseStudies && entry.caseStudies.length > 0 && (
+        <>
+          <h2>Case studies from this role</h2>
+          <div class="not-prose grid md:grid-cols-2 gap-4 mt-4">
+            {entry.caseStudies.map((c) => {
+              const slug = c.href.split("/").pop()!;
+              return (
+                <a
+                  href={c.href}
+                  transition:name={`card-${slug}`}
+                  class="spotlight group block rounded-xl border border-[var(--color-border)] hover:border-[var(--color-border-strong)] bg-[var(--color-surface)] p-5 transition-colors"
+                >
+                  <h3
+                    class="font-serif text-xl text-[var(--color-ink)] group-hover:text-[var(--color-saffron)] transition-colors"
+                    transition:name={`card-${slug}-title`}
+                  >
+                    {c.name}
+                  </h3>
+                  <p class="mt-2 text-sm text-[var(--color-ink-muted)] leading-relaxed">{c.blurb}</p>
+                  <div class="mt-3 inline-flex items-center gap-2 text-xs text-[var(--color-ink-muted)] group-hover:text-[var(--color-saffron)] transition-colors">
+                    Read case study
+                    <span class="transition-transform group-hover:translate-x-1">→</span>
+                  </div>
+                </a>
+              );
+            })}
+          </div>
+        </>
+      )
+    }
+  </article>
+</Base>

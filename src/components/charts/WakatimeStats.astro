@@ -1,0 +1,367 @@
+---
+import type { WakatimeStats, WakatimeAllTime, WakatimeDay } from "../../lib/wakatime";
+import { formatWakaDuration } from "../../lib/wakatime";
+
+type Props = {
+  stats: WakatimeStats;
+  allTime: WakatimeAllTime | null;
+  summaries: WakatimeDay[];
+};
+
+const { stats, allTime, summaries } = Astro.props;
+
+const topLanguages = stats.languages.slice(0, 6);
+const topEditors = stats.editors.slice(0, 5);
+
+const labelForRange = (r: string) =>
+  ({
+    last_7_days: "Last 7 days",
+    last_30_days: "Last 30 days",
+    last_6_months: "Last 6 months",
+    last_year: "Last year",
+  })[r] ?? r;
+
+const bestDayLabel = stats.bestDayDate
+  ? new Date(stats.bestDayDate).toLocaleDateString("en-US", {
+      month: "short",
+      day: "numeric",
+    })
+  : null;
+
+const aiEditorKeywords = [
+  "cursor",
+  "claude",
+  "copilot",
+  "windsurf",
+  "zed",
+  "supermaven",
+  "tabnine",
+  "codeium",
+  "continue",
+];
+const isAi = (n: string) => aiEditorKeywords.some((k) => n.toLowerCase().includes(k));
+
+// AI vs Human donut — describe the arc as two SVG strokes around a circle.
+const donutR = 36;
+const donutCirc = 2 * Math.PI * donutR;
+const aiPct = Math.max(0, Math.min(100, stats.aiCodePercent));
+const aiArc = (aiPct / 100) * donutCirc;
+const humanArc = donutCirc - aiArc;
+
+// ─── Activity heatmap layout (52w × 7d) ────────────────────────────────────
+const sortedDays = [...summaries].sort((a, b) => a.date.localeCompare(b.date));
+const padStart = sortedDays.length
+  ? new Date(sortedDays[0].date).getUTCDay()
+  : 0;
+const padded: (WakatimeDay | null)[] = [
+  ...Array(padStart).fill(null),
+  ...sortedDays,
+];
+const weeks: (WakatimeDay | null)[][] = [];
+for (let i = 0; i < padded.length; i += 7) weeks.push(padded.slice(i, i + 7));
+const cellSize = 11;
+const cellGap = 3;
+const gridW = weeks.length * (cellSize + cellGap);
+const gridH = 7 * (cellSize + cellGap);
+
+const monthLabels: { col: number; label: string }[] = [];
+let lastMonth = -1;
+weeks.forEach((week, col) => {
+  const day = week.find((d) => d !== null) as WakatimeDay | undefined;
+  if (!day) return;
+  const m = new Date(day.date).getUTCMonth();
+  if (m !== lastMonth) {
+    monthLabels.push({
+      col,
+      label: new Date(day.date).toLocaleString("en-US", { month: "short" }),
+    });
+    lastMonth = m;
+  }
+});
+
+const summariesTotalH = Math.round(
+  sortedDays.reduce((s, d) => s + d.totalSeconds, 0) / 3600,
+);
+const activeDaysCount = sortedDays.filter((d) => d.totalSeconds > 0).length;
+---
+
+<figure class="my-8 rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] p-6 not-prose">
+  {/* Header strip */}
+  <div class="flex flex-wrap items-baseline justify-between gap-3 mb-6">
+    <div>
+      <div class="font-mono text-xs uppercase tracking-[0.2em] text-[var(--color-mint)]">
+        IDE activity
+      </div>
+      <div class="text-[var(--color-ink-muted)] text-sm mt-1">
+        Editor time and AI authoring, instrumented by
+        <a
+          href="https://wakatime.com"
+          target="_blank"
+          rel="noopener"
+          class="font-mono hover:text-[var(--color-saffron)] transition-colors"
+        >
+          Wakatime
+        </a>
+        <span class="text-[var(--color-ink-faint)]">·</span>
+        project names redacted
+      </div>
+    </div>
+    <div class="font-mono text-[10px] uppercase tracking-wider text-[var(--color-ink-faint)] border border-[var(--color-border)] rounded-full px-2.5 py-1">
+      {labelForRange(stats.range)}
+    </div>
+  </div>
+
+  {/* Hero row: totals card + AI ring card */}
+  <div class="grid md:grid-cols-2 gap-4 mb-6">
+    <div class="rounded-xl border border-[var(--color-border)] bg-[var(--color-surface-2)] p-5">
+      <div class="font-serif text-5xl text-[var(--color-saffron)] leading-none">
+        {formatWakaDuration(stats.totalSeconds)}
+      </div>
+      <div class="text-[10px] uppercase tracking-wider text-[var(--color-ink-faint)] mt-2">
+        total · {labelForRange(stats.range)}
+      </div>
+      <div class="mt-5 grid grid-cols-3 gap-3 text-xs">
+        <div>
+          <div class="font-mono text-base text-[var(--color-ink)]">
+            {formatWakaDuration(stats.dailyAverageSeconds)}
+          </div>
+          <div class="text-[10px] uppercase tracking-wider text-[var(--color-ink-faint)] mt-0.5">
+            daily avg
+          </div>
+        </div>
+        <div>
+          <div class="font-mono text-base text-[var(--color-ink)]">
+            {formatWakaDuration(stats.bestDaySeconds)}
+          </div>
+          <div class="text-[10px] uppercase tracking-wider text-[var(--color-ink-faint)] mt-0.5">
+            best day {bestDayLabel ? `· ${bestDayLabel}` : ""}
+          </div>
+        </div>
+        <div>
+          <div class="font-mono text-base text-[var(--color-ink)]">
+            {allTime
+              ? `${Math.round(allTime.totalSeconds / 3600).toLocaleString()} h`
+              : "—"}
+          </div>
+          <div class="text-[10px] uppercase tracking-wider text-[var(--color-ink-faint)] mt-0.5">
+            all-time
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="rounded-xl border border-[var(--color-border)] bg-[var(--color-surface-2)] p-5 flex items-center gap-5">
+      <svg width="100" height="100" viewBox="0 0 100 100" class="shrink-0" aria-hidden="true">
+        <circle
+          cx="50"
+          cy="50"
+          r={donutR}
+          fill="none"
+          stroke="rgba(255,140,0,0.25)"
+          stroke-width="12"
+        />
+        <circle
+          cx="50"
+          cy="50"
+          r={donutR}
+          fill="none"
+          stroke="var(--color-mint)"
+          stroke-width="12"
+          stroke-dasharray={`${aiArc} ${humanArc}`}
+          stroke-dashoffset={donutCirc / 4}
+          transform="rotate(-90 50 50)"
+          stroke-linecap="butt"
+        />
+        <text
+          x="50"
+          y="48"
+          text-anchor="middle"
+          fill="var(--color-mint)"
+          style="font-family: 'Playfair Display', serif; font-size: 22px; font-weight: 700;"
+        >
+          {Math.round(aiPct)}%
+        </text>
+        <text
+          x="50"
+          y="64"
+          text-anchor="middle"
+          fill="rgba(237,237,237,0.45)"
+          style="font: 500 8px 'JetBrains Mono', monospace; letter-spacing: 0.1em; text-transform: uppercase;"
+        >
+          AI
+        </text>
+      </svg>
+      <div class="flex-1 min-w-0">
+        <div class="text-[10px] uppercase tracking-wider text-[var(--color-ink-faint)] mb-2">
+          AI vs human authoring
+        </div>
+        <div class="space-y-1.5 text-xs">
+          <div class="flex items-center gap-2">
+            <span class="inline-block w-2 h-2 rounded-sm bg-[var(--color-mint)]" />
+            <span class="font-mono text-[var(--color-ink)]">
+              {stats.aiAdditions.toLocaleString()}
+            </span>
+            <span class="text-[var(--color-ink-faint)]">AI lines</span>
+          </div>
+          <div class="flex items-center gap-2">
+            <span class="inline-block w-2 h-2 rounded-sm bg-[var(--color-saffron)]/40" />
+            <span class="font-mono text-[var(--color-ink)]">
+              {stats.humanAdditions.toLocaleString()}
+            </span>
+            <span class="text-[var(--color-ink-faint)]">human lines</span>
+          </div>
+        </div>
+        <div class="mt-3 pt-3 border-t border-[var(--color-border)] grid grid-cols-2 gap-3 text-xs">
+          <div>
+            <div class="font-mono text-base text-[var(--color-mint)]">
+              {stats.aiPromptEvents.toLocaleString()}
+            </div>
+            <div class="text-[10px] uppercase tracking-wider text-[var(--color-ink-faint)] mt-0.5">
+              AI prompts
+            </div>
+          </div>
+          <div>
+            <div class="font-mono text-base text-[var(--color-mint)]">
+              {Math.round(stats.aiAugmentedPercent)}%
+            </div>
+            <div class="text-[10px] uppercase tracking-wider text-[var(--color-ink-faint)] mt-0.5">
+              in AI editors
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  {/* Activity heatmap — only if we have any summary data */}
+  {sortedDays.length > 0 && (
+    <div class="mb-6">
+      <div class="flex flex-wrap items-baseline justify-between gap-3 mb-3">
+        <div class="font-mono text-[10px] uppercase tracking-wider text-[var(--color-ink-faint)]">
+          Activity · {sortedDays.length} days · {activeDaysCount} active
+        </div>
+        <div class="font-mono text-[10px] uppercase tracking-wider text-[var(--color-ink-faint)]">
+          {summariesTotalH.toLocaleString()} h coded
+        </div>
+      </div>
+      <div class="overflow-x-auto pb-1">
+        <svg
+          viewBox={`-32 -16 ${gridW + 40} ${gridH + 24}`}
+          width={gridW + 40}
+          class="block"
+          role="img"
+          aria-label={`Wakatime activity heatmap, ${summariesTotalH} hours over ${sortedDays.length} days`}
+        >
+          <style>
+            .wk-cell { rx: 2; }
+            .wk-l-0 { fill: #1a1a1a; stroke: rgba(255,255,255,0.04); stroke-width: 0.5; }
+            .wk-l-1 { fill: rgba(80,227,194,0.18); }
+            .wk-l-2 { fill: rgba(80,227,194,0.40); }
+            .wk-l-3 { fill: rgba(80,227,194,0.65); }
+            .wk-l-4 { fill: rgba(80,227,194,0.95); }
+            .wk-pad { fill: transparent; }
+            .wk-month { fill: rgba(237,237,237,0.55); font: 400 9px "JetBrains Mono", monospace; }
+            .wk-day { fill: rgba(237,237,237,0.45); font: 400 9px "JetBrains Mono", monospace; }
+          </style>
+          {monthLabels.map((m) => (
+            <text x={m.col * (cellSize + cellGap) + 1} y={-4} class="wk-month">
+              {m.label}
+            </text>
+          ))}
+          <text x={-26} y={1 * (cellSize + cellGap) + cellSize - 1} class="wk-day">Mon</text>
+          <text x={-26} y={3 * (cellSize + cellGap) + cellSize - 1} class="wk-day">Wed</text>
+          <text x={-22} y={5 * (cellSize + cellGap) + cellSize - 1} class="wk-day">Fri</text>
+          {weeks.map((week, col) =>
+            week.map((day, row) => {
+              const x = col * (cellSize + cellGap);
+              const y = row * (cellSize + cellGap);
+              if (day === null) {
+                return <rect x={x} y={y} width={cellSize} height={cellSize} class="wk-pad wk-cell" />;
+              }
+              const tip = `${day.date} · ${formatWakaDuration(day.totalSeconds)}`;
+              return (
+                <rect x={x} y={y} width={cellSize} height={cellSize} class={`wk-cell wk-l-${day.level}`}>
+                  <title>{tip}</title>
+                </rect>
+              );
+            }),
+          )}
+        </svg>
+      </div>
+      <div class="mt-2 flex items-center justify-end gap-2 text-[10px] font-mono text-[var(--color-ink-faint)] uppercase tracking-wider">
+        <span>Less</span>
+        <svg width="62" height="11" viewBox="0 0 62 11" aria-hidden="true">
+          <rect x="0" y="0" width="11" height="11" rx="2" class="wk-l-0" />
+          <rect x="13" y="0" width="11" height="11" rx="2" class="wk-l-1" />
+          <rect x="26" y="0" width="11" height="11" rx="2" class="wk-l-2" />
+          <rect x="39" y="0" width="11" height="11" rx="2" class="wk-l-3" />
+          <rect x="51" y="0" width="11" height="11" rx="2" class="wk-l-4" />
+        </svg>
+        <span>More</span>
+      </div>
+    </div>
+  )}
+
+  {/* Languages | Editors */}
+  <div class="grid md:grid-cols-2 gap-x-8 gap-y-6">
+    <div>
+      <div class="font-mono text-[10px] uppercase tracking-wider text-[var(--color-ink-faint)] mb-3">
+        Languages · top {topLanguages.length}
+      </div>
+      <div class="space-y-3">
+        {topLanguages.map((l) => (
+          <div>
+            <div class="flex items-baseline justify-between mb-1">
+              <span class="font-mono text-xs text-[var(--color-ink)]">{l.name}</span>
+              <span class="font-mono text-xs text-[var(--color-ink-faint)]">
+                {formatWakaDuration(l.totalSeconds)} · {Math.round(l.percent)}%
+              </span>
+            </div>
+            <div class="h-2 bg-[var(--color-surface-2)] rounded overflow-hidden">
+              <div
+                class="h-full bg-[var(--color-saffron)]"
+                style={`width: ${Math.max(0, Math.min(100, l.percent))}%`}
+              />
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+
+    <div>
+      <div class="font-mono text-[10px] uppercase tracking-wider text-[var(--color-ink-faint)] mb-3">
+        Editors · top {topEditors.length}
+      </div>
+      <div class="space-y-3">
+        {topEditors.map((e) => {
+          const ai = isAi(e.name);
+          return (
+            <div>
+              <div class="flex items-baseline justify-between mb-1">
+                <span class="font-mono text-xs flex items-center gap-1.5">
+                  <span class={ai ? "text-[var(--color-mint)]" : "text-[var(--color-ink)]"}>
+                    {e.name}
+                  </span>
+                  {ai && (
+                    <span class="font-mono text-[9px] uppercase tracking-wider text-[var(--color-mint)] border border-[var(--color-mint)]/40 rounded px-1 py-0.5">
+                      AI
+                    </span>
+                  )}
+                </span>
+                <span class="font-mono text-xs text-[var(--color-ink-faint)]">
+                  {formatWakaDuration(e.totalSeconds)} · {Math.round(e.percent)}%
+                </span>
+              </div>
+              <div class="h-2 bg-[var(--color-surface-2)] rounded overflow-hidden">
+                <div
+                  class={`h-full ${ai ? "bg-[var(--color-mint)]" : "bg-[var(--color-saffron)]"}`}
+                  style={`width: ${Math.max(0, Math.min(100, e.percent))}%`}
+                />
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  </div>
+</figure>

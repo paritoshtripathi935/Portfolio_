@@ -1,0 +1,21 @@
+---
+type Props = {
+  title?: string;
+  caption?: string;
+};
+const { title, caption } = Astro.props;
+---
+
+<figure class="my-8 rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] p-4 sm:p-6 not-prose">
+  {
+    title && (
+      <figcaption class="font-mono text-xs uppercase tracking-wider text-[var(--color-ink-faint)] mb-4">
+        {title}
+      </figcaption>
+    )
+  }
+  <div class="overflow-x-auto">
+    <slot />
+  </div>
+  {caption && <div class="mt-4 text-xs text-[var(--color-ink-faint)]">{caption}</div>}
+</figure>

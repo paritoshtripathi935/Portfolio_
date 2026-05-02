@@ -1,0 +1,217 @@
+---
+import Base from "../../layouts/Base.astro";
+import CaseStudyHeader from "../../components/CaseStudyHeader.astro";
+import CaseStudyTOC from "../../components/CaseStudyTOC.astro";
+import BarChart from "../../components/charts/BarChart.astro";
+import ArchDiagram from "../../components/charts/ArchDiagram.astro";
+
+const tocItems = [
+  { id: "problem", label: "The problem" },
+  { id: "architecture", label: "Architecture" },
+  { id: "design", label: "Design" },
+  { id: "production", label: "What it ran in 12 months" },
+  { id: "growth", label: "Steady-state growth" },
+  { id: "scaling", label: "Why this scales linearly" },
+  { id: "next", label: "What I'd add next" },
+  { id: "stack", label: "Stack" },
+];
+
+const stats = [
+  { value: "3.9M", label: "writes" },
+  { value: "7,800", label: "manufacturers" },
+  { value: "30%", label: "MoM growth" },
+  { value: "407K", label: "peak day" },
+];
+
+const throughput = [
+  { label: "Sustained avg", value: "~35 / sec", fill: 35 / 100 },
+  { label: "Sustained peak", value: "100+ / sec", fill: 100 / 100 },
+  { label: "Burst-day total", value: "407K writes", fill: 1, accent: true },
+];
+---
+
+<Base
+  title="Inventory Service · Paritosh Tripathi"
+  description="Parspec's Inventory Service — saga-pattern ingestion with Redis-backed per-SKU locks, processing 3.9M+ writes across 7,800+ manufacturers in production."
+>
+  <CaseStudyHeader
+    slug="inventory-service"
+    eyebrow="May 2025 → Apr 2026 · Parspec"
+    title="Inventory Service"
+    blurb="Parspec's Inventory Service — Django REST + DynamoDB ingestion serialized through a saga with compensating transactions and Redis-backed mutual exclusion at the SKU level."
+    stats={stats}
+  />
+
+  <CaseStudyTOC items={tocItems} />
+  <article class="max-w-4xl mx-auto px-6 prose-invert">
+    <h2 id="problem">The problem</h2>
+    <p>
+      Inventory writes were arriving from multiple upstream services concurrently — webhook callbacks, batch ingests, manufacturer onboardings. Without coordination, two writes for the same SKU could interleave through downstream Elasticsearch and specsheet steps, leaving the system in a partially updated state.
+    </p>
+
+    <h2 id="architecture">Architecture</h2>
+    <ArchDiagram
+      title="Saga + per-SKU lock · ingestion path"
+      caption="Lock acquisition is the first step. If anything downstream fails, compensating actions undo the prior steps before the lock is released."
+    >
+      <svg viewBox="0 0 920 360" class="w-full h-auto" role="img" aria-label="Inventory Service architecture">
+        <style>
+          .i-node { fill: #1a1a1a; stroke: rgba(255,255,255,0.12); }
+          .i-node-accent { fill: #1a1a1a; stroke: #ff8c00; }
+          .i-store { fill: #121212; stroke: rgba(80,227,194,0.35); }
+          .i-label { fill: #ededed; font: 500 12px "JetBrains Mono", ui-monospace, monospace; }
+          .i-sub { fill: rgba(237,237,237,0.55); font: 400 10px "JetBrains Mono", ui-monospace, monospace; }
+          .i-arrow { stroke: rgba(255,255,255,0.25); stroke-width: 1.5; fill: none; }
+          .i-arrow-accent { stroke: #ff8c00; stroke-width: 1.5; fill: none; }
+          .i-comp { stroke: #ff6b6b; stroke-width: 1.5; fill: none; stroke-dasharray: 4 4; }
+        </style>
+        <defs>
+          <marker id="i-ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+            <path d="M0,0 L10,5 L0,10 z" fill="rgba(255,255,255,0.4)"></path>
+          </marker>
+          <marker id="i-ah-saf" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+            <path d="M0,0 L10,5 L0,10 z" fill="#ff8c00"></path>
+          </marker>
+          <marker id="i-ah-comp" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+            <path d="M0,0 L10,5 L0,10 z" fill="#ff6b6b"></path>
+          </marker>
+        </defs>
+
+        <rect x="20" y="20" width="170" height="60" rx="10" class="i-node" />
+        <text x="105" y="48" text-anchor="middle" class="i-label">Producers</text>
+        <text x="105" y="64" text-anchor="middle" class="i-sub">webhooks · batches · onboard</text>
+
+        <rect x="220" y="20" width="160" height="60" rx="10" class="i-node-accent" />
+        <text x="300" y="48" text-anchor="middle" class="i-label">Saga orchestrator</text>
+        <text x="300" y="64" text-anchor="middle" class="i-sub">Django REST</text>
+
+        <rect x="160" y="120" width="140" height="50" rx="8" class="i-node-accent" />
+        <text x="230" y="142" text-anchor="middle" class="i-label">1 · Lock</text>
+        <text x="230" y="158" text-anchor="middle" class="i-sub">acquire per-SKU</text>
+
+        <rect x="320" y="120" width="140" height="50" rx="8" class="i-node" />
+        <text x="390" y="142" text-anchor="middle" class="i-label">2 · Validate</text>
+        <text x="390" y="158" text-anchor="middle" class="i-sub">schema + biz rules</text>
+
+        <rect x="480" y="120" width="140" height="50" rx="8" class="i-node" />
+        <text x="550" y="142" text-anchor="middle" class="i-label">3 · Write</text>
+        <text x="550" y="158" text-anchor="middle" class="i-sub">DynamoDB row</text>
+
+        <rect x="640" y="120" width="140" height="50" rx="8" class="i-node" />
+        <text x="710" y="142" text-anchor="middle" class="i-label">4 · Index</text>
+        <text x="710" y="158" text-anchor="middle" class="i-sub">ES projection</text>
+
+        <rect x="320" y="220" width="140" height="50" rx="8" class="i-node" />
+        <text x="390" y="242" text-anchor="middle" class="i-label">5 · Specsheet</text>
+        <text x="390" y="258" text-anchor="middle" class="i-sub">attach + hash</text>
+
+        <rect x="480" y="220" width="140" height="50" rx="8" class="i-node" />
+        <text x="550" y="242" text-anchor="middle" class="i-label">6 · Emit events</text>
+        <text x="550" y="258" text-anchor="middle" class="i-sub">downstream pubs</text>
+
+        <rect x="640" y="220" width="140" height="50" rx="8" class="i-node-accent" />
+        <text x="710" y="242" text-anchor="middle" class="i-label">7 · Release</text>
+        <text x="710" y="258" text-anchor="middle" class="i-sub">drop SKU lock</text>
+
+        <rect x="40" y="290" width="180" height="55" rx="8" class="i-store" />
+        <text x="130" y="316" text-anchor="middle" class="i-label">Redis</text>
+        <text x="130" y="332" text-anchor="middle" class="i-sub">per-SKU lock + TTL</text>
+
+        <rect x="240" y="290" width="180" height="55" rx="8" class="i-store" />
+        <text x="330" y="316" text-anchor="middle" class="i-label">DynamoDB</text>
+        <text x="330" y="332" text-anchor="middle" class="i-sub">inventory table</text>
+
+        <rect x="440" y="290" width="180" height="55" rx="8" class="i-store" />
+        <text x="530" y="316" text-anchor="middle" class="i-label">Elasticsearch</text>
+        <text x="530" y="332" text-anchor="middle" class="i-sub">search projection</text>
+
+        <rect x="640" y="290" width="180" height="55" rx="8" class="i-store" />
+        <text x="730" y="316" text-anchor="middle" class="i-label">Event bus</text>
+        <text x="730" y="332" text-anchor="middle" class="i-sub">downstream services</text>
+
+        <path class="i-arrow" marker-end="url(#i-ah)" d="M190 50 L220 50" />
+        <path class="i-arrow-accent" marker-end="url(#i-ah-saf)" d="M300 80 L230 120" />
+        <path class="i-arrow" marker-end="url(#i-ah)" d="M300 145 L320 145" />
+        <path class="i-arrow" marker-end="url(#i-ah)" d="M460 145 L480 145" />
+        <path class="i-arrow" marker-end="url(#i-ah)" d="M620 145 L640 145" />
+        <path class="i-arrow" marker-end="url(#i-ah)" d="M710 170 L460 220" />
+        <path class="i-arrow" marker-end="url(#i-ah)" d="M460 245 L480 245" />
+        <path class="i-arrow-accent" marker-end="url(#i-ah-saf)" d="M620 245 L640 245" />
+
+        <path class="i-arrow" d="M230 170 L130 290" />
+        <path class="i-arrow" d="M550 170 L330 290" />
+        <path class="i-arrow" d="M710 170 L530 290" />
+        <path class="i-arrow" d="M550 270 L730 290" />
+
+        <path class="i-comp" marker-end="url(#i-ah-comp)" d="M390 245 Q 200 250 200 175" />
+      </svg>
+    </ArchDiagram>
+    <p>
+      The dashed red arrow is the compensating-transaction path. If a downstream step (specsheet attach, ES index, event emit) fails, prior side effects are reverted before the SKU lock releases — never just abandoned.
+    </p>
+
+    <h2 id="design">Design</h2>
+
+    <h3>Saga with compensating transactions</h3>
+    <p>
+      Each ingestion is a saga of discrete steps: validate → write to DynamoDB → index in Elasticsearch → attach specsheet → emit downstream events. If any step fails, prior steps are compensated — not just rolled back, <em>compensated</em> — because some of them have already published events to other services.
+    </p>
+
+    <h3>Per-SKU (per-aggregate) locks, not table locks</h3>
+    <p>
+      The contended resource is the SKU, not the table. Locking the table would serialize all 35 writes-per-second through a single mutex. Per-SKU locks let independent writes run in parallel and only serialize when the same SKU is being modified — which is the actual race we care about.
+    </p>
+    <p>
+      Locks live in Redis with a TTL ceiling so a crashed worker can't hold a SKU forever. The saga acquires the lock as its first step and releases on completion or compensation.
+    </p>
+
+    <h2 id="production">What it ran in 12 months</h2>
+    <p>
+      All numbers below are organic ingestion only — they exclude the initial seed that bootstrapped the table.
+    </p>
+    <ul>
+      <li><strong>3.91M</strong> product writes across <strong>198</strong> active days</li>
+      <li><strong>~7,800</strong> distinct manufacturers (up from a handful at seed time)</li>
+      <li>Sustained throughput: <strong>~35 writes/sec</strong> average; <strong>100+ writes/sec</strong> peak</li>
+      <li>Largest single-day burst: <strong>407K writes</strong> during the first major customer onboarding</li>
+      <li>Second-largest single-day burst: <strong>216K writes</strong></li>
+      <li>Onboarded <strong>2,500+ new manufacturers</strong> in a single month — over <strong>30×</strong> the prior month's volume</li>
+    </ul>
+
+    <BarChart
+      title="Throughput envelope"
+      rows={throughput}
+      caption="The mint bar is a single-day burst total — different unit (writes/day) than the per-second sustained rates above. The point is the same: the system holds shape across an order-of-magnitude jump."
+    />
+
+    <h2 id="growth">Steady-state growth</h2>
+    <p>
+      In organic steady state the system absorbed <strong>25–30% month-over-month volume growth</strong> without any throughput re-tuning — a clean validation that the saga + per-SKU lock design holds under compounding load.
+    </p>
+    <p>
+      The dramatic events were the customer-onboarding burst days, not the steady curve: the Nov-style <strong>407K-write</strong> day was an order of magnitude above sustained throughput, and the system absorbed it with no duplicate-row incidents and no manual intervention. That's the proof point — not the curve, the bursts.
+    </p>
+
+    <h2 id="scaling">Why this scales linearly</h2>
+    <p>
+      Saga + per-SKU lock are the unit of horizontal scaling. Adding workers doesn't change the per-SKU contention, so latency and cost scale linearly with throughput, not super-linearly. The biggest customer-onboarding burst ran clean on the same primitives the steady curve runs on — no special-cased path, no scramble.
+    </p>
+
+    <h2 id="next">What I'd add next</h2>
+    <ul>
+      <li>p50 / p99 ingestion latency on the API endpoints</li>
+      <li>Lock contention rate (% of writes that waited)</li>
+      <li>Saga rollback rate (% of ingestions that hit a compensating step)</li>
+      <li>Cost per write before vs. after the saga + lock implementation</li>
+    </ul>
+
+    <h2 id="stack">Stack</h2>
+    <ul>
+      <li>Django REST Framework</li>
+      <li>DynamoDB (us-east-2) for the inventory table</li>
+      <li>Redis for distributed locks</li>
+      <li>Elasticsearch for the search-side projection</li>
+      <li>CloudWatch + Sentry for observability</li>
+    </ul>
+  </article>
+</Base>
