@@ -30,6 +30,15 @@ const links = [
         ))
       }
     </ul>
-    <CommandPalette />
+    <div class="flex items-center gap-2">
+      <a
+        href="/recruiter"
+        class="hidden sm:inline-flex items-center gap-1.5 rounded-full border border-[var(--color-border-strong)] hover:border-[var(--color-saffron)] hover:text-[var(--color-saffron)] text-[var(--color-ink-muted)] text-xs font-mono uppercase tracking-[0.18em] px-3 py-1.5 transition-colors"
+      >
+        For recruiters
+        <span class="text-[var(--color-saffron)]">→</span>
+      </a>
+      <CommandPalette />
+    </div>
   </nav>
 </header>
