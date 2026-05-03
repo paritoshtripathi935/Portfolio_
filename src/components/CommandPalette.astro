@@ -112,6 +112,7 @@ const items: Item[] = [
     const triggers = [
       document.getElementById("cmdk-trigger"),
       document.getElementById("cmdk-trigger-mobile"),
+      ...Array.from(document.querySelectorAll<HTMLElement>("[data-cmdk-trigger]")),
     ].filter(Boolean);
 
     if (!overlay || !panel || !input || !list) return;

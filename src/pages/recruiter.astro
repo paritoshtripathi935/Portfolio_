@@ -1,0 +1,146 @@
+---
+import Base from "../layouts/Base.astro";
+import { site } from "../data/site";
+
+const wins = [
+  {
+    metric: "3.9M+",
+    unit: "writes",
+    title: "Inventory service · saga + per-SKU locks",
+    blurb:
+      "Designed the SAGA + per-SKU distributed-lock pattern behind 3.9M+ inventory writes across 7,800+ manufacturers. 10K+ ops under 300s at 99.6% success.",
+    href: "/work/inventory-service",
+  },
+  {
+    metric: "4h → 8min",
+    unit: "setup time",
+    title: "Hermes · per-branch ephemeral environments",
+    blurb:
+      "Internal platform spinning up 100+ isolated PR environments. Cut review setup 95%, lifted team velocity 30%, drove 7× DAU growth on the surface.",
+    href: "/work/hermes",
+  },
+  {
+    metric: "150 GB",
+    unit: "per day",
+    title: "Distributed pipeline · Anakin (YC S21)",
+    blurb:
+      "Architected a fault-tolerant distributed pipeline across 4 teams at 99.95% availability. 150M+ events/month at 50K events/min peak; cut infra cost $3K/mo.",
+    href: "/experience/anakin",
+  },
+];
+
+const facts = [
+  { k: "Role", v: "Backend / distributed systems engineer" },
+  { k: "Currently", v: "Software Engineer II · Parspec (Apr 2025 → present)" },
+  { k: "Previously", v: "Founding eng · Anakin (YC S21) · Engineer of the Quarter Q3 '24" },
+  { k: "Experience", v: "~3.5 yrs full-time backend" },
+  { k: "Stack", v: "Python · Go · Django · FastAPI · PostgreSQL · DynamoDB · Redis · AWS" },
+  { k: "Location", v: "Bangalore · open to remote" },
+  { k: "Looking for", v: "Senior / staff backend, platform, or distributed-systems roles" },
+];
+---
+
+<Base title="Paritosh Tripathi — for recruiters (30-second version)">
+  <section class="max-w-4xl mx-auto px-6 pt-16 pb-24 md:pt-24">
+    <div class="reveal flex items-center gap-2 text-xs font-mono text-[var(--color-ink-muted)] tracking-wider uppercase mb-6">
+      <span class="relative flex h-2 w-2">
+        <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-[var(--color-saffron)] opacity-50"></span>
+        <span class="relative inline-flex rounded-full h-2 w-2 bg-[var(--color-saffron)]"></span>
+      </span>
+      <span>30-second version · for recruiters</span>
+    </div>
+
+    <h1 class="reveal font-serif text-4xl md:text-6xl leading-[1.05] tracking-tight mb-2">
+      <span class="text-[var(--color-ink)]">{site.name}</span>
+    </h1>
+    <p class="reveal font-mono text-xs uppercase tracking-[0.24em] text-[var(--color-saffron)] mb-10">
+      {site.role}
+    </p>
+
+    <!-- TL;DR card -->
+    <div class="reveal rounded-2xl border border-[var(--color-border-strong)] bg-[var(--color-surface)]/70 backdrop-blur-sm p-6 md:p-8 mb-10">
+      <dl class="grid grid-cols-1 md:grid-cols-[max-content_1fr] gap-x-8 gap-y-3 text-sm">
+        {
+          facts.map((f) => (
+            <>
+              <dt class="font-mono text-xs uppercase tracking-[0.18em] text-[var(--color-ink-faint)] md:pt-0.5">{f.k}</dt>
+              <dd class="text-[var(--color-ink)]">{f.v}</dd>
+            </>
+          ))
+        }
+      </dl>
+
+      <div class="mt-8 flex flex-wrap gap-3">
+        <a
+          href={site.resume}
+          target="_blank"
+          rel="noopener"
+          class="group inline-flex items-center gap-2 rounded-full bg-[var(--color-saffron)] hover:bg-[var(--color-saffron-light)] text-black font-medium px-5 py-2.5 transition-colors"
+        >
+          Resume
+          <span class="transition-transform group-hover:translate-x-1">↗</span>
+        </a>
+        <a
+          href={`mailto:${site.email}`}
+          class="inline-flex items-center gap-2 rounded-full border border-[var(--color-border-strong)] hover:border-[var(--color-saffron)] hover:text-[var(--color-saffron)] text-[var(--color-ink)] px-5 py-2.5 transition-colors"
+        >
+          Email me <span class="text-[var(--color-ink-faint)] font-mono text-xs">{site.email}</span>
+        </a>
+        <a
+          href={site.linkedin}
+          target="_blank"
+          rel="noopener"
+          class="inline-flex items-center gap-2 rounded-full text-[var(--color-ink-muted)] hover:text-[var(--color-ink)] px-3 py-2.5 transition-colors"
+        >
+          LinkedIn ↗
+        </a>
+      </div>
+    </div>
+
+    <!-- Wins -->
+    <div class="reveal mb-4 flex items-baseline justify-between">
+      <h2 class="font-serif text-2xl md:text-3xl text-[var(--color-ink)]">Three things that travel</h2>
+      <span class="font-mono text-[10px] uppercase tracking-[0.24em] text-[var(--color-ink-faint)]">pick one</span>
+    </div>
+
+    <ol class="space-y-4">
+      {
+        wins.map((w, i) => (
+          <li class="reveal">
+            <a
+              href={w.href}
+              class="spotlight group block rounded-xl border border-[var(--color-border)] hover:border-[var(--color-saffron)] bg-[var(--color-surface)]/50 backdrop-blur-sm p-5 md:p-6 transition-colors"
+            >
+              <div class="flex items-baseline gap-4 mb-2">
+                <span class="font-mono text-[10px] tabular-nums text-[var(--color-ink-faint)]">0{i + 1}</span>
+                <div class="flex items-baseline gap-2">
+                  <span class="font-serif text-2xl md:text-3xl text-[var(--color-saffron)] tabular-nums">{w.metric}</span>
+                  <span class="font-mono text-[10px] uppercase tracking-[0.18em] text-[var(--color-ink-muted)]">{w.unit}</span>
+                </div>
+              </div>
+              <h3 class="text-[var(--color-ink)] font-medium mb-1.5">{w.title}</h3>
+              <p class="text-sm text-[var(--color-ink-muted)] leading-relaxed mb-3">{w.blurb}</p>
+              <span class="inline-flex items-center gap-1 text-xs text-[var(--color-ink-faint)] group-hover:text-[var(--color-saffron)] transition-colors font-mono">
+                read the full case study
+                <span class="transition-transform group-hover:translate-x-1">→</span>
+              </span>
+            </a>
+          </li>
+        ))
+      }
+    </ol>
+
+    <!-- Quiet escape hatch -->
+    <div class="reveal mt-12 flex items-center justify-between gap-4 pt-6 border-t border-[var(--color-border)]">
+      <p class="text-xs font-mono uppercase tracking-[0.2em] text-[var(--color-ink-faint)]">
+        want the long version?
+      </p>
+      <a
+        href="/"
+        class="text-sm text-[var(--color-ink-muted)] hover:text-[var(--color-saffron)] transition-colors"
+      >
+        See the full portfolio →
+      </a>
+    </div>
+  </section>
+</Base>
