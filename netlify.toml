@@ -3,7 +3,9 @@
   publish = "dist"
 
 [build.environment]
-  NODE_VERSION = "20"
+  # package.json engines says >=22.12.0 — keep Netlify in sync.
+  NODE_VERSION = "22"
+  NPM_FLAGS = "--no-audit --no-fund"
   # Astro reads .env from the build environment. Set the real values in
   # Netlify → Site settings → Environment variables, NOT here.
   # Required: WAKATIME_API_KEY (for the IDE activity panel)
