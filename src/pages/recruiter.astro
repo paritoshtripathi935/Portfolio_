@@ -82,9 +82,10 @@ const facts = [
         </a>
         <a
           href={`mailto:${site.email}`}
-          class="inline-flex items-center gap-2 rounded-full border border-[var(--color-border-strong)] hover:border-[var(--color-saffron)] hover:text-[var(--color-saffron)] text-[var(--color-ink)] px-5 py-2.5 transition-colors"
+          class="inline-flex items-center gap-2 rounded-full border border-[var(--color-border-strong)] hover:border-[var(--color-saffron)] hover:text-[var(--color-saffron)] text-[var(--color-ink)] px-5 py-2.5 transition-colors max-w-full"
         >
-          Email me <span class="text-[var(--color-ink-faint)] font-mono text-xs">{site.email}</span>
+          Email me
+          <span class="hidden md:inline text-[var(--color-ink-faint)] font-mono text-xs truncate">{site.email}</span>
         </a>
         <a
           href={site.linkedin}
