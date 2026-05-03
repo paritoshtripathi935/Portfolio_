@@ -394,13 +394,56 @@ html.intro-seen .intro { display: none; }
   }
   @keyframes intro-fade-out { to { opacity: 0; visibility: hidden; } }
 }
+
+@media (max-width: 640px) {
+  /* Smaller chromatic offset so letters don't bleed offscreen on phones. */
+  .intro-name span {
+    transform: translateY(-40px) scale(1.35);
+    text-shadow:
+      8px 0 0 rgba(255, 0, 80, 0.55),
+      -8px 0 0 rgba(0, 217, 255, 0.55);
+  }
+  @keyframes intro-slam {
+    0% {
+      opacity: 0;
+      transform: translateY(-40px) scale(1.35);
+      text-shadow:
+        8px 0 0 rgba(255, 0, 80, 0.55),
+        -8px 0 0 rgba(0, 217, 255, 0.55);
+    }
+    60% { opacity: 1; }
+    100% {
+      opacity: 1;
+      transform: none;
+      text-shadow: 0 0 0 transparent, 0 0 0 transparent;
+    }
+  }
+  /* Devanagari backdrop must not push horizontal scroll. */
+  .intro-backname {
+    font-size: clamp(4.5rem, 28vw, 9rem);
+    max-width: 100vw;
+    overflow: hidden;
+  }
+  /* Slightly tighter corner tags on small screens so they don't crowd the name. */
+  .intro-tag-l { left: -0.5rem; }
+  .intro-tag-r { right: -0.5rem; }
+  /* The rule lines flanking the role tagline overflow phones — drop them. */
+  .intro-role::before,
+  .intro-role::after { display: none; }
+}
 @media (max-width: 640px) {
   .bg-blob { filter: blur(50px); }
   .bg-blob-3 { display: none; }
 }
 
+/* On touch devices the cursor halo is stuck at viewport center — hide it. */
+@media (hover: none), (pointer: coarse) {
+  .bg-spotlight { display: none; }
+}
+
 .stage-section {
   min-height: 100vh;
+  min-height: 100svh;
   position: relative;
   display: flex;
   flex-direction: column;
