@@ -13,6 +13,9 @@ const {
   title = "Paritosh Tripathi — Backend / distributed systems engineer",
   description = "Software Engineer II at Parspec. Designed Hermes (per-branch ephemeral environments) and the saga + per-SKU lock pattern behind 3.9M+ inventory writes.",
 } = Astro.props;
+
+const isHome = Astro.url.pathname === "/";
+const introName = "Paritosh Tripathi";
 ---
 
 <!doctype html>
@@ -34,8 +37,41 @@ const {
     />
     <ClientRouter />
     <title>{title}</title>
+    <script is:inline>
+      try {
+        // Clean up legacy persistent flag (intro now plays once per session).
+        localStorage.removeItem("intro_seen_v1");
+        if (sessionStorage.getItem("intro_seen_v1")) {
+          document.documentElement.classList.add("intro-seen");
+        }
+      } catch (_) {}
+    </script>
   </head>
   <body class="grain min-h-screen">
+    <div class="bg-stage" aria-hidden="true">
+      <div class="bg-blob bg-blob-1"></div>
+      <div class="bg-blob bg-blob-2"></div>
+      <div class="bg-blob bg-blob-3"></div>
+      <div class="bg-grid"></div>
+      <div class="bg-spotlight"></div>
+    </div>
+    {isHome && (
+      <div class="intro" id="intro" role="presentation">
+        <div class="intro-lines" aria-hidden="true"></div>
+        <div class="intro-halftone" aria-hidden="true"></div>
+        <div class="intro-backname" aria-hidden="true">पारितोष</div>
+        <div class="intro-inner">
+          <span class="intro-tag intro-tag-l" aria-hidden="true">— 01</span>
+          <span class="intro-tag intro-tag-r" aria-hidden="true">enter ›</span>
+          <h1 class="intro-name" aria-label={introName}>
+            {[...introName].map((ch, i) => (
+              <span style={`--i:${i}`} aria-hidden="true">{ch === " " ? " " : ch}</span>
+            ))}
+          </h1>
+          <p class="intro-role">backend &middot; distributed systems</p>
+        </div>
+      </div>
+    )}
     <Header />
     <slot />
     <Footer />
@@ -52,6 +88,56 @@ const {
             el.style.setProperty("--spotlight-y", `${e.clientY - r.top}px`);
           });
         });
+
+        // Intro: clean up after curtain finishes; allow click/key to skip.
+        const introEl = document.getElementById("intro");
+        if (introEl && !document.documentElement.classList.contains("intro-seen")) {
+          let cleaned = false;
+          const cleanup = () => {
+            if (cleaned) return;
+            cleaned = true;
+            introEl.remove();
+            document.documentElement.classList.add("intro-seen");
+            try { sessionStorage.setItem("intro_seen_v1", "1"); } catch (_) {}
+          };
+          introEl.addEventListener("animationend", (e: AnimationEvent) => {
+            if (e.target === introEl && e.animationName === "intro-curtain") cleanup();
+            if (e.target === introEl && e.animationName === "intro-fade-out") cleanup();
+          });
+          const skip = () => {
+            if (cleaned) return;
+            introEl.style.animation = "none";
+            introEl.style.transition = "opacity 280ms ease, transform 280ms ease";
+            introEl.style.opacity = "0";
+            introEl.style.transform = "translateY(-100%)";
+            window.setTimeout(cleanup, 300);
+          };
+          introEl.addEventListener("click", skip, { once: true });
+          window.addEventListener("keydown", skip, { once: true });
+        }
+
+        // Page-level cursor halo for .bg-spotlight. rAF-throttled.
+        if (!(window as any).__bgSpotlightBound) {
+          (window as any).__bgSpotlightBound = true;
+          let rafId = 0;
+          let nextX = innerWidth / 2;
+          let nextY = innerHeight / 2;
+          const root = document.documentElement;
+          const apply = () => {
+            rafId = 0;
+            root.style.setProperty("--cursor-x", `${nextX}px`);
+            root.style.setProperty("--cursor-y", `${nextY}px`);
+          };
+          window.addEventListener(
+            "pointermove",
+            (e) => {
+              nextX = e.clientX;
+              nextY = e.clientY;
+              if (!rafId) rafId = requestAnimationFrame(apply);
+            },
+            { passive: true },
+          );
+        }
 
         const io = new IntersectionObserver(
           (entries) => {
