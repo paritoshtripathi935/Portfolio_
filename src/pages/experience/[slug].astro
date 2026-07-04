@@ -1,6 +1,7 @@
 ---
 import Base from "../../layouts/Base.astro";
 import { experience } from "../../data/experience";
+import { techIconUrl } from "../../lib/techIcons";
 
 export const getStaticPaths = () =>
   experience.map((x) => ({ params: { slug: x.slug }, props: { entry: x } }));
@@ -63,14 +64,22 @@ const { entry } = Astro.props;
     </ul>
 
     <h2>Stack</h2>
-    <div class="not-prose flex flex-wrap gap-2 mt-3">
-      {
-        entry.stack.map((s) => (
-          <span class="font-mono text-xs px-2.5 py-1 rounded-md border border-[var(--color-border)] text-[var(--color-ink-muted)]">
-            {s}
-          </span>
-        ))
-      }
+    <div
+      class="not-prose mt-3 relative overflow-hidden"
+      style="mask-image: linear-gradient(to right, transparent, black 6%, black 94%, transparent); -webkit-mask-image: linear-gradient(to right, transparent, black 6%, black 94%, transparent);"
+    >
+      <div class="flex w-max gap-2.5 stack-marquee">
+        {
+          [...entry.stack, ...entry.stack].map((s) => (
+            <span class="inline-flex shrink-0 items-center gap-2 font-mono text-xs px-2.5 py-1 rounded-md border border-[var(--color-border)] text-[var(--color-ink-muted)]">
+              {techIconUrl(s) && (
+                <img src={techIconUrl(s)!} alt="" width="14" height="14" loading="lazy" class="opacity-80" />
+              )}
+              {s}
+            </span>
+          ))
+        }
+      </div>
     </div>
 
     {

@@ -1,79 +1,135 @@
 ---
 import SectionHeader from "./SectionHeader.astro";
 import { experience } from "../data/experience";
+import { techIconUrl } from "../lib/techIcons";
+
+const monthsBetween = (start: string, end: string) => {
+  const [sy, sm] = start.split("-").map(Number);
+  const [ey, em] = end.split("-").map(Number);
+  return (ey - sy) * 12 + (em - sm);
+};
+const yearsSpan = (start: string, end: string) => {
+  const sy = Number(start.split("-")[0]);
+  const ey = Number(end.split("-")[0]);
+  const years: number[] = [];
+  for (let y = ey; y >= sy; y--) years.push(y);
+  return years;
+};
+
+const items = experience
+  .map((x) => ({ ...x, months: monthsBetween(x.startDate, x.endDate), years: yearsSpan(x.startDate, x.endDate) }))
+  .sort((a, b) => b.startDate.localeCompare(a.startDate));
 ---
 
 <section id="timeline" class="max-w-6xl mx-auto px-6 py-24 scroll-mt-20">
   <SectionHeader
     eyebrow="Timeline"
     title="Where I've been"
-    blurb="Click a role for the full writeup — bullets, stack, and the case studies it produced."
+    blurb="Years mark the line; roles alternate along it — click one for the full writeup."
   />
 
-  <div class="relative">
-    <div
-      class="flex gap-5 overflow-x-auto snap-x snap-mandatory pb-6 -mx-6 px-6 scroll-smooth"
-      style="scrollbar-width: thin;"
-    >
+  <div class="relative pl-9 md:pl-0">
+    <div class="absolute left-[7px] md:left-1/2 md:-translate-x-1/2 top-2 bottom-2 w-px bg-[var(--color-border)]"></div>
+
+    <div class="track-car absolute left-[7px] md:left-1/2 -translate-x-1/2 z-[5] text-[var(--color-saffron)]" aria-hidden="true">
+      <svg viewBox="0 0 24 40" width="15" height="25" fill="currentColor" class="drop-shadow-[0_0_5px_rgba(255,140,0,0.65)]">
+        <path d="M12 0 C16 6 18 12 18 18 L6 18 C6 12 8 6 12 0 Z" />
+        <circle cx="12" cy="13.5" r="2.4" fill="var(--color-bg)" />
+        <path d="M6 18 L1 26 L6 24 Z" />
+        <path d="M18 18 L23 26 L18 24 Z" />
+        <rect x="6" y="18" width="12" height="6" />
+        <path d="M9 24 L12 33 L15 24 Z" fill="var(--color-saffron-light)" opacity="0.9" />
+      </svg>
+      <span class="track-car-trail"></span>
+    </div>
+
+    <div class="space-y-10 md:space-y-14">
       {
-        experience.map((x) => (
-          <a
-            href={`/experience/${x.slug}`}
-            class="spotlight reveal group snap-start shrink-0 w-[88%] md:w-[460px] rounded-2xl border border-[var(--color-border)] hover:border-[var(--color-border-strong)] bg-[var(--color-surface)] p-6 md:p-7 transition-colors block"
-          >
-            <div class="flex items-center justify-between gap-4">
+        items.map((x, i) => {
+          const isLeft = i % 2 === 0;
+          const card = (
+            <a
+              href={`/experience/${x.slug}`}
+              class="spotlight block rounded-2xl border border-[var(--color-border)] hover:border-[var(--color-border-strong)] bg-[var(--color-surface)] p-6 md:p-7 transition-colors"
+            >
               <div
                 class="font-mono text-[11px] uppercase tracking-wider text-[var(--color-ink-faint)]"
                 transition:name={`exp-${x.slug}-period`}
               >
                 {x.period}
               </div>
-              {x.current && (
-                <span class="font-mono text-[10px] uppercase tracking-wider text-[var(--color-saffron)] border border-[var(--color-saffron)] rounded-full px-2 py-0.5">
-                  current
-                </span>
+
+              <h3
+                class="mt-4 font-serif text-2xl text-[var(--color-ink)] group-hover:text-[var(--color-saffron)] transition-colors"
+                transition:name={`exp-${x.slug}-role`}
+              >
+                {x.role}
+              </h3>
+              <div class="text-[var(--color-saffron)] font-medium" transition:name={`exp-${x.slug}-company`}>
+                {x.company}
+              </div>
+
+              <ul class="mt-5 space-y-2.5">
+                {x.bullets.slice(0, 4).map((b) => (
+                  <li class="text-sm text-[var(--color-ink-muted)] leading-relaxed pl-4 relative before:content-['→'] before:absolute before:left-0 before:text-[var(--color-saffron)]/70">
+                    {b}
+                  </li>
+                ))}
+              </ul>
+
+              <div
+                class="mt-5 relative overflow-hidden"
+                style="mask-image: linear-gradient(to right, transparent, black 6%, black 94%, transparent); -webkit-mask-image: linear-gradient(to right, transparent, black 6%, black 94%, transparent);"
+              >
+                <div class="flex w-max gap-1.5 stack-marquee">
+                  {[...x.stack, ...x.stack].map((s) => (
+                    <span class="inline-flex shrink-0 items-center gap-1.5 font-mono text-[10px] px-1.5 py-0.5 rounded border border-[var(--color-border)] text-[var(--color-ink-muted)]">
+                      {techIconUrl(s) && (
+                        <img src={techIconUrl(s)!} alt="" width="12" height="12" loading="lazy" class="opacity-80" />
+                      )}
+                      {s}
+                    </span>
+                  ))}
+                </div>
+              </div>
+
+              <div class="mt-5 inline-flex items-center gap-2 text-xs font-mono text-[var(--color-ink-muted)] group-hover:text-[var(--color-saffron)] transition-colors">
+                Read full writeup
+                <span class="transition-transform group-hover:translate-x-1">→</span>
+              </div>
+            </a>
+          );
+
+          return (
+            <div class="reveal group relative md:grid md:grid-cols-2 md:gap-x-12">
+              <span class="md:hidden absolute -left-9 top-7 w-3.5 h-3.5 rounded-full border-2 border-[var(--color-saffron)] bg-[var(--color-bg)] group-hover:bg-[var(--color-saffron)] transition-colors" />
+
+              <div class="hidden md:flex absolute left-1/2 top-6 bottom-6 -translate-x-1/2 flex-col items-center justify-between z-10">
+                {x.years.map((y) => (
+                  <div class="flex flex-col items-center gap-1.5">
+                    <span class="font-mono text-[11px] text-[var(--color-saffron)] bg-[var(--color-bg)] px-1.5">
+                      {y}
+                    </span>
+                    <span class="w-3 h-3 rounded-full border-2 border-[var(--color-saffron)] bg-[var(--color-bg)] group-hover:bg-[var(--color-saffron)] transition-colors" />
+                  </div>
+                ))}
+              </div>
+
+              {isLeft ? (
+                <>
+                  <div class="md:pr-14">{card}</div>
+                  <div class="hidden md:block" />
+                </>
+              ) : (
+                <>
+                  <div class="hidden md:block" />
+                  <div class="md:pl-14">{card}</div>
+                </>
               )}
             </div>
-            <h3
-              class="mt-3 font-serif text-2xl text-[var(--color-ink)] group-hover:text-[var(--color-saffron)] transition-colors"
-              transition:name={`exp-${x.slug}-role`}
-            >
-              {x.role}
-            </h3>
-            <div
-              class="text-[var(--color-saffron)] font-medium"
-              transition:name={`exp-${x.slug}-company`}
-            >
-              {x.company}
-            </div>
-
-            <ul class="mt-5 space-y-2.5">
-              {x.bullets.slice(0, 4).map((b) => (
-                <li class="text-sm text-[var(--color-ink-muted)] leading-relaxed pl-4 relative before:content-['→'] before:absolute before:left-0 before:text-[var(--color-saffron)]/70">
-                  {b}
-                </li>
-              ))}
-            </ul>
-
-            <div class="mt-5 flex flex-wrap gap-1.5">
-              {x.stack.map((s) => (
-                <span class="font-mono text-[10px] px-1.5 py-0.5 rounded border border-[var(--color-border)] text-[var(--color-ink-muted)]">
-                  {s}
-                </span>
-              ))}
-            </div>
-
-            <div class="mt-5 inline-flex items-center gap-2 text-xs font-mono text-[var(--color-ink-muted)] group-hover:text-[var(--color-saffron)] transition-colors">
-              Read full writeup
-              <span class="transition-transform group-hover:translate-x-1">→</span>
-            </div>
-          </a>
-        ))
+          );
+        })
       }
-    </div>
-
-    <div class="mt-2 flex items-center gap-2 text-xs font-mono text-[var(--color-ink-faint)]">
-      <span>← scroll →</span>
     </div>
   </div>
 </section>

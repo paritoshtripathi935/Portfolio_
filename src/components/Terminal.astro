@@ -5,14 +5,17 @@ const filesystem = {
   "about.md": [
     "Backend / distributed systems engineer based in Bangalore.",
     "",
-    "Currently Software Engineer II at Parspec (the platform that distributors and",
-    "electrical contractors use to quote, submit, and fulfill construction projects).",
-    "Owned 43 epics in 12 months across REST APIs, ERP integrations, search, security,",
-    "performance, async infra, and order management.",
+    "Most recently Software Engineer II at Parspec (Apr 2025 - Jun 2026) — the",
+    "platform that distributors and electrical contractors use to quote, submit,",
+    "and fulfill construction projects. Owned 43 epics in 12 months across REST",
+    "APIs, ERP integrations, search, security, performance, async infra, and",
+    "order management.",
     "",
-    "Before Parspec — founding-team Software Engineer I at Anakin (YC S21).",
-    "Built a 150 GB/day pipeline and an Android device-orchestration platform from",
+    "Before that — founding-team Software Engineer I at Anakin (YC S21). Built a",
+    "150 GB/day pipeline and an Android device-orchestration platform from",
     "scratch, plus reusable microservice patterns adopted by 6 teams.",
+    "",
+    "Currently open to new opportunities.",
     "",
     "Type 'ls work' to see specific projects, or 'help' for the full command list.",
   ],
@@ -37,10 +40,10 @@ const filesystem = {
 };
 
 const work = [
-  { name: "hermes", path: "/work/hermes", desc: "per-branch ephemeral environments" },
-  { name: "inventory-service", path: "/work/inventory-service", desc: "saga + per-SKU locks" },
-  { name: "generic-compiler", path: "/work/generic-compiler", desc: "config-driven data pipeline" },
-  { name: "device-orchestration", path: "/work/device-orchestration", desc: "android automation platform" },
+  { name: "iris", path: "/work/iris", desc: "per-branch ephemeral environments" },
+  { name: "argus", path: "/work/argus", desc: "saga + per-SKU locks" },
+  { name: "proteus", path: "/work/proteus", desc: "config-driven data pipeline" },
+  { name: "hydra", path: "/work/hydra", desc: "android automation platform" },
 ];
 
 const externals = {
@@ -155,9 +158,9 @@ const externals = {
 
     const printWhoami = () => {
       printLines([
-        "Paritosh Tripathi · Software Engineer II at Parspec",
-        "Backend / distributed systems · Python · Go · AWS",
-        "Previously founding team at Anakin (YC S21).",
+        "Paritosh Tripathi · Backend / distributed systems engineer",
+        "Python · Go · AWS · open to new opportunities",
+        "Most recently at Parspec; previously founding team at Anakin (YC S21).",
         "",
         "Try: 'ls work', 'cat about.md', 'help'",
       ]);
@@ -208,7 +211,7 @@ const externals = {
 
     const openTarget = (arg) => {
       if (!arg) {
-        error("open: missing operand. try 'open hermes' or 'open github'");
+        error("open: missing operand. try 'open iris' or 'open github'");
         return;
       }
       const q = arg.trim().toLowerCase();

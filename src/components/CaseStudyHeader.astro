@@ -1,7 +1,6 @@
 ---
 type Stat = { value: string; label: string };
 type Props = {
-  eyebrow: string;
   title: string;
   blurb: string;
   stats: Stat[];
@@ -10,7 +9,6 @@ type Props = {
   backLabel?: string;
 };
 const {
-  eyebrow,
   title,
   blurb,
   stats,
@@ -28,14 +26,8 @@ const {
     ← {backLabel}
   </a>
 
-  <div
-    class="mt-8 font-mono text-xs uppercase tracking-[0.2em] text-[var(--color-saffron)]"
-    transition:name={slug ? `card-${slug}-eyebrow` : undefined}
-  >
-    {eyebrow}
-  </div>
   <h1
-    class="mt-3 font-serif text-5xl md:text-6xl tracking-tight text-[var(--color-ink)]"
+    class="mt-8 font-serif text-5xl md:text-6xl tracking-tight text-[var(--color-ink)]"
     transition:name={slug ? `card-${slug}-title` : undefined}
   >
     {title}

@@ -3,9 +3,8 @@ import SectionHeader from "./SectionHeader.astro";
 
 const cases = [
   {
-    href: "/work/hermes",
-    eyebrow: "Apr 2025 → Apr 2026 · Parspec",
-    title: "Hermes",
+    href: "/work/iris",
+    title: "Iris",
     subtitle: "Per-branch ephemeral environments. PR open to live URL in 3.8 min, host-header routed on a shared ALB.",
     metrics: [
       { v: "1,567", l: "builds" },
@@ -16,10 +15,9 @@ const cases = [
     stack: ["FastAPI", "ECS Fargate", "ALB", "CodeBuild", "ECR", "Route53", "Postgres"],
   },
   {
-    href: "/work/inventory-service",
-    eyebrow: "May 2025 → Apr 2026 · Parspec",
-    title: "Inventory Service",
-    subtitle: "Saga with compensating transactions and Redis-backed per-SKU locks behind Parspec's inventory ingestion path.",
+    href: "/work/argus",
+    title: "Argus",
+    subtitle: "Saga with compensating transactions and Redis-backed per-SKU locks behind the inventory ingestion path.",
     metrics: [
       { v: "3.9M", l: "writes" },
       { v: "7,800", l: "manufacturers" },
@@ -29,9 +27,8 @@ const cases = [
     stack: ["Django REST", "DynamoDB", "Redis", "Saga", "Per-SKU locks"],
   },
   {
-    href: "/work/product-finder",
-    eyebrow: "Apr 2025 → Apr 2026 · Parspec",
-    title: "Product Finder",
+    href: "/work/ariadne",
+    title: "Ariadne",
     subtitle: "Soft-filtering search with weighted ranking, match-strength buckets, and ML image similarity. Held to per-tier p90 latency budgets.",
     metrics: [
       { v: "21%", l: "accuracy lift" },
@@ -42,9 +39,8 @@ const cases = [
     stack: ["Elasticsearch", "OpenSearch", "Vector search", "Python", "ML similarity"],
   },
   {
-    href: "/work/generic-compiler",
-    eyebrow: "Aug 2022 → Dec 2024 · Anakin (YC S21)",
-    title: "Generic Compiler Service",
+    href: "/work/proteus",
+    title: "Proteus",
     subtitle: "Config-driven FastAPI service that replaced multiple per-team custom compilers — JSONPath configs, dual-queue SQS + DLQ, multi-sink writes.",
     metrics: [
       { v: "200 GB", l: "peak day" },
@@ -55,9 +51,8 @@ const cases = [
     stack: ["Python", "FastAPI", "SQS", "ECS", "MongoDB", "BigQuery", "S3"],
   },
   {
-    href: "/work/device-orchestration",
-    eyebrow: "Aug 2022 → Dec 2024 · Anakin (YC S21)",
-    title: "Android Device Orchestration & Automation Platform",
+    href: "/work/hydra",
+    title: "Hydra",
     subtitle: "Hybrid Pixel + Genymotion automation platform with affinity scheduling and runtime Frida injection.",
     metrics: [
       { v: "10", l: "concurrent sessions" },
@@ -74,7 +69,7 @@ const cases = [
   <SectionHeader
     eyebrow="Selected work"
     title="Five systems I designed end-to-end"
-    blurb="Three from Parspec, two from Anakin's founding team. Click in for architecture, decisions, and the numbers."
+    blurb="Click in for architecture, decisions, and the numbers."
   />
 
   <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -87,10 +82,7 @@ const cases = [
           transition:name={`card-${slug}`}
           class="spotlight reveal group block rounded-2xl border border-[var(--color-border)] hover:border-[var(--color-border-strong)] bg-[var(--color-surface)] p-7 transition-colors"
         >
-          <div class="font-mono text-[11px] uppercase tracking-wider text-[var(--color-ink-faint)]" transition:name={`card-${slug}-eyebrow`}>
-            {c.eyebrow}
-          </div>
-          <h3 class="mt-3 font-serif text-2xl text-[var(--color-ink)] group-hover:text-[var(--color-saffron)] transition-colors leading-tight" transition:name={`card-${slug}-title`}>
+          <h3 class="font-serif text-2xl text-[var(--color-ink)] group-hover:text-[var(--color-saffron)] transition-colors leading-tight" transition:name={`card-${slug}-title`}>
             {c.title}
           </h3>
           <p class="mt-3 text-sm text-[var(--color-ink-muted)] leading-relaxed">{c.subtitle}</p>

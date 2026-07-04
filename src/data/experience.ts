@@ -3,6 +3,8 @@ export type Experience = {
   company: string;
   role: string;
   period: string;
+  startDate: string;
+  endDate: string;
   location?: string;
   summary: string;
   bullets: string[];
@@ -17,9 +19,10 @@ export const experience: Experience[] = [
     slug: "parspec",
     company: "Parspec",
     role: "Software Engineer II",
-    period: "Apr 2025 — Present",
+    period: "Apr 2025 — Jun 2026",
+    startDate: "2025-04",
+    endDate: "2026-06",
     location: "Bangalore",
-    current: true,
     summary:
       "Backend lead for the public REST API and the ERP integrations program at Parspec — the platform that distributors and electrical contractors use to quote, submit, and fulfill construction projects. Owned 43 epics across 115 tickets in 12 months, working across the most critical parts of the product.",
     bullets: [
@@ -39,18 +42,18 @@ export const experience: Experience[] = [
     ],
     caseStudies: [
       {
-        name: "Hermes",
-        href: "/work/hermes",
+        name: "Iris",
+        href: "/work/iris",
         blurb: "Per-branch ephemeral environments — 1,567 builds, 88% end-to-end success, 7× DAU growth.",
       },
       {
-        name: "Inventory Service",
-        href: "/work/inventory-service",
+        name: "Argus",
+        href: "/work/argus",
         blurb: "Saga + per-SKU locks behind 3.9M+ writes across 7,800+ manufacturers.",
       },
       {
-        name: "Product Finder",
-        href: "/work/product-finder",
+        name: "Ariadne",
+        href: "/work/ariadne",
         blurb: "Soft-filtering search engine with weighted ranking and ML image similarity — 21% accuracy lift.",
       },
     ],
@@ -60,6 +63,8 @@ export const experience: Experience[] = [
     company: "Anakin (YC S21)",
     role: "Software Engineer I",
     period: "Aug 2022 — Dec 2024",
+    startDate: "2022-08",
+    endDate: "2024-12",
     location: "Bangalore",
     summary:
       "Founding-team backend engineer. Built the platform infra that the rest of the team built on top of — distributed pipelines, event-driven microservices, and Android device-orchestration capacity. Engineer of the Quarter, Q3 2024.",
@@ -80,13 +85,13 @@ export const experience: Experience[] = [
     ],
     caseStudies: [
       {
-        name: "Generic Compiler Service",
-        href: "/work/generic-compiler",
+        name: "Proteus",
+        href: "/work/proteus",
         blurb: "Config-driven FastAPI pipeline replacing per-team custom compilers — 200 GB/day peak.",
       },
       {
-        name: "Android Device Orchestration & Automation Platform",
-        href: "/work/device-orchestration",
+        name: "Hydra",
+        href: "/work/hydra",
         blurb: "Hybrid Pixel + Genymotion automation with Frida runtime injection across 100+ devices.",
       },
     ],

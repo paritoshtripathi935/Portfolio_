@@ -46,13 +46,12 @@ const pipeline = [
 ---
 
 <Base
-  title="Hermes — per-branch ephemeral environments · Paritosh Tripathi"
-  description="Architecture and metrics for Hermes, the FastAPI control-plane service that provisions per-branch ephemeral environments on AWS in under 4 minutes."
+  title="Iris — per-branch ephemeral environments · Paritosh Tripathi"
+  description="Architecture and metrics for Iris, the FastAPI control-plane service that provisions per-branch ephemeral environments on AWS in under 4 minutes."
 >
   <CaseStudyHeader
-    slug="hermes"
-    eyebrow="Apr 2025 → Apr 2026 · Production"
-    title="Hermes"
+    slug="iris"
+    title="Iris"
     blurb="A FastAPI control-plane service that provisions per-branch ephemeral environments on AWS — clone to live URL in under four minutes, host-header routed on a shared ALB."
     stats={stats}
   />
@@ -61,19 +60,19 @@ const pipeline = [
   <article class="max-w-4xl mx-auto px-6 prose-invert">
     <h2 id="problem">The problem</h2>
     <p>
-      Engineers were spending hours per branch wiring up an AWS-side environment to test their PR. The team had ~14 active developers; the queue was a meeting, not a system. Hermes turned the entire flow into a self-service API call: push to a PR, get back a stable URL.
+      Engineers were spending hours per branch wiring up an AWS-side environment to test their PR. The team had ~14 active developers; the queue was a meeting, not a system. Iris turned the entire flow into a self-service API call: push to a PR, get back a stable URL.
     </p>
 
     <h2 id="architecture">Architecture</h2>
     <p>
-      Hermes is a control-plane service — it doesn't serve user traffic, it orchestrates AWS resources. One FastAPI process, one Postgres database, and a reconciliation loop holding it all together.
+      Iris is a control-plane service — it doesn't serve user traffic, it orchestrates AWS resources. One FastAPI process, one Postgres database, and a reconciliation loop holding it all together.
     </p>
 
     <ArchDiagram
       title="Provisioning pipeline · 8 stages"
       caption="Each stage is idempotent. Failure at any step leaves the system in a state the reconciler can recover from on the next pass."
     >
-      <svg viewBox="0 0 920 320" class="w-full h-auto" role="img" aria-label="Hermes architecture">
+      <svg viewBox="0 0 920 320" class="w-full h-auto" role="img" aria-label="Iris architecture">
         <style>
           .h-node { fill: #1a1a1a; stroke: rgba(255,255,255,0.12); }
           .h-node-accent { fill: #1a1a1a; stroke: #ff8c00; }
@@ -97,7 +96,7 @@ const pipeline = [
         <text x="80" y="58" text-anchor="middle" class="h-sub">github webhook</text>
 
         <rect x="170" y="20" width="140" height="50" rx="8" class="h-node-accent" />
-        <text x="240" y="42" text-anchor="middle" class="h-label">Hermes API</text>
+        <text x="240" y="42" text-anchor="middle" class="h-label">Iris API</text>
         <text x="240" y="58" text-anchor="middle" class="h-sub">FastAPI · ECS</text>
 
         <rect x="340" y="20" width="120" height="50" rx="8" class="h-node" />
@@ -121,7 +120,7 @@ const pipeline = [
         <text x="400" y="158" text-anchor="middle" class="h-sub">stable DNS</text>
 
         <rect x="490" y="120" width="270" height="50" rx="8" class="h-node" />
-        <text x="625" y="142" text-anchor="middle" class="h-label">{`{env}.dev.parspec.xyz`}</text>
+        <text x="625" y="142" text-anchor="middle" class="h-label">{`{env}.dev.internal.example`}</text>
         <text x="625" y="158" text-anchor="middle" class="h-sub">URL stable across re-creates</text>
 
         <rect x="170" y="220" width="200" height="60" rx="8" class="h-store" />
@@ -170,7 +169,7 @@ const pipeline = [
 
     <h3>1. Host-header routing on a shared ALB, not one ALB per env</h3>
     <p>
-      The naive design is one ALB per environment. That's clean but the cost is linear in env count — at 14 developers iterating you're paying for ~30 ALBs at any given moment. Hermes uses a single shared ALB with one listener and a host-header rule per environment. Cost is essentially flat in env count; latency is unchanged.
+      The naive design is one ALB per environment. That's clean but the cost is linear in env count — at 14 developers iterating you're paying for ~30 ALBs at any given moment. Iris uses a single shared ALB with one listener and a host-header rule per environment. Cost is essentially flat in env count; latency is unchanged.
     </p>
 
     <h3>2. URL stability across re-creates</h3>
@@ -178,12 +177,12 @@ const pipeline = [
       A PR is iterative. The most-iterated environment in the dataset absorbed <strong>222 rebuilds at 100% success</strong> over its lifetime. If every rebuild churned a new URL, every Jira link and reviewer bookmark would rot.
     </p>
     <p>
-      So Hermes detects existing ALB rules and Route53 records on collision and updates them in place. <code>{`{env}.dev.parspec.xyz`}</code> stays valid across the full PR lifecycle. This single design call is what made 9.7 average rebuilds per env (p95 37, peak 222) practical instead of chaos.
+      So Iris detects existing ALB rules and Route53 records on collision and updates them in place. <code>{`{env}.dev.internal.example`}</code> stays valid across the full PR lifecycle. This single design call is what made 9.7 average rebuilds per env (p95 37, peak 222) practical instead of chaos.
     </p>
 
     <h3>3. Reconciliation loop survives process restarts</h3>
     <p>
-      The in-memory <code>active_deployments</code> dict is fast but volatile. Postgres is the durable record, and an <code>EnvironmentMonitor</code> boot scan plus a <code>TaskLifecycleService</code> reconciler that polls ECS every 30s closes the gap. Restart Hermes and lifecycle tracking picks up exactly where it left off — no orphan tasks, no leaked routing rules.
+      The in-memory <code>active_deployments</code> dict is fast but volatile. Postgres is the durable record, and an <code>EnvironmentMonitor</code> boot scan plus a <code>TaskLifecycleService</code> reconciler that polls ECS every 30s closes the gap. Restart Iris and lifecycle tracking picks up exactly where it left off — no orphan tasks, no leaked routing rules.
     </p>
 
     <h2 id="production">What it ran in 12 months</h2>
