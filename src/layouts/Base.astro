@@ -12,7 +12,7 @@ type Props = {
 
 const {
   title = "Paritosh Tripathi — Backend / distributed systems engineer",
-  description = "Software Engineer II at Parspec. Designed Hermes (per-branch ephemeral environments) and the saga + per-SKU lock pattern behind 3.9M+ inventory writes.",
+  description = "Backend / distributed-systems engineer. Designed Iris (per-branch ephemeral environments) and the saga + per-SKU lock pattern (Argus) behind 3.9M+ inventory writes.",
 } = Astro.props;
 
 const isHome = Astro.url.pathname === "/";
@@ -22,6 +22,16 @@ const introName = "Paritosh Tripathi";
 <!doctype html>
 <html lang="en">
   <head>
+    <script is:inline>
+      (function () {
+        try {
+          if (localStorage.getItem("theme") === "dark") {
+            document.documentElement.classList.add("dark");
+            document.documentElement.style.colorScheme = "dark";
+          }
+        } catch (_) {}
+      })();
+    </script>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="generator" content={Astro.generator} />

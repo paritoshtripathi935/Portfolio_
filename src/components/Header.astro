@@ -1,17 +1,17 @@
 ---
 import { site } from "../data/site";
 import CommandPalette from "./CommandPalette.astro";
+import ThemeToggle from "./ThemeToggle.astro";
 
 const links = [
   { href: "/#work", label: "work" },
-  { href: "/#engineering", label: "engineering" },
   { href: "/#timeline", label: "timeline" },
   { href: "/#projects", label: "projects" },
   { href: "/#contact", label: "contact" },
 ];
 ---
 
-<header class="sticky top-0 z-50 backdrop-blur-md bg-[rgba(10,10,10,0.6)] border-b border-[var(--color-border)]">
+<header class="sticky top-0 z-50 backdrop-blur-md bg-[var(--color-bg)]/60 border-b border-[var(--color-border)]">
   <nav class="max-w-6xl mx-auto px-6 h-14 flex items-center justify-between gap-4">
     <a href="/" class="font-serif text-lg tracking-tight text-[var(--color-ink)] hover:text-[var(--color-saffron)] transition-colors shrink-0">
       {site.hindiName}
@@ -38,6 +38,7 @@ const links = [
         For recruiters
         <span class="text-[var(--color-saffron)]">→</span>
       </a>
+      <ThemeToggle />
       <CommandPalette />
     </div>
   </nav>

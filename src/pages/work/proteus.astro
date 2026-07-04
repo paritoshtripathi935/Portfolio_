@@ -33,13 +33,12 @@ const dataVolume = [
 ---
 
 <Base
-  title="Generic Compiler Service · Paritosh Tripathi"
-  description="A config-driven Generic Compiler Service in Python/FastAPI for transforming unstructured data into structured datasets. Factory Pattern + JSONPath configs + dual-queue SQS, processing 100-200 GB/day."
+  title="Proteus · Paritosh Tripathi"
+  description="Proteus — a config-driven data-transformation service in Python/FastAPI for turning unstructured data into structured datasets. Factory Pattern + JSONPath configs + dual-queue SQS, processing 100-200 GB/day."
 >
   <CaseStudyHeader
-    slug="generic-compiler"
-    eyebrow="Aug 2022 → Dec 2024 · Anakin (YC S21)"
-    title="Generic Compiler Service"
+    slug="proteus"
+    title="Proteus"
     blurb="A config-driven service that replaced multiple per-team custom compilers. Parses, transforms, and validates heterogeneous input data into structured datasets — entirely from JSONPath-driven config, no code change required to onboard a new client."
     stats={stats}
   />
@@ -48,10 +47,10 @@ const dataVolume = [
   <article class="max-w-4xl mx-auto px-6 prose-invert">
     <h2 id="problem">The problem</h2>
     <p>
-      Each team at Anakin had spun up its own custom compiler — different conventions, different validation rules, different storage paths. Every new client meant a 3-day engineering onboarding. The compilers diverged faster than they could be maintained, and bugs in one didn't get fixed in the others.
+      Each team had spun up its own custom compiler — different conventions, different validation rules, different storage paths. Every new client meant a 3-day engineering onboarding. The compilers diverged faster than they could be maintained, and bugs in one didn't get fixed in the others.
     </p>
     <p>
-      I built one Generic Compiler Service to replace them. Heterogeneous in, structured out, all driven by a JSONPath-style configuration that ops could edit without redeploying.
+      I built one Proteus service to replace them. Heterogeneous in, structured out, all driven by a JSONPath-style configuration that ops could edit without redeploying.
     </p>
 
     <h2 id="architecture">Architecture</h2>
@@ -59,7 +58,7 @@ const dataVolume = [
       title="Ingestion · compile · multi-sink"
       caption="Configs hot-reload from MongoDB. WAL + S3 backup are written before the primary sink so a downstream outage never loses data."
     >
-      <svg viewBox="0 0 920 380" class="w-full h-auto" role="img" aria-label="Generic Compiler Service architecture">
+      <svg viewBox="0 0 920 380" class="w-full h-auto" role="img" aria-label="Proteus architecture">
         <style>
           .g-node { fill: #1a1a1a; stroke: rgba(255,255,255,0.12); }
           .g-node-accent { fill: #1a1a1a; stroke: #ff8c00; }
@@ -91,7 +90,7 @@ const dataVolume = [
         <text x="110" y="208" text-anchor="middle" class="g-sub">bulk replay safe</text>
 
         <rect x="240" y="30" width="240" height="190" rx="14" class="g-node-accent" />
-        <text x="360" y="60" text-anchor="middle" class="g-label">Compiler Service</text>
+        <text x="360" y="60" text-anchor="middle" class="g-label">Proteus</text>
         <text x="360" y="78" text-anchor="middle" class="g-sub">FastAPI · Factory Pattern</text>
         <line x1="260" y1="92" x2="460" y2="92" stroke="rgba(255,255,255,0.1)" />
         <text x="360" y="112" text-anchor="middle" class="g-sub">parse</text>
