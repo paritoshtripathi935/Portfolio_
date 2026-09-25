@@ -3,6 +3,18 @@ import SectionHeader from "./SectionHeader.astro";
 
 const cases = [
   {
+    href: "/work/atlas",
+    title: "Atlas",
+    subtitle: "Multi-tenant ClickHouse + dbt analytics platform fed by zero-downtime Postgres CDC — replaced legacy Python ETLs and oversized OLAP instances.",
+    metrics: [
+      { v: "20×", l: "faster nightly ELT" },
+      { v: "1–2s", l: "query latency" },
+      { v: "85%", l: "DB cost cut" },
+      { v: "100+", l: "tenants" },
+    ],
+    stack: ["ClickHouse", "dbt", "PeerDB", "Postgres", "ECS", "AWS CDK", "MCP"],
+  },
+  {
     href: "/work/iris",
     title: "Iris",
     subtitle: "Per-branch ephemeral environments. PR open to live URL in 3.8 min, host-header routed on a shared ALB.",
@@ -68,7 +80,7 @@ const cases = [
 <section id="work" class="max-w-6xl mx-auto px-6 py-24 scroll-mt-20">
   <SectionHeader
     eyebrow="Selected work"
-    title="Five systems I designed end-to-end"
+    title="Six systems I designed end-to-end"
     blurb="Click in for architecture, decisions, and the numbers."
   />
 

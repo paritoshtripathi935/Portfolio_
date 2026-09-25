@@ -40,6 +40,13 @@ export const experience: Experience[] = [
       { value: "100+", label: "tenants" },
       { value: "1–2s", label: "query latency" },
     ],
+    caseStudies: [
+      {
+        name: "Atlas",
+        href: "/work/atlas",
+        blurb: "ClickHouse + dbt analytics platform with zero-downtime CDC — 20× faster ELT, 85% lower DB cost.",
+      },
+    ],
   },
   {
     slug: "parspec",
