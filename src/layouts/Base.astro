@@ -103,6 +103,9 @@ const introName = "Paritosh Tripathi";
     </div>
 
     <script>
+      import { initFitText } from "../lib/fitText";
+      initFitText();
+
       // Re-run on every navigation since ClientRouter swaps DOM in place.
       const init = () => {
         document.querySelectorAll<HTMLElement>(".spotlight").forEach((el) => {

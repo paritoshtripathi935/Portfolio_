@@ -234,28 +234,3 @@ import { site } from "../data/site";
   }
 </style>
 
-<script>
-  // Fit each display line to the full width of its container.
-  const fit = () => {
-    document.querySelectorAll<HTMLElement>(".fit-line").forEach((line) => {
-      if (!line.offsetParent) return;
-      const text = line.firstElementChild as HTMLElement | null;
-      if (!text) return;
-      line.style.setProperty("--fs", "100px");
-      const w = text.getBoundingClientRect().width;
-      if (!w) return;
-      line.style.setProperty("--fs", `${(100 * line.clientWidth) / w}px`);
-    });
-  };
-  const run = () => {
-    fit();
-    document.fonts?.ready.then(fit);
-  };
-  run();
-  document.addEventListener("astro:page-load", run);
-  let t = 0;
-  window.addEventListener("resize", () => {
-    clearTimeout(t);
-    t = window.setTimeout(fit, 80);
-  });
-</script>

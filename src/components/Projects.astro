@@ -74,7 +74,8 @@ const lastSync = new Date().toISOString();
 <section id="projects" class="max-w-6xl mx-auto px-6 py-24 scroll-mt-20">
   <SectionHeader
     eyebrow="On GitHub"
-    title="Activity & side projects"
+    title="Side projects."
+    titleAccent="Built after hours."
     blurb="Last 12 months of activity across both my personal and work accounts, plus the personal repos I've pushed in my own time."
   />
 
@@ -102,13 +103,13 @@ const lastSync = new Date().toISOString();
   {starred.length > 0 && (
     <>
       <div class="mt-12 mb-6 flex items-baseline justify-between gap-4">
-        <h3 class="font-serif text-2xl md:text-3xl text-[var(--color-ink)]">Most starred</h3>
+        <h3 class="title-heavy text-3xl md:text-4xl text-[var(--color-ink)]">Most starred</h3>
         <span class="font-mono text-[10px] uppercase tracking-wider text-[var(--color-ink-faint)]">
           sorted by stars desc
         </span>
       </div>
-      <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {starred.map((p) => <ProjectCard project={p} />)}
+      <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-5" data-motion-grid>
+        {starred.map((p, i) => <ProjectCard project={p} index={i} />)}
       </div>
     </>
   )}
@@ -116,18 +117,18 @@ const lastSync = new Date().toISOString();
   {recent.length > 0 && (
     <>
       <div class="mt-12 mb-6 flex items-baseline justify-between gap-4">
-        <h3 class="font-serif text-2xl md:text-3xl text-[var(--color-ink)]">Most recent</h3>
+        <h3 class="title-heavy text-3xl md:text-4xl text-[var(--color-ink)]">Most recent</h3>
         <span class="font-mono text-[10px] uppercase tracking-wider text-[var(--color-ink-faint)]">
           sorted by last-pushed
         </span>
       </div>
-      <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {recent.map((p) => <ProjectCard project={p} />)}
+      <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-5" data-motion-grid>
+        {recent.map((p, i) => <ProjectCard project={p} index={i + starred.length} />)}
       </div>
     </>
   )}
 
-  <div class="mt-8 flex items-center justify-between gap-4 text-xs font-mono text-[var(--color-ink-faint)]">
+  <div class="mt-8 flex flex-wrap items-center justify-between gap-4 text-xs font-mono text-[var(--color-ink-faint)]">
     <a
       href={`https://github.com/${personalAccount}`}
       target="_blank"
@@ -143,3 +144,8 @@ const lastSync = new Date().toISOString();
     </span>
   </div>
 </section>
+
+<script>
+  import { initCardMotion } from "../lib/cardMotion";
+  initCardMotion();
+</script>

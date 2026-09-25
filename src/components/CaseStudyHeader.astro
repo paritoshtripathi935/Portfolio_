@@ -1,4 +1,6 @@
 ---
+import { skies, skyStyle } from "../data/skies";
+
 type Stat = { value: string; label: string };
 type Props = {
   title: string;
@@ -18,30 +20,42 @@ const {
 } = Astro.props;
 ---
 
-<header class="max-w-4xl mx-auto px-6 pt-16 pb-12">
+<header class="max-w-5xl mx-auto px-6 pt-12 pb-12">
   <a
     href={backHref}
-    class="inline-flex items-center gap-2 font-mono text-xs uppercase tracking-wider text-[var(--color-ink-muted)] hover:text-[var(--color-saffron)] transition-colors"
+    class="inline-flex items-center gap-2 label-wide text-[11px] text-[var(--color-ink-muted)] hover:text-[var(--color-saffron)] transition-colors"
   >
     ← {backLabel}
   </a>
 
-  <h1
-    class="mt-8 display-serif text-[clamp(5rem,16vw,10rem)] text-[var(--color-ink)]"
-    transition:name={slug ? `card-${slug}-title` : undefined}
+  <div
+    class="sys-card page-hero mt-6"
+    style={skyStyle((slug && skies[slug]) || skies.default)}
+    transition:name={slug ? `card-${slug}` : undefined}
   >
-    {title}
-  </h1>
-  <p class="mt-5 text-lg text-[var(--color-ink-muted)] leading-relaxed max-w-2xl">{blurb}</p>
+    <div class="sky page-hero-sky" aria-hidden="true"><span class="sky-ridge"></span></div>
+    <div class="sys-top">
+      <span class="label-wide text-[10px] md:text-xs">Case study</span>
+    </div>
+    <div class="sys-body">
+      <h1
+        class="sys-title page-hero-title display-serif"
+        transition:name={slug ? `card-${slug}-title` : undefined}
+      >
+        {title}
+      </h1>
+      <p class="mt-5 text-lg text-[var(--color-ink-muted)] leading-relaxed max-w-3xl">{blurb}</p>
 
-  <dl class="mt-10 grid grid-cols-2 md:grid-cols-4 gap-px bg-[var(--color-border)] border border-[var(--color-border)] rounded-xl overflow-hidden">
-    {
-      stats.map((s) => (
-        <div class="bg-[var(--color-surface)] p-5">
-          <dt class="font-serif text-2xl text-[var(--color-saffron)]">{s.value}</dt>
-          <dd class="text-[10px] uppercase tracking-wider text-[var(--color-ink-faint)] mt-1">{s.label}</dd>
-        </div>
-      ))
-    }
-  </dl>
+      <dl class="sys-metrics sys-metrics-wide">
+        {
+          stats.map((s) => (
+            <div>
+              <dt>{s.value}</dt>
+              <dd>{s.label}</dd>
+            </div>
+          ))
+        }
+      </dl>
+    </div>
+  </div>
 </header>

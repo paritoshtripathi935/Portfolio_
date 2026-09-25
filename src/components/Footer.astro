@@ -3,18 +3,21 @@ import { site } from "../data/site";
 const year = new Date().getFullYear();
 ---
 
-<footer class="border-t border-[var(--color-border)] mt-32">
-  <div class="max-w-6xl mx-auto px-6 py-10 flex flex-col md:flex-row gap-6 md:items-center md:justify-between text-sm text-[var(--color-ink-muted)]">
-    <div class="flex items-center gap-3">
-      <span class="font-serif text-[var(--color-ink)]">{site.hindiName}</span>
-      <span class="text-[var(--color-ink-faint)]">/</span>
-      <span>{site.role}</span>
+<footer class="site-footer mt-24 border-t border-[var(--color-border)]">
+  <div class="max-w-6xl mx-auto px-6 pt-12 pb-6 flex flex-col md:flex-row gap-6 md:items-end md:justify-between">
+    <div>
+      <div class="label-wide text-[10px] text-[var(--color-saffron)] mb-2">{site.status}</div>
+      <div class="title-heavy text-2xl text-[var(--color-ink)]">{site.role}.</div>
     </div>
-    <div class="flex items-center gap-5">
+    <nav class="flex items-center gap-6 text-sm text-[var(--color-ink-muted)]" aria-label="Footer">
       <a href={site.github} target="_blank" rel="noopener" class="hover:text-[var(--color-saffron)] transition-colors">GitHub</a>
       <a href={site.linkedin} target="_blank" rel="noopener" class="hover:text-[var(--color-saffron)] transition-colors">LinkedIn</a>
       <a href={`mailto:${site.email}`} class="hover:text-[var(--color-saffron)] transition-colors">Email</a>
-    </div>
-    <div class="text-[var(--color-ink-faint)]">© {year}</div>
+      <a href={site.resume} target="_blank" rel="noopener" class="hover:text-[var(--color-saffron)] transition-colors">Resume</a>
+      <span class="font-mono text-xs text-[var(--color-ink-faint)]">© {year}</span>
+    </nav>
+  </div>
+  <div class="footer-mark" aria-hidden="true">
+    <span class="fit-line footer-fit display-serif"><span>{site.name}</span></span>
   </div>
 </footer>

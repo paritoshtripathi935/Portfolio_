@@ -2,6 +2,7 @@
 import SectionHeader from "./SectionHeader.astro";
 import { experience } from "../data/experience";
 import { techIconUrl } from "../lib/techIcons";
+import { skies, skyStyle } from "../data/skies";
 
 const monthsBetween = (start: string, end: string) => {
   const [sy, sm] = start.split("-").map(Number);
@@ -24,7 +25,8 @@ const items = experience
 <section id="timeline" class="max-w-6xl mx-auto px-6 py-24 scroll-mt-20">
   <SectionHeader
     eyebrow="Timeline"
-    title="Where I've been"
+    title="Where I've been."
+    titleAccent="Three stops so far."
     blurb="Years mark the line; roles alternate along it — click one for the full writeup."
   />
 
@@ -43,65 +45,77 @@ const items = experience
       <span class="track-car-trail"></span>
     </div>
 
-    <div class="space-y-10 md:space-y-14">
+    <div class="space-y-10 md:space-y-14" data-motion-grid>
       {
         items.map((x, i) => {
           const isLeft = i % 2 === 0;
+          const [companyName, companyTag] = x.company.split(/\s*\((.+)\)/);
           const card = (
             <a
               href={`/experience/${x.slug}`}
-              class="spotlight block rounded-2xl border border-[var(--color-border)] hover:border-[var(--color-border-strong)] bg-[var(--color-surface)] p-6 md:p-7 transition-colors"
+              data-motion-card
+              class="sys-card tl-card"
+              style={skyStyle(skies[x.slug] ?? skies.default)}
             >
-              <div
-                class="font-mono text-[11px] uppercase tracking-wider text-[var(--color-ink-faint)]"
-                transition:name={`exp-${x.slug}-period`}
-              >
-                {x.period}
+              <div class="sky tl-sky" aria-hidden="true"><span class="sky-ridge"></span></div>
+              <div class="sys-top">
+                <span class="label-wide text-[10px]" transition:name={`exp-${x.slug}-period`}>{x.period}</span>
+                {x.current ? (
+                  <span class="tl-now"><span class="tl-now-dot" />Now</span>
+                ) : (
+                  <span class="sys-arrow" aria-hidden="true">↗</span>
+                )}
               </div>
 
-              <h3
-                class="mt-4 font-serif text-2xl text-[var(--color-ink)] group-hover:text-[var(--color-saffron)] transition-colors"
-                transition:name={`exp-${x.slug}-role`}
-              >
-                {x.role}
-              </h3>
-              <div class="text-[var(--color-saffron)] font-medium" transition:name={`exp-${x.slug}-company`}>
-                {x.company}
-              </div>
-
-              <ul class="mt-5 space-y-2.5">
-                {x.bullets.slice(0, 4).map((b) => (
-                  <li class="text-sm text-[var(--color-ink-muted)] leading-relaxed pl-4 relative before:content-['→'] before:absolute before:left-0 before:text-[var(--color-saffron)]/70">
-                    {b}
-                  </li>
-                ))}
-              </ul>
-
-              <div
-                class="mt-5 relative overflow-hidden"
-                style="mask-image: linear-gradient(to right, transparent, black 6%, black 94%, transparent); -webkit-mask-image: linear-gradient(to right, transparent, black 6%, black 94%, transparent);"
-              >
-                <div class="flex w-max gap-1.5 stack-marquee">
-                  {[...x.stack, ...x.stack].map((s) => (
-                    <span class="inline-flex shrink-0 items-center gap-1.5 font-mono text-[10px] px-1.5 py-0.5 rounded border border-[var(--color-border)] text-[var(--color-ink-muted)]">
-                      {techIconUrl(s) && (
-                        <img src={techIconUrl(s)!} alt="" width="12" height="12" loading="lazy" class="opacity-80" />
-                      )}
-                      {s}
-                    </span>
-                  ))}
+              <div class="sys-body">
+                <h3 class="sys-title display-serif" transition:name={`exp-${x.slug}-company`}>
+                  {companyName}
+                  {companyTag && <span class="tl-tag">{companyTag}</span>}
+                </h3>
+                <div class="tl-role" transition:name={`exp-${x.slug}-role`}>
+                  {x.role}{x.location && <span> · {x.location}</span>}
                 </div>
-              </div>
 
-              <div class="mt-5 inline-flex items-center gap-2 text-xs font-mono text-[var(--color-ink-muted)] group-hover:text-[var(--color-saffron)] transition-colors">
-                Read full writeup
-                <span class="transition-transform group-hover:translate-x-1">→</span>
+                {x.highlights && (
+                  <dl class="sys-metrics">
+                    {x.highlights.map((h) => (
+                      <div>
+                        <dt>{h.value}</dt>
+                        <dd>{h.label}</dd>
+                      </div>
+                    ))}
+                  </dl>
+                )}
+
+                <ul class="tl-bullets">
+                  {x.bullets.slice(0, 3).map((b) => <li>{b}</li>)}
+                </ul>
+
+                <div
+                  class="mt-5 relative overflow-hidden"
+                  style="mask-image: linear-gradient(to right, transparent, black 6%, black 94%, transparent); -webkit-mask-image: linear-gradient(to right, transparent, black 6%, black 94%, transparent);"
+                >
+                  <div class="flex w-max gap-1.5 stack-marquee">
+                    {[...x.stack, ...x.stack].map((s) => (
+                      <span class="inline-flex shrink-0 items-center gap-1.5 font-mono text-[11px] px-2 py-0.5 rounded-full border border-[var(--color-border)] text-[var(--color-ink-muted)]">
+                        {techIconUrl(s) && (
+                          <img src={techIconUrl(s)!} alt="" width="12" height="12" loading="lazy" class="tech-icon" />
+                        )}
+                        {s}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+
+                <div class="tl-more">
+                  Read full writeup <span aria-hidden="true">→</span>
+                </div>
               </div>
             </a>
           );
 
           return (
-            <div class="reveal group relative md:grid md:grid-cols-2 md:gap-x-12">
+            <div class="group relative md:grid md:grid-cols-2 md:gap-x-12">
               <span class="md:hidden absolute -left-9 top-7 w-3.5 h-3.5 rounded-full border-2 border-[var(--color-saffron)] bg-[var(--color-bg)] group-hover:bg-[var(--color-saffron)] transition-colors" />
 
               <div class="hidden md:flex absolute left-1/2 top-6 bottom-6 -translate-x-1/2 flex-col items-center justify-between z-10">
