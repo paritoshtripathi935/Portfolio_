@@ -4,11 +4,19 @@ import { site } from "../data/site";
 
 const wins = [
   {
+    metric: "20×",
+    unit: "faster ELT",
+    title: "ClickHouse + dbt platform · Sharpsell",
+    blurb:
+      "Replaced legacy Python ETLs across 100+ tenants — nightly runs 5h → 15min, queries 15s+ → 1–2s, and 85% lower database cost (~$25K/yr) after retiring RDS OLAP instances.",
+    href: "/experience/sharpsell",
+  },
+  {
     metric: "3.9M+",
     unit: "writes",
     title: "Argus · saga + per-SKU locks",
     blurb:
-      "Designed the SAGA + per-SKU distributed-lock pattern behind 3.9M+ inventory writes across 7,800+ manufacturers. 10K+ ops under 300s at 99.6% success.",
+      "Go saga-based ingestion keeping DynamoDB and OpenSearch consistent, with conditional-write locks serializing 3.9M+ concurrent writes across 7,800+ manufacturers at p99 under 5 ms.",
     href: "/work/argus",
   },
   {
@@ -19,25 +27,17 @@ const wins = [
       "Internal platform spinning up 100+ isolated PR environments. Cut review setup 95%, lifted team velocity 30%, drove 7× DAU growth on the surface.",
     href: "/work/iris",
   },
-  {
-    metric: "150 GB",
-    unit: "per day",
-    title: "Distributed pipeline · Anakin (YC S21)",
-    blurb:
-      "Architected a fault-tolerant distributed pipeline across 4 teams at 99.95% availability. 150M+ events/month at 50K events/min peak; cut infra cost $3K/mo.",
-    href: "/experience/anakin",
-  },
 ];
 
 const facts = [
   { k: "Role", v: "Backend / distributed systems engineer" },
-  { k: "Status", v: "Open to new opportunities" },
-  { k: "Most recent", v: "Software Engineer II · Parspec (Apr 2025 → Jun 2026)" },
-  { k: "Before that", v: "Founding eng · Anakin (YC S21) · Engineer of the Quarter Q3 '24" },
-  { k: "Experience", v: "~3.5 yrs full-time backend" },
-  { k: "Stack", v: "Python · Go · Django · FastAPI · PostgreSQL · DynamoDB · Redis · AWS" },
-  { k: "Location", v: "Bangalore · open to remote" },
-  { k: "Looking for", v: "Senior / staff backend, platform, or distributed-systems roles" },
+  { k: "Current", v: "Software Engineer II · Sharpsell (Jun 2026 → present)" },
+  { k: "Before that", v: "Software Engineer II · Parspec (Apr 2025 → Jun 2026)" },
+  { k: "Earlier", v: "Founding eng · Anakin (YC S21) · Engineer of the Quarter Q3 '24" },
+  { k: "Experience", v: "4 yrs full-time backend" },
+  { k: "Stack", v: "Python · Go · FastAPI · Django · PostgreSQL · ClickHouse · DynamoDB · OpenSearch · AWS" },
+  { k: "Education", v: "B.Tech CS (Data Science) · Bennett University" },
+  { k: "Location", v: "Bangalore" },
 ];
 ---
 

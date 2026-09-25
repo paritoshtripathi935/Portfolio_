@@ -4,22 +4,26 @@ export type Project = {
   language: string;
   stars?: number;
   href: string;
+  liveUrl?: string;
 };
 
 export const projects: Project[] = [
   {
     name: "MiniPerplexity",
     blurb:
-      "Perplexity-style conversational search — plain-English questions answered from live Google + Bing results.",
+      "PaidPilot — dual-provider web-search assistant with live citation grounding, serving 100+ users. React, FastAPI, LLaMA 70B, RAG on Cloudflare AI Workers.",
     language: "TypeScript",
     stars: 6,
     href: "https://github.com/paritoshtripathi935/MiniPerplexity",
+    liveUrl: "https://paid.pilot.paritosh.online/",
   },
   {
     name: "MiniHarvery",
-    blurb: "AI research workbench for Indian law — structured legal briefs with live citations.",
+    blurb:
+      "Vidhi — domain RAG assistant for Indian law with a citation-regex hallucination guard, streaming the first token in under 2s. React, FastAPI, LLaMA 70B, SSE.",
     language: "TypeScript",
     href: "https://github.com/paritoshtripathi935/MiniHarvery",
+    liveUrl: "https://vidhi.paritosh.online/",
   },
   {
     name: "GlitchAgent",

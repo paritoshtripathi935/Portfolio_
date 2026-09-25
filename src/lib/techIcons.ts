@@ -14,6 +14,9 @@ const slugs: Record<string, string> = {
   jenkins: "jenkins",
   bigquery: "googlebigquery",
   grafana: "grafana",
+  clickhouse: "clickhouse",
+  dbt: "dbt",
+  superset: "apachesuperset",
 };
 
 export const techIconUrl = (name: string): string | null => {
