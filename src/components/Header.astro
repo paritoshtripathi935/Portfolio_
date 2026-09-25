@@ -2,44 +2,24 @@
 import { site } from "../data/site";
 import CommandPalette from "./CommandPalette.astro";
 import ThemeToggle from "./ThemeToggle.astro";
-
-const links = [
-  { href: "/#work", label: "work" },
-  { href: "/#timeline", label: "timeline" },
-  { href: "/#projects", label: "projects" },
-  { href: "/#contact", label: "contact" },
-];
 ---
 
-<header class="sticky top-0 z-50 backdrop-blur-md bg-[var(--color-bg)]/60 border-b border-[var(--color-border)]">
-  <nav class="max-w-6xl mx-auto px-6 h-14 flex items-center justify-between gap-4">
-    <a href="/" class="font-serif text-lg tracking-tight text-[var(--color-ink)] hover:text-[var(--color-saffron)] transition-colors shrink-0">
-      {site.hindiName}
+<header class="topbar sticky top-0 z-50 border-b border-[var(--color-border)]">
+  <nav class="h-14 px-4 md:px-6 flex items-center justify-between gap-4">
+    <a href="/" class="flex items-baseline gap-2 shrink-0 group" aria-label="Home">
+      <span class="[font-family:var(--font-heavy)] font-bold text-lg tracking-tight text-[var(--color-ink)]">Paritosh</span>
+      <span class="font-serif italic text-[var(--color-saffron)] text-lg group-hover:text-[var(--color-saffron-light)] transition-colors">{site.hindiName.split(" ")[0]}</span>
     </a>
-    <ul class="hidden md:flex items-center gap-1 text-sm text-[var(--color-ink-muted)]">
-      {
-        links.map((l) => (
-          <li>
-            <a
-              href={l.href}
-              class="px-3 py-2 rounded-md hover:text-[var(--color-ink)] hover:bg-[var(--color-surface)] transition-colors"
-            >
-              {l.label}
-            </a>
-          </li>
-        ))
-      }
-    </ul>
     <div class="flex items-center gap-2">
-      <a
-        href="/recruiter"
-        class="hidden sm:inline-flex items-center gap-1.5 rounded-full border border-[var(--color-border-strong)] hover:border-[var(--color-saffron)] hover:text-[var(--color-saffron)] text-[var(--color-ink-muted)] text-xs font-mono uppercase tracking-[0.18em] px-3 py-1.5 transition-colors"
-      >
-        For recruiters
-        <span class="text-[var(--color-saffron)]">→</span>
-      </a>
       <ThemeToggle />
       <CommandPalette />
+      <a
+        href="/recruiter"
+        class="inline-flex items-center rounded-md bg-[var(--color-saffron)] hover:bg-[var(--color-saffron-light)] text-black font-semibold text-sm px-3.5 md:px-4 h-9 transition-colors"
+      >
+        <span class="hidden sm:inline">For recruiters</span>
+        <span class="sm:hidden">Hire</span>
+      </a>
     </div>
   </nav>
 </header>
