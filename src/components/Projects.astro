@@ -48,7 +48,7 @@ const enriched = projects.map((p) => {
     pushedAt: r?.pushedAt ?? null,
     archived: r?.archived ?? false,
     href: r?.htmlUrl ?? p.href,
-    liveUrl: r?.homepage ?? null,
+    liveUrl: r?.homepage || p.liveUrl || null,
   };
 });
 
