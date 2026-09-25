@@ -1,6 +1,7 @@
 ---
 import Base from "../layouts/Base.astro";
 import { site } from "../data/site";
+import { skies, skyStyle } from "../data/skies";
 
 const wins = [
   {
@@ -10,6 +11,7 @@ const wins = [
     blurb:
       "Replaced legacy Python ETLs across 100+ tenants — nightly runs 5h → 15min, queries 15s+ → 1–2s, and 85% lower database cost (~$25K/yr) after retiring RDS OLAP instances.",
     href: "/work/atlas",
+    sky: "atlas",
   },
   {
     metric: "3.9M+",
@@ -18,6 +20,7 @@ const wins = [
     blurb:
       "Go saga-based ingestion keeping DynamoDB and OpenSearch consistent, with conditional-write locks serializing 3.9M+ concurrent writes across 7,800+ manufacturers at p99 under 5 ms.",
     href: "/work/argus",
+    sky: "argus",
   },
   {
     metric: "4h → 8min",
@@ -26,6 +29,7 @@ const wins = [
     blurb:
       "Internal platform spinning up 100+ isolated PR environments. Cut review setup 95%, lifted team velocity 30%, drove 7× DAU growth on the surface.",
     href: "/work/iris",
+    sky: "iris",
   },
 ];
 
@@ -42,8 +46,8 @@ const facts = [
 ---
 
 <Base title="Paritosh Tripathi — for recruiters (30-second version)">
-  <section class="max-w-4xl mx-auto px-6 pt-16 pb-24 md:pt-24">
-    <div class="reveal flex items-center gap-2 text-xs font-mono text-[var(--color-ink-muted)] tracking-wider uppercase mb-6">
+  <section class="max-w-5xl mx-auto px-6 pt-14 pb-24 md:pt-20">
+    <div class="reveal flex items-center gap-2.5 label-wide text-[11px] text-[var(--color-ink-muted)] mb-5">
       <span class="relative flex h-2 w-2">
         <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-[var(--color-saffron)] opacity-50"></span>
         <span class="relative inline-flex rounded-full h-2 w-2 bg-[var(--color-saffron)]"></span>
@@ -51,98 +55,68 @@ const facts = [
       <span>30-second version · for recruiters</span>
     </div>
 
-    <h1 class="reveal font-serif text-4xl md:text-6xl leading-[1.05] tracking-tight mb-2">
-      <span class="text-[var(--color-ink)]">{site.name}</span>
-    </h1>
-    <p class="reveal font-mono text-xs uppercase tracking-[0.24em] text-[var(--color-saffron)] mb-10">
-      {site.role}
-    </p>
+    <h1 class="reveal display-serif text-[clamp(4rem,13vw,8.5rem)] text-[var(--color-ink)]">{site.name}</h1>
+    <p class="reveal label-wide text-xs text-[var(--color-saffron)] mt-4 mb-10">{site.role}</p>
 
     <!-- TL;DR card -->
-    <div class="reveal rounded-2xl border border-[var(--color-border-strong)] bg-[var(--color-surface)]/70 backdrop-blur-sm p-6 md:p-8 mb-10">
-      <dl class="grid grid-cols-1 md:grid-cols-[max-content_1fr] gap-x-8 gap-y-3 text-sm">
-        {
-          facts.map((f) => (
-            <>
-              <dt class="font-mono text-xs uppercase tracking-[0.18em] text-[var(--color-ink-faint)] md:pt-0.5">{f.k}</dt>
-              <dd class="text-[var(--color-ink)]">{f.v}</dd>
-            </>
-          ))
-        }
-      </dl>
+    <div class="reveal sys-card page-hero mb-14" style={skyStyle(skies.sharpsell)}>
+      <div class="sky mini-sky" aria-hidden="true"><span class="sky-ridge"></span></div>
+      <div class="sys-top"><span class="label-wide text-[10px]">TL;DR</span></div>
+      <div class="sys-body">
+        <dl class="grid grid-cols-1 md:grid-cols-[max-content_1fr] gap-x-10 gap-y-3.5 text-[15px] mt-2">
+          {
+            facts.map((f) => (
+              <>
+                <dt class="label-wide text-[10.5px] text-[var(--color-ink-faint)] md:pt-1">{f.k}</dt>
+                <dd class="text-[var(--color-ink)]">{f.v}</dd>
+              </>
+            ))
+          }
+        </dl>
 
-      <div class="mt-8 flex flex-wrap gap-3">
-        <a
-          href={site.resume}
-          target="_blank"
-          rel="noopener"
-          class="group inline-flex items-center gap-2 rounded-full bg-[var(--color-saffron)] hover:bg-[var(--color-saffron-light)] text-black font-medium px-5 py-2.5 transition-colors"
-        >
-          Resume
-          <span class="transition-transform group-hover:translate-x-1">↗</span>
-        </a>
-        <a
-          href={`mailto:${site.email}`}
-          class="inline-flex items-center gap-2 rounded-full border border-[var(--color-border-strong)] hover:border-[var(--color-saffron)] hover:text-[var(--color-saffron)] text-[var(--color-ink)] px-5 py-2.5 transition-colors max-w-full"
-        >
-          Email me
-          <span class="hidden md:inline text-[var(--color-ink-faint)] font-mono text-xs truncate">{site.email}</span>
-        </a>
-        <a
-          href={site.linkedin}
-          target="_blank"
-          rel="noopener"
-          class="inline-flex items-center gap-2 rounded-full text-[var(--color-ink-muted)] hover:text-[var(--color-ink)] px-3 py-2.5 transition-colors"
-        >
-          LinkedIn ↗
-        </a>
+        <div class="mt-8 flex flex-wrap gap-3">
+          <a href={site.resume} target="_blank" rel="noopener" class="btn-pill">Resume ↗</a>
+          <a href={`mailto:${site.email}`} class="btn-outline">Email me</a>
+          <a href={site.linkedin} target="_blank" rel="noopener" class="btn-outline">LinkedIn ↗</a>
+        </div>
       </div>
     </div>
 
     <!-- Wins -->
-    <div class="reveal mb-4 flex items-baseline justify-between">
-      <h2 class="font-serif text-2xl md:text-3xl text-[var(--color-ink)]">Three things that travel</h2>
-      <span class="font-mono text-[10px] uppercase tracking-[0.24em] text-[var(--color-ink-faint)]">pick one</span>
+    <div class="reveal mb-6">
+      <div class="label-wide text-xs text-[var(--color-saffron)] mb-3">— Pick one</div>
+      <h2 class="title-heavy text-[clamp(2.25rem,5vw,3.75rem)] text-[var(--color-ink)]">Three things that travel.</h2>
     </div>
 
-    <ol class="space-y-4">
+    <div class="grid md:grid-cols-3 gap-5" data-motion-grid>
       {
         wins.map((w, i) => (
-          <li class="reveal">
-            <a
-              href={w.href}
-              class="spotlight group block rounded-xl border border-[var(--color-border)] hover:border-[var(--color-saffron)] bg-[var(--color-surface)]/50 backdrop-blur-sm p-5 md:p-6 transition-colors"
-            >
-              <div class="flex items-baseline gap-4 mb-2">
-                <span class="font-mono text-[10px] tabular-nums text-[var(--color-ink-faint)]">0{i + 1}</span>
-                <div class="flex items-baseline gap-2">
-                  <span class="font-serif text-2xl md:text-3xl text-[var(--color-saffron)] tabular-nums">{w.metric}</span>
-                  <span class="font-mono text-[10px] uppercase tracking-[0.18em] text-[var(--color-ink-muted)]">{w.unit}</span>
-                </div>
-              </div>
-              <h3 class="text-[var(--color-ink)] font-medium mb-1.5">{w.title}</h3>
-              <p class="text-sm text-[var(--color-ink-muted)] leading-relaxed mb-3">{w.blurb}</p>
-              <span class="inline-flex items-center gap-1 text-xs text-[var(--color-ink-faint)] group-hover:text-[var(--color-saffron)] transition-colors font-mono">
-                read the full case study
-                <span class="transition-transform group-hover:translate-x-1">→</span>
-              </span>
-            </a>
-          </li>
+          <a href={w.href} class="sys-card" style={skyStyle(skies[w.sky] ?? skies.default)}>
+            <div class="sky mini-sky" aria-hidden="true"><span class="sky-ridge"></span></div>
+            <div class="sys-top">
+              <span class="label-wide text-[10px]">0{i + 1}</span>
+              <span class="sys-arrow" aria-hidden="true">↗</span>
+            </div>
+            <div class="sys-body">
+              <div class="sys-title rec-metric display-serif">{w.metric}</div>
+              <div class="label-wide text-[10.5px] text-[var(--color-saffron)] mt-2">{w.unit}</div>
+              <h3 class="mt-4 font-semibold text-[var(--color-ink)]">{w.title}</h3>
+              <p class="sys-sub">{w.blurb}</p>
+            </div>
+          </a>
         ))
       }
-    </ol>
+    </div>
 
     <!-- Quiet escape hatch -->
-    <div class="reveal mt-12 flex items-center justify-between gap-4 pt-6 border-t border-[var(--color-border)]">
-      <p class="text-xs font-mono uppercase tracking-[0.2em] text-[var(--color-ink-faint)]">
-        want the long version?
-      </p>
-      <a
-        href="/"
-        class="text-sm text-[var(--color-ink-muted)] hover:text-[var(--color-saffron)] transition-colors"
-      >
-        See the full portfolio →
-      </a>
+    <div class="reveal mt-14 flex flex-wrap items-center justify-between gap-4 pt-6 border-t border-[var(--color-border)]">
+      <p class="label-wide text-[11px] text-[var(--color-ink-faint)]">want the long version?</p>
+      <a href="/" class="btn-outline">See the full portfolio →</a>
     </div>
   </section>
+
+  <script>
+    import { initCardMotion } from "../lib/cardMotion";
+    initCardMotion();
+  </script>
 </Base>

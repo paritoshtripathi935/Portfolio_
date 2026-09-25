@@ -114,7 +114,7 @@ const activeDaysCount = sortedDays.filter((d) => d.totalSeconds > 0).length;
   {/* Hero row: totals card + AI ring card */}
   <div class="grid md:grid-cols-2 gap-4 mb-6">
     <div class="rounded-xl border border-[var(--color-border)] bg-[var(--color-surface-2)] p-5">
-      <div class="font-serif text-5xl text-[var(--color-saffron)] leading-none">
+      <div class="title-heavy text-5xl text-[var(--color-saffron)] leading-none">
         {formatWakaDuration(stats.totalSeconds)}
       </div>
       <div class="text-[10px] uppercase tracking-wider text-[var(--color-ink-faint)] mt-2">
