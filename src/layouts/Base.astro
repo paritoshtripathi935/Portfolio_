@@ -68,18 +68,30 @@ const introName = "Paritosh Tripathi";
     </div>
     {isHome && (
       <div class="intro" id="intro" role="presentation">
-        <div class="intro-lines" aria-hidden="true"></div>
-        <div class="intro-halftone" aria-hidden="true"></div>
-        <div class="intro-backname" aria-hidden="true">पारितोष</div>
-        <div class="intro-inner">
-          <span class="intro-tag intro-tag-l" aria-hidden="true">— 01</span>
-          <span class="intro-tag intro-tag-r" aria-hidden="true">enter ›</span>
-          <h1 class="intro-name" aria-label={introName}>
-            {[...introName].map((ch, i) => (
-              <span style={`--i:${i}`} aria-hidden="true">{ch === " " ? " " : ch}</span>
-            ))}
-          </h1>
-          <p class="intro-role">backend &middot; distributed systems</p>
+        <div class="intro-panel intro-panel-top" aria-hidden="true"></div>
+        <div class="intro-panel intro-panel-bot" aria-hidden="true"></div>
+        <div class="intro-stage" aria-hidden="true">
+          <div class="intro-dawn"></div>
+          <div class="intro-inner">
+            <p class="intro-kicker"><span class="intro-hi">पारितोष</span> presents</p>
+            <div class="intro-name">
+              {introName.split(" ").map((word, w) => (
+                <span class="intro-line" aria-hidden="true">
+                  <span class="intro-line-inner">
+                    {[...word].map((ch, i) => (
+                      <span class="intro-ch" style={`--i:${w * 8 + i}`}>{ch}</span>
+                    ))}
+                  </span>
+                </span>
+              ))}
+            </div>
+            <p class="intro-role">Backend · Distributed systems</p>
+          </div>
+          <div class="intro-foot">
+            <span>Est. 2022</span>
+            <span class="intro-progress"><span></span></span>
+            <span>Click to enter ›</span>
+          </div>
         </div>
       </div>
     )}
@@ -120,11 +132,8 @@ const introName = "Paritosh Tripathi";
           });
           const skip = () => {
             if (cleaned) return;
-            introEl.style.animation = "none";
-            introEl.style.transition = "opacity 280ms ease, transform 280ms ease";
-            introEl.style.opacity = "0";
-            introEl.style.transform = "translateY(-100%)";
-            window.setTimeout(cleanup, 300);
+            introEl.classList.add("intro-skip");
+            window.setTimeout(cleanup, 650);
           };
           introEl.addEventListener("click", skip, { once: true });
           window.addEventListener("keydown", skip, { once: true });

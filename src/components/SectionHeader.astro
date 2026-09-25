@@ -2,15 +2,20 @@
 type Props = {
   eyebrow: string;
   title: string;
+  /** Optional second line, set in the accent colour. */
+  titleAccent?: string;
   blurb?: string;
 };
-const { eyebrow, title, blurb } = Astro.props;
+const { eyebrow, title, titleAccent, blurb } = Astro.props;
 ---
 
 <div class="reveal mb-10">
   <div class="label-wide text-xs text-[var(--color-saffron)] mb-4">
     — {eyebrow}
   </div>
-  <h2 class="title-heavy text-[clamp(2.5rem,7vw,5.5rem)] text-[var(--color-ink)]">{title}</h2>
+  <h2 class="title-heavy text-[clamp(2.5rem,7vw,5.5rem)] text-[var(--color-ink)]">
+    {title}
+    {titleAccent && <><br /><span class="text-[var(--color-saffron)]">{titleAccent}</span></>}
+  </h2>
   {blurb && <p class="mt-5 max-w-2xl text-lg text-[var(--color-ink-muted)]">{blurb}</p>}
 </div>
