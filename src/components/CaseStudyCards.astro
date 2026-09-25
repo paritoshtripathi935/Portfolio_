@@ -1,10 +1,24 @@
 ---
 import SectionHeader from "./SectionHeader.astro";
+import { site } from "../data/site";
 
-const cases = [
+type Case = {
+  href: string;
+  title: string;
+  domain: string;
+  subtitle: string;
+  metrics: { v: string; l: string }[];
+  stack: string[];
+  /** Painted-sky band: top colour, horizon colour, sun position. */
+  sky: [string, string, string];
+  featured?: boolean;
+};
+
+const cases: Case[] = [
   {
     href: "/work/atlas",
     title: "Atlas",
+    domain: "Data platform",
     subtitle: "Multi-tenant ClickHouse + dbt analytics platform fed by zero-downtime Postgres CDC — replaced legacy Python ETLs and oversized OLAP instances.",
     metrics: [
       { v: "20×", l: "faster nightly ELT" },
@@ -13,10 +27,13 @@ const cases = [
       { v: "100+", l: "tenants" },
     ],
     stack: ["ClickHouse", "dbt", "PeerDB", "Postgres", "ECS", "AWS CDK", "MCP"],
+    sky: ["#17214d", "#d0925a", "68%"],
+    featured: true,
   },
   {
     href: "/work/iris",
     title: "Iris",
+    domain: "Developer platform",
     subtitle: "Per-branch ephemeral environments. PR open to live URL in 3.8 min, host-header routed on a shared ALB.",
     metrics: [
       { v: "1,567", l: "builds" },
@@ -25,10 +42,12 @@ const cases = [
       { v: "7×", l: "DAU growth" },
     ],
     stack: ["FastAPI", "ECS Fargate", "ALB", "CodeBuild", "ECR", "Route53", "Postgres"],
+    sky: ["#2a1f4f", "#d97a6c", "30%"],
   },
   {
     href: "/work/argus",
     title: "Argus",
+    domain: "Distributed consistency",
     subtitle: "Saga with compensating transactions and Redis-backed per-SKU locks behind the inventory ingestion path.",
     metrics: [
       { v: "3.9M", l: "writes" },
@@ -37,11 +56,13 @@ const cases = [
       { v: "407K", l: "peak day" },
     ],
     stack: ["Django REST", "DynamoDB", "Redis", "Saga", "Per-SKU locks"],
+    sky: ["#0e1830", "#8b6aa0", "75%"],
   },
   {
     href: "/work/ariadne",
     title: "Ariadne",
-    subtitle: "Soft-filtering search with weighted ranking, match-strength buckets, and ML image similarity. Held to per-tier p90 latency budgets.",
+    domain: "Search & ranking",
+    subtitle: "Soft-filtering search with weighted ranking, match-strength buckets, and ML image similarity under per-tier latency budgets.",
     metrics: [
       { v: "21%", l: "accuracy lift" },
       { v: "1.5s", l: "p90 (top 50)" },
@@ -49,11 +70,13 @@ const cases = [
       { v: "3", l: "match buckets" },
     ],
     stack: ["Elasticsearch", "OpenSearch", "Vector search", "Python", "ML similarity"],
+    sky: ["#3a1c1f", "#e3a256", "40%"],
   },
   {
     href: "/work/proteus",
     title: "Proteus",
-    subtitle: "Config-driven FastAPI service that replaced multiple per-team custom compilers — JSONPath configs, dual-queue SQS + DLQ, multi-sink writes.",
+    domain: "Data pipeline",
+    subtitle: "Config-driven FastAPI service that replaced per-team custom compilers — JSONPath configs, dual-queue SQS + DLQ, multi-sink writes.",
     metrics: [
       { v: "200 GB", l: "peak day" },
       { v: "100+", l: "concurrent tasks" },
@@ -61,10 +84,12 @@ const cases = [
       { v: "99.95%", l: "availability" },
     ],
     stack: ["Python", "FastAPI", "SQS", "ECS", "MongoDB", "BigQuery", "S3"],
+    sky: ["#0d2a36", "#62a39d", "62%"],
   },
   {
     href: "/work/hydra",
     title: "Hydra",
+    domain: "Device orchestration",
     subtitle: "Hybrid Pixel + Genymotion automation platform with affinity scheduling and runtime Frida injection.",
     metrics: [
       { v: "10", l: "concurrent sessions" },
@@ -73,6 +98,7 @@ const cases = [
       { v: "Frida", l: "runtime hooks" },
     ],
     stack: ["Python", "Go", "ECS", "SQS", "PostgreSQL", "MongoDB", "Frida", "Genymotion"],
+    sky: ["#1b2a22", "#b8a25a", "35%"],
   },
 ];
 ---
@@ -80,49 +106,245 @@ const cases = [
 <section id="work" class="max-w-6xl mx-auto px-6 py-24 scroll-mt-20">
   <SectionHeader
     eyebrow="Selected work"
-    title="Six systems I designed end-to-end"
-    blurb="Click in for architecture, decisions, and the numbers."
+    title="Six systems."
+    titleAccent="End to end."
+    blurb="Each one designed, shipped, and run in production. Click in for architecture, decisions, and the numbers."
   />
 
-  <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+  <div class="sys-grid grid md:grid-cols-2 lg:grid-cols-3 gap-5">
     {
-      cases.map((c) => {
+      cases.map((c, i) => {
         const slug = c.href.split("/").pop()!;
         return (
-        <a
-          href={c.href}
-          transition:name={`card-${slug}`}
-          class="spotlight reveal group block rounded-2xl border border-[var(--color-border)] hover:border-[var(--color-border-strong)] bg-[var(--color-surface)] p-7 transition-colors"
-        >
-          <h3 class="font-serif text-2xl text-[var(--color-ink)] group-hover:text-[var(--color-saffron)] transition-colors leading-tight" transition:name={`card-${slug}-title`}>
-            {c.title}
-          </h3>
-          <p class="mt-3 text-sm text-[var(--color-ink-muted)] leading-relaxed">{c.subtitle}</p>
+          <a
+            href={c.href}
+            transition:name={`card-${slug}`}
+            class:list={["sys-card group", { "sys-featured md:col-span-2": c.featured }]}
+            style={`--sky-a:${c.sky[0]};--sky-b:${c.sky[1]};--sun-x:${c.sky[2]}`}
+          >
+            <div class="sys-sky" aria-hidden="true">
+              <span class="sys-ridge"></span>
+            </div>
+            <div class="sys-top">
+              <span class="label-wide text-[10px]">{String(i + 1).padStart(2, "0")} · {c.domain}</span>
+              <span class="sys-arrow" aria-hidden="true">↗</span>
+            </div>
 
-          <dl class="mt-6 grid grid-cols-2 gap-4">
-            {c.metrics.map((m) => (
-              <div>
-                <dt class="font-mono text-base text-[var(--color-saffron)]">{m.v}</dt>
-                <dd class="text-[10px] uppercase tracking-wider text-[var(--color-ink-faint)] mt-0.5">{m.l}</dd>
+            <div class="sys-body">
+              <h3 class="sys-title display-serif" transition:name={`card-${slug}-title`}>{c.title}</h3>
+              <p class="sys-sub">{c.subtitle}</p>
+
+              <dl class:list={["sys-metrics", { "sys-metrics-wide": c.featured }]}>
+                {c.metrics.map((m) => (
+                  <div>
+                    <dt>{m.v}</dt>
+                    <dd>{m.l}</dd>
+                  </div>
+                ))}
+              </dl>
+
+              <div class="sys-stack">
+                {c.stack.map((s) => <span>{s}</span>)}
               </div>
-            ))}
-          </dl>
-
-          <div class="mt-6 flex flex-wrap gap-1.5">
-            {c.stack.map((s) => (
-              <span class="font-mono text-[11px] px-2 py-1 rounded-md border border-[var(--color-border)] text-[var(--color-ink-muted)]">
-                {s}
-              </span>
-            ))}
-          </div>
-
-          <div class="mt-6 inline-flex items-center gap-2 text-sm text-[var(--color-ink-muted)] group-hover:text-[var(--color-saffron)] transition-colors">
-            Read the case study
-            <span class="transition-transform group-hover:translate-x-1">→</span>
-          </div>
-        </a>
+            </div>
+          </a>
         );
       })
     }
+
+    <div class="sys-card sys-cta md:col-span-2" style="--sky-a:#121a3d;--sky-b:#c98a55;--sun-x:62%">
+      <div class="sys-sky sys-sky-full" aria-hidden="true"><span class="sys-ridge"></span></div>
+      <div class="sys-body sys-cta-body">
+        <span class="label-wide text-[10px] text-[var(--color-cream)]/80">Short on time?</span>
+        <p class="title-heavy text-3xl md:text-5xl text-[var(--color-cream)]">The 30-second version.</p>
+        <div class="flex flex-wrap gap-3 mt-2">
+          <a href="/recruiter" class="btn-pill">For recruiters</a>
+          <a href={site.resume} target="_blank" rel="noopener" class="btn-ghost">Resume ↗</a>
+        </div>
+      </div>
+    </div>
   </div>
 </section>
+
+<style>
+  .sys-card {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    isolation: isolate;
+    border-radius: 1.25rem;
+    border: 1px solid var(--color-border);
+    background: var(--color-surface);
+    transition: border-color 250ms ease;
+  }
+  .sys-card:hover { border-color: rgba(253, 231, 208, 0.35); }
+  :global(html.light) .sys-card:hover { border-color: var(--color-border-strong); }
+
+  /* Painted sky band: gradient sky, low sun, brushstroke grain, ridge silhouette. */
+  .sys-sky {
+    position: relative;
+    height: 9.5rem;
+    overflow: hidden;
+    background:
+      radial-gradient(ellipse 55% 95% at var(--sun-x) 118%, rgba(255, 220, 160, 0.95), rgba(236, 150, 80, 0.5) 34%, transparent 70%),
+      radial-gradient(ellipse 35% 22% at 22% 38%, rgba(255, 240, 220, 0.22), transparent 70%),
+      radial-gradient(ellipse 30% 18% at 78% 28%, rgba(255, 240, 220, 0.14), transparent 70%),
+      linear-gradient(180deg, var(--sky-a) 0%, color-mix(in oklab, var(--sky-a) 55%, var(--sky-b)) 55%, var(--sky-b) 100%);
+    transition: transform 700ms cubic-bezier(0.2, 0.7, 0.2, 1);
+    transform-origin: 50% 100%;
+  }
+  .sys-featured .sys-sky { height: 12rem; }
+  .sys-card:hover .sys-sky { transform: scale(1.06); }
+  .sys-sky::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    opacity: 0.4;
+    mix-blend-mode: overlay;
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='600' height='200'><filter id='b'><feTurbulence type='fractalNoise' baseFrequency='0.004 0.05' numOctaves='3' seed='4'/><feColorMatrix type='saturate' values='0'/></filter><rect width='100%' height='100%' filter='url(%23b)'/></svg>");
+    background-size: cover;
+  }
+  .sys-ridge {
+    position: absolute;
+    left: -2%;
+    right: -2%;
+    bottom: -1px;
+    height: 42%;
+    background: var(--color-surface);
+    clip-path: polygon(0 62%, 8% 48%, 15% 58%, 24% 36%, 31% 50%, 40% 42%, 48% 60%, 57% 30%, 63% 44%, 72% 38%, 80% 56%, 88% 40%, 95% 52%, 100% 46%, 100% 100%, 0 100%);
+  }
+
+  .sys-top {
+    position: absolute;
+    top: 1rem;
+    left: 1.25rem;
+    right: 1rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    color: rgba(253, 231, 208, 0.9);
+    z-index: 2;
+  }
+  .sys-arrow {
+    display: grid;
+    place-items: center;
+    width: 2.1rem;
+    height: 2.1rem;
+    border-radius: 9999px;
+    border: 1px solid rgba(253, 231, 208, 0.4);
+    background: rgba(0, 0, 0, 0.2);
+    backdrop-filter: blur(6px);
+    transition: transform 300ms ease, background 300ms ease;
+  }
+  .sys-card:hover .sys-arrow { transform: rotate(45deg); background: var(--color-saffron); color: #000; border-color: transparent; }
+
+  .sys-body {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    padding: 0 1.5rem 1.6rem;
+  }
+  /* Title straddles the ridge line, like the hero lettering over the spire. */
+  .sys-title {
+    font-size: clamp(3.25rem, 6vw, 4.25rem);
+    margin-top: -0.62em;
+    color: var(--color-ink);
+    transition: color 250ms ease;
+  }
+  .sys-featured .sys-title { font-size: clamp(4rem, 8vw, 6.25rem); }
+  .sys-card:hover .sys-title { color: var(--color-saffron); }
+  .sys-sub {
+    margin-top: 0.9rem;
+    font-size: 0.925rem;
+    line-height: 1.65;
+    color: var(--color-ink-muted);
+    max-width: 38rem;
+  }
+  .sys-metrics {
+    margin-top: 1.4rem;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1rem 1.25rem;
+    padding-top: 1.1rem;
+    border-top: 1px solid var(--color-border);
+  }
+  @media (min-width: 768px) {
+    .sys-metrics-wide { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+  }
+  .sys-metrics dt {
+    font-family: var(--font-heavy);
+    font-weight: 800;
+    letter-spacing: -0.03em;
+    font-size: 1.5rem;
+    line-height: 1;
+    color: var(--color-saffron);
+  }
+  .sys-featured .sys-metrics dt { font-size: 2rem; }
+  .sys-metrics dd {
+    margin-top: 0.35rem;
+    font-family: var(--font-mono);
+    font-size: 9.5px;
+    text-transform: uppercase;
+    letter-spacing: 0.16em;
+    color: var(--color-ink-faint);
+  }
+  .sys-stack {
+    margin-top: auto;
+    padding-top: 1.4rem;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+  }
+  .sys-stack span {
+    font-family: var(--font-mono);
+    font-size: 10.5px;
+    padding: 0.2rem 0.5rem;
+    border-radius: 9999px;
+    border: 1px solid var(--color-border);
+    color: var(--color-ink-muted);
+  }
+
+  /* Closing tile: the whole card is sky. */
+  .sys-cta { min-height: 16rem; justify-content: flex-end; }
+  .sys-sky-full { position: absolute; inset: 0; height: auto; }
+  .sys-sky-full .sys-ridge { height: 30%; background: rgba(5, 5, 5, 0.55); }
+  .sys-cta-body { gap: 0.75rem; padding: 2rem; justify-content: flex-end; }
+  .sys-cta:hover .sys-sky { transform: scale(1.04); }
+</style>
+
+<script>
+  import { animate, inView, hover, stagger } from "motion";
+
+  const spring = { type: "spring", stiffness: 260, damping: 26 } as const;
+
+  const init = () => {
+    const grid = document.querySelector<HTMLElement>(".sys-grid");
+    if (!grid || grid.dataset.motion === "1") return;
+    grid.dataset.motion = "1";
+    if (matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+
+    const cards = Array.from(grid.querySelectorAll<HTMLElement>(".sys-card"));
+
+    // Hidden only once JS is running, so the cards never stay invisible without it.
+    animate(cards, { opacity: 0, y: 48 }, { duration: 0 });
+    inView(
+      grid,
+      () => {
+        animate(cards, { opacity: 1, y: 0 }, { ...spring, delay: stagger(0.07) });
+      },
+      { amount: 0.1 },
+    );
+
+    // Spring lift on hover; the sky and title transitions live in CSS.
+    hover(cards, (card) => {
+      animate(card, { y: -8 }, spring);
+      return () => animate(card, { y: 0 }, spring);
+    });
+  };
+
+  init();
+  document.addEventListener("astro:page-load", init);
+</script>
