@@ -50,14 +50,14 @@
     const moon = document.getElementById("theme-icon-moon");
 
     const sync = () => {
-      const dark = document.documentElement.classList.contains("dark");
+      const dark = !document.documentElement.classList.contains("light");
       if (sun) sun.classList.toggle("hidden", dark);
       if (moon) moon.classList.toggle("hidden", !dark);
     };
     sync();
 
     btn.addEventListener("click", () => {
-      const dark = document.documentElement.classList.toggle("dark");
+      const dark = !document.documentElement.classList.toggle("light");
       document.documentElement.style.colorScheme = dark ? "dark" : "light";
       try {
         localStorage.setItem("theme", dark ? "dark" : "light");

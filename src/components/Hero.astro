@@ -1,59 +1,261 @@
 ---
 import { site } from "../data/site";
-import Terminal from "./Terminal.astro";
 ---
 
-<section class="relative max-w-6xl mx-auto px-6 pt-20 pb-24 md:pt-28 md:pb-32">
-  <div class="space-y-8">
-    <div class="reveal flex items-center gap-2 text-xs font-mono text-[var(--color-ink-muted)] tracking-wider uppercase">
-      <span class="relative flex h-2 w-2">
-        <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-[var(--color-saffron)] opacity-50"></span>
+<section class="hero" id="hero">
+  <!-- Sky: gradient + sun glow -->
+  <div class="hero-layer hero-sky" aria-hidden="true">
+    <svg viewBox="0 0 1600 1000" preserveAspectRatio="xMidYMid slice">
+      <defs>
+        <linearGradient id="hx-sky" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stop-color="#121a3d" />
+          <stop offset="0.28" stop-color="#26356b" />
+          <stop offset="0.5" stop-color="#5a5f8e" />
+          <stop offset="0.66" stop-color="#b98a62" />
+          <stop offset="0.8" stop-color="#8a4f2a" />
+          <stop offset="1" stop-color="#1c100a" />
+        </linearGradient>
+        <radialGradient id="hx-sun" cx="0.62" cy="0.6" r="0.45">
+          <stop offset="0" stop-color="#ffe2a8" stop-opacity="0.95" />
+          <stop offset="0.25" stop-color="#f4b35e" stop-opacity="0.55" />
+          <stop offset="0.6" stop-color="#c9713a" stop-opacity="0.15" />
+          <stop offset="1" stop-color="#c9713a" stop-opacity="0" />
+        </radialGradient>
+      </defs>
+      <rect width="1600" height="1000" fill="url(#hx-sky)" />
+      <rect width="1600" height="1000" fill="url(#hx-sun)" />
+    </svg>
+  </div>
+
+  <!-- Back clouds: soft shapes pushed through turbulence for ragged, painted edges -->
+  <div class="hero-layer hero-clouds-back" aria-hidden="true">
+    <svg viewBox="0 0 1600 1000" preserveAspectRatio="xMidYMid slice">
+      <defs>
+        <filter id="hx-paint" x="-20%" y="-20%" width="140%" height="140%">
+          <feTurbulence type="fractalNoise" baseFrequency="0.011 0.018" numOctaves="4" seed="7" result="n" />
+          <feDisplacementMap in="SourceGraphic" in2="n" scale="110" xChannelSelector="R" yChannelSelector="G" result="d" />
+          <feGaussianBlur in="d" stdDeviation="2.2" />
+        </filter>
+        <filter id="hx-paint-2" x="-20%" y="-20%" width="140%" height="140%">
+          <feTurbulence type="fractalNoise" baseFrequency="0.02 0.03" numOctaves="3" seed="21" result="n" />
+          <feDisplacementMap in="SourceGraphic" in2="n" scale="70" xChannelSelector="G" yChannelSelector="B" result="d" />
+          <feGaussianBlur in="d" stdDeviation="1.4" />
+        </filter>
+      </defs>
+
+      <!-- High, cool violet clouds -->
+      <g filter="url(#hx-paint)" opacity="0.85">
+        <ellipse cx="180" cy="140" rx="260" ry="70" fill="#3d4478" />
+        <ellipse cx="260" cy="120" rx="160" ry="50" fill="#6c6f9e" />
+        <ellipse cx="1350" cy="110" rx="300" ry="80" fill="#3a4274" />
+        <ellipse cx="1420" cy="95" rx="170" ry="45" fill="#7a7aa6" />
+        <ellipse cx="800" cy="60" rx="240" ry="40" fill="#2f3868" />
+      </g>
+
+      <!-- Mid clouds catching the sun -->
+      <g filter="url(#hx-paint-2)">
+        <ellipse cx="300" cy="420" rx="330" ry="95" fill="#6a5a78" />
+        <ellipse cx="260" cy="385" rx="220" ry="55" fill="#d9a86a" opacity="0.9" />
+        <ellipse cx="330" cy="370" rx="120" ry="30" fill="#f6dcae" opacity="0.9" />
+
+        <ellipse cx="1300" cy="440" rx="360" ry="100" fill="#6b5470" />
+        <ellipse cx="1260" cy="400" rx="240" ry="60" fill="#e0ad68" opacity="0.9" />
+        <ellipse cx="1200" cy="385" rx="130" ry="32" fill="#fbe3b8" opacity="0.95" />
+
+        <ellipse cx="820" cy="300" rx="200" ry="50" fill="#8a7390" opacity="0.8" />
+        <ellipse cx="860" cy="285" rx="110" ry="26" fill="#f0c98a" opacity="0.8" />
+      </g>
+
+      <!-- Low warm banks near the horizon -->
+      <g filter="url(#hx-paint)" opacity="0.95">
+        <ellipse cx="120" cy="690" rx="340" ry="110" fill="#7d4a2c" />
+        <ellipse cx="160" cy="650" rx="220" ry="60" fill="#e6a35c" opacity="0.85" />
+        <ellipse cx="1500" cy="700" rx="360" ry="120" fill="#6e3f26" />
+        <ellipse cx="1460" cy="655" rx="220" ry="60" fill="#f0b86d" opacity="0.85" />
+      </g>
+    </svg>
+  </div>
+
+  <!-- Brushstroke texture over the whole sky -->
+  <div class="hero-layer hero-brush" aria-hidden="true">
+    <svg viewBox="0 0 1600 1000" preserveAspectRatio="none">
+      <defs>
+        <filter id="hx-brush" x="0" y="0" width="100%" height="100%">
+          <feTurbulence type="fractalNoise" baseFrequency="0.004 0.028" numOctaves="3" seed="3" />
+          <feColorMatrix type="saturate" values="0" />
+          <feComponentTransfer>
+            <feFuncR type="linear" slope="1.8" intercept="-0.4" />
+            <feFuncG type="linear" slope="1.8" intercept="-0.4" />
+            <feFuncB type="linear" slope="1.8" intercept="-0.4" />
+          </feComponentTransfer>
+        </filter>
+      </defs>
+      <rect width="1600" height="1000" filter="url(#hx-brush)" />
+    </svg>
+  </div>
+
+  <!-- Distant ridge anchored to the bottom edge -->
+  <div class="hero-layer hero-front" aria-hidden="true">
+    <svg viewBox="0 0 1600 1000" preserveAspectRatio="xMidYMax slice">
+      <defs>
+        <linearGradient id="hx-ridge" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stop-color="#3a2418" />
+          <stop offset="1" stop-color="#0b0706" />
+        </linearGradient>
+        <filter id="hx-rough" x="-5%" y="-5%" width="110%" height="110%">
+          <feTurbulence type="fractalNoise" baseFrequency="0.02" numOctaves="3" seed="11" result="n" />
+          <feDisplacementMap in="SourceGraphic" in2="n" scale="24" xChannelSelector="R" yChannelSelector="G" />
+        </filter>
+      </defs>
+      <path
+        filter="url(#hx-rough)"
+        fill="url(#hx-ridge)"
+        d="M0 900 L120 860 L240 880 L360 830 L470 860 L560 845 L640 880 L760 870 L900 890 L1040 880 L1160 850 L1260 870 L1380 835 L1500 860 L1600 840 L1600 1000 L0 1000 Z"
+      />
+    </svg>
+  </div>
+
+  <!-- Front wisps crossing the base of the title -->
+  <div class="hero-layer hero-clouds-front" aria-hidden="true">
+    <svg viewBox="0 0 1600 1000" preserveAspectRatio="xMidYMid slice">
+      <g filter="url(#hx-paint-2)" opacity="0.7">
+        <ellipse cx="420" cy="760" rx="300" ry="38" fill="#f3c98c" opacity="0.55" />
+        <ellipse cx="1180" cy="780" rx="340" ry="42" fill="#e9b576" opacity="0.5" />
+        <ellipse cx="780" cy="820" rx="260" ry="30" fill="#fbe3b8" opacity="0.35" />
+      </g>
+    </svg>
+  </div>
+
+  <div class="hero-layer hero-vignette" aria-hidden="true"></div>
+
+  <div class="hero-content w-full max-w-[1500px] mx-auto px-4 md:px-12 pt-10 pb-16 md:pt-12 md:pb-20">
+    <div class="reveal flex items-center gap-2.5 label-wide text-[11px] md:text-base text-[var(--color-cream)]/90 md:pl-[0.4vw]">
+      <span class="relative flex h-2 w-2 shrink-0">
+        <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-[var(--color-saffron)] opacity-60"></span>
         <span class="relative inline-flex rounded-full h-2 w-2 bg-[var(--color-saffron)]"></span>
       </span>
       <span>{site.status}</span>
     </div>
 
-    <h1 class="reveal font-serif text-[clamp(2.5rem,12vw,4.5rem)] md:text-7xl leading-[1.05] tracking-tight">
-      <span class="block text-[var(--color-ink)]">Backend &amp;</span>
-      <span class="block text-[var(--color-saffron)]">distributed systems</span>
-      <span class="block text-[var(--color-ink-muted)] italic">engineer.</span>
-    </h1>
+    <div class="hero-title-wrap mt-3 md:mt-4">
+      <h1 class="display-serif hero-title-stack" aria-label={site.name}>
+        <span class="fit-line hidden md:block" aria-hidden="true"><span>Paritosh Tripathi</span></span>
+        <span class="fit-line block md:hidden" aria-hidden="true"><span>Paritosh</span></span>
+        <span class="fit-line block md:hidden" aria-hidden="true"><span>Tripathi</span></span>
+      </h1>
 
-    <p class="reveal max-w-2xl text-lg text-[var(--color-ink-muted)] leading-relaxed">
-      I'm <span class="text-[var(--color-ink)]">{site.name}</span> — a backend engineer with 4 years building microservices, distributed systems, and event-driven architectures in Python and Go. Currently Software Engineer II at <span class="text-[var(--color-ink)]">Sharpsell</span>, building a multi-tenant ClickHouse + dbt analytics platform. Previously at <span class="text-[var(--color-ink)]">Parspec</span> (saga-based inventory, public API, ERP integrations, ephemeral environments) and <span class="text-[var(--color-ink)]">Anakin (YC&nbsp;S21)</span>. I design and ship backend systems end-to-end — from technical design and ADRs through production, scaling, and observability.
-    </p>
-
-    <div class="reveal max-w-2xl flex items-baseline gap-3 text-sm">
-      <span class="font-mono text-[10px] uppercase tracking-[0.2em] text-[var(--color-saffron)] shrink-0">Now ›</span>
-      <span class="text-[var(--color-ink-muted)] leading-relaxed">{site.now}</span>
+      <!-- Summit spire rising in front of the lower half of the letters -->
+      <svg
+        class="hero-summit"
+        viewBox="0 -60 400 1560"
+        preserveAspectRatio="xMidYMin meet"
+        aria-hidden="true"
+      >
+        <defs>
+          <linearGradient id="hx-rock" x1="0" y1="0" x2="1" y2="0">
+            <stop offset="0" stop-color="#d59a58" />
+            <stop offset="0.18" stop-color="#7a4a2a" />
+            <stop offset="0.55" stop-color="#2a1a12" />
+            <stop offset="1" stop-color="#120b08" />
+          </linearGradient>
+          <linearGradient id="hx-rock-shade" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0" stop-color="#050505" stop-opacity="0" />
+            <stop offset="0.35" stop-color="#050505" stop-opacity="0.35" />
+            <stop offset="1" stop-color="#050505" stop-opacity="0.95" />
+          </linearGradient>
+          <linearGradient id="hx-rock-mask-g" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0" stop-color="#fff" />
+            <stop offset="0.7" stop-color="#fff" />
+            <stop offset="1" stop-color="#000" />
+          </linearGradient>
+          <mask id="hx-rock-mask" maskUnits="userSpaceOnUse" x="-100" y="-60" width="600" height="1560">
+            <rect x="-100" y="-60" width="600" height="1560" fill="url(#hx-rock-mask-g)" />
+          </mask>
+        </defs>
+        <g mask="url(#hx-rock-mask)">
+          <g filter="url(#hx-rough)">
+            <path
+              id="hx-spire"
+              fill="url(#hx-rock)"
+              d="M200 60 L222 120 L240 118 L262 190 L292 230 L300 300 L338 360 L350 450 L390 540 L400 1500 L0 1500 L20 560 L60 470 L70 380 L110 320 L128 240 L160 200 L176 120 Z"
+            />
+            <path
+              fill="url(#hx-rock-shade)"
+              d="M200 60 L222 120 L240 118 L262 190 L292 230 L300 300 L338 360 L350 450 L390 540 L400 1500 L0 1500 L20 560 L60 470 L70 380 L110 320 L128 240 L160 200 L176 120 Z"
+            />
+            <path
+              fill="none"
+              stroke="#ffd79a"
+              stroke-opacity="0.75"
+              stroke-width="3"
+              d="M200 60 L176 120 L160 200 L128 240 L110 320 L70 380 L60 470"
+            />
+          </g>
+        </g>
+        <line x1="200" y1="62" x2="200" y2="-40" stroke="#2a1a12" stroke-width="4" />
+        <path class="hero-flag" d="M202 -38 L286 -22 L262 -6 L290 10 L202 0 Z" fill="#c8281e" />
+      </svg>
     </div>
 
-    <Terminal />
+    <div class="reveal relative z-10 flex justify-end label-wide text-[11px] md:text-base text-[var(--color-cream)]/90 mt-3 md:mt-4 md:pr-[0.4vw]">
+      Backend · Distributed systems
+    </div>
 
-    <div class="reveal flex flex-wrap items-center gap-3 pt-2">
-      <a
-        href="/#work"
-        class="group inline-flex items-center gap-2 rounded-full bg-[var(--color-saffron)] hover:bg-[var(--color-saffron-light)] text-black font-medium px-5 py-2.5 transition-colors"
-      >
-        See selected work
-        <span class="transition-transform group-hover:translate-x-1">→</span>
-      </a>
-      <a
-        href={site.resume}
-        target="_blank"
-        rel="noopener"
-        class="inline-flex items-center gap-2 rounded-full border border-[var(--color-border-strong)] hover:border-[var(--color-saffron)] hover:text-[var(--color-saffron)] text-[var(--color-ink)] px-5 py-2.5 transition-colors"
-      >
-        Resume <span class="text-[var(--color-ink-faint)]">↗</span>
-      </a>
-      <a
-        href={site.github}
-        target="_blank"
-        rel="noopener"
-        class="inline-flex items-center gap-2 rounded-full text-[var(--color-ink-muted)] hover:text-[var(--color-ink)] px-3 py-2.5 transition-colors"
-      >
-        GitHub ↗
-      </a>
+    <div class="reveal relative z-10 mt-10 md:mt-12 flex flex-col items-center text-center gap-8">
+      <p class="[font-family:var(--font-heavy)] font-bold text-xl md:text-3xl leading-snug tracking-tight text-[var(--color-cream)] drop-shadow-[0_2px_12px_rgba(0,0,0,0.6)]">
+        I design and ship backend systems end-to-end —<br class="hidden md:block" />
+        from ADRs to production at scale.
+      </p>
+      <div class="flex flex-wrap items-center justify-center gap-3">
+        <a href="/#work" class="btn-pill">See the work</a>
+        <a href={site.resume} target="_blank" rel="noopener" class="btn-ghost">Resume ↗</a>
+      </div>
     </div>
   </div>
 </section>
+
+<style>
+  .hero-title-stack {
+    position: relative;
+    z-index: 2;
+  }
+  .hero-summit {
+    position: absolute;
+    z-index: 3;
+    left: 58%;
+    top: 42%;
+    width: 20%;
+    height: 400%;
+    overflow: visible;
+    pointer-events: none;
+  }
+  @media (max-width: 767.98px) {
+    .hero-summit { left: 55%; top: 62%; width: 34%; }
+  }
+</style>
+
+<script>
+  // Fit each display line to the full width of its container.
+  const fit = () => {
+    document.querySelectorAll<HTMLElement>(".fit-line").forEach((line) => {
+      if (!line.offsetParent) return;
+      const text = line.firstElementChild as HTMLElement | null;
+      if (!text) return;
+      line.style.setProperty("--fs", "100px");
+      const w = text.getBoundingClientRect().width;
+      if (!w) return;
+      line.style.setProperty("--fs", `${(100 * line.clientWidth) / w}px`);
+    });
+  };
+  const run = () => {
+    fit();
+    document.fonts?.ready.then(fit);
+  };
+  run();
+  document.addEventListener("astro:page-load", run);
+  let t = 0;
+  window.addEventListener("resize", () => {
+    clearTimeout(t);
+    t = window.setTimeout(fit, 80);
+  });
+</script>

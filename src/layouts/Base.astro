@@ -3,7 +3,7 @@ import "../styles/global.css";
 import { ClientRouter } from "astro:transitions";
 import Header from "../components/Header.astro";
 import Footer from "../components/Footer.astro";
-import FloatingActions from "../components/FloatingActions.astro";
+import SideRail from "../components/SideRail.astro";
 
 type Props = {
   title?: string;
@@ -25,9 +25,9 @@ const introName = "Paritosh Tripathi";
     <script is:inline>
       (function () {
         try {
-          if (localStorage.getItem("theme") === "dark") {
-            document.documentElement.classList.add("dark");
-            document.documentElement.style.colorScheme = "dark";
+          if (localStorage.getItem("theme") === "light") {
+            document.documentElement.classList.add("light");
+            document.documentElement.style.colorScheme = "light";
           }
         } catch (_) {}
       })();
@@ -43,7 +43,7 @@ const introName = "Paritosh Tripathi";
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Playfair+Display:wght@400;700&family=JetBrains+Mono:wght@400;500&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Noto+Serif+Display:wdth,wght@62.5,900&family=Inter+Tight:wght@700;800&family=JetBrains+Mono:wght@400;500&display=swap"
       rel="stylesheet"
     />
     <ClientRouter />
@@ -84,9 +84,11 @@ const introName = "Paritosh Tripathi";
       </div>
     )}
     <Header />
-    <slot />
-    <Footer />
-    <FloatingActions />
+    <SideRail />
+    <div class="shell-main">
+      <slot />
+      <Footer />
+    </div>
 
     <script>
       // Re-run on every navigation since ClientRouter swaps DOM in place.
