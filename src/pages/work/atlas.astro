@@ -1,0 +1,240 @@
+---
+import Base from "../../layouts/Base.astro";
+import CaseStudyHeader from "../../components/CaseStudyHeader.astro";
+import CaseStudyTOC from "../../components/CaseStudyTOC.astro";
+import BarChart from "../../components/charts/BarChart.astro";
+import ArchDiagram from "../../components/charts/ArchDiagram.astro";
+
+const tocItems = [
+  { id: "problem", label: "The problem" },
+  { id: "architecture", label: "Architecture" },
+  { id: "elt", label: "ELT on ClickHouse + dbt" },
+  { id: "infra", label: "Retiring the OLAP fleet" },
+  { id: "cdc", label: "Zero-downtime CDC" },
+  { id: "migration", label: "Dashboard cutover" },
+  { id: "mcp", label: "MCP servers" },
+  { id: "results", label: "Results" },
+  { id: "next", label: "What I'd add next" },
+  { id: "stack", label: "Stack" },
+];
+
+const stats = [
+  { value: "20×", label: "faster nightly ELT" },
+  { value: "85%", label: "DB cost cut" },
+  { value: "100+", label: "tenants" },
+  { value: "1–2s", label: "query latency" },
+];
+
+const runtime = [
+  { label: "Legacy Python ETL", value: "5 h / night", fill: 1 },
+  { label: "ClickHouse + dbt", value: "15 min / night", fill: 15 / 300, accent: true },
+];
+
+const queryLatency = [
+  { label: "Before (row-store OLAP)", value: "15+ s", fill: 1 },
+  { label: "After (ClickHouse)", value: "1–2 s", fill: 2 / 15, accent: true },
+];
+
+const storage = [
+  { label: "Row-store footprint", value: "~1 TB", fill: 1 },
+  { label: "Columnar footprint", value: "~200 GB", fill: 0.2, accent: true },
+];
+---
+
+<Base
+  title="Atlas · Paritosh Tripathi"
+  description="Atlas — a multi-tenant ClickHouse + dbt analytics platform with zero-downtime Postgres CDC: nightly ELT 5h → 15min, queries 15s+ → 1–2s, 85% lower database cost."
+>
+  <CaseStudyHeader
+    slug="atlas"
+    title="Atlas"
+    blurb="A multi-tenant analytics platform that replaced legacy Python ETLs and oversized row-store OLAP instances with ClickHouse + dbt, fed by a zero-downtime Postgres CDC pipeline — and migrated 100+ live client dashboards without a hard cutover."
+    stats={stats}
+  />
+
+  <CaseStudyTOC items={tocItems} />
+  <article class="max-w-4xl mx-auto px-6 prose-invert">
+    <h2 id="problem">The problem</h2>
+    <p>
+      Analytics for 100+ tenants ran on a stack of legacy Python ETL scripts writing into large row-store Postgres (RDS) instances that doubled as the OLAP layer. It worked, but every part of it was straining: the nightly batch took around <strong>five hours</strong>, dashboard queries routinely took <strong>15+ seconds</strong>, and the only lever for performance was a bigger instance — the fleet had already reached <code>8xlarge</code> class.
+    </p>
+    <p>
+      The goal: move analytics onto a columnar engine, turn the ETL into declarative, testable models, keep data fresh without a nightly-only window, and do all of it without breaking the 100+ BI dashboards clients already relied on.
+    </p>
+
+    <h2 id="architecture">Architecture</h2>
+    <ArchDiagram
+      title="Atlas · Postgres → CDC → ClickHouse → dbt → BI"
+      caption="Operational Postgres stays the source of truth. CDC mirrors it into ClickHouse raw tables; dbt builds tenant-aware marts on top; BI dashboards and MCP servers read the marts."
+    >
+      <svg viewBox="0 0 920 360" class="w-full h-auto" role="img" aria-label="Atlas architecture">
+        <style>
+          .at-node { fill: #1a1a1a; stroke: rgba(255,255,255,0.12); }
+          .at-node-accent { fill: #1a1a1a; stroke: #ff8c00; }
+          .at-store { fill: #121212; stroke: rgba(80,227,194,0.35); }
+          .at-label { fill: #ededed; font: 500 12px "JetBrains Mono", ui-monospace, monospace; }
+          .at-sub { fill: rgba(237,237,237,0.55); font: 400 10px "JetBrains Mono", ui-monospace, monospace; }
+          .at-arrow { stroke: rgba(255,255,255,0.25); stroke-width: 1.5; fill: none; }
+          .at-arrow-accent { stroke: #ff8c00; stroke-width: 1.5; fill: none; }
+          .at-metric { stroke: #50e3c2; stroke-width: 1.5; fill: none; stroke-dasharray: 4 4; }
+        </style>
+        <defs>
+          <marker id="at-ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+            <path d="M0,0 L10,5 L0,10 z" fill="rgba(255,255,255,0.4)"></path>
+          </marker>
+          <marker id="at-ah-saf" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+            <path d="M0,0 L10,5 L0,10 z" fill="#ff8c00"></path>
+          </marker>
+          <marker id="at-ah-mint" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+            <path d="M0,0 L10,5 L0,10 z" fill="#50e3c2"></path>
+          </marker>
+        </defs>
+
+        <!-- Sources -->
+        <rect x="20" y="40" width="170" height="60" rx="10" class="at-store" />
+        <text x="105" y="68" text-anchor="middle" class="at-label">Postgres</text>
+        <text x="105" y="84" text-anchor="middle" class="at-sub">4 microservice DBs</text>
+
+        <!-- CDC -->
+        <rect x="230" y="40" width="170" height="60" rx="10" class="at-node-accent" />
+        <text x="315" y="68" text-anchor="middle" class="at-label">PeerDB CDC</text>
+        <text x="315" y="84" text-anchor="middle" class="at-sub">ECS Fargate mirrors</text>
+
+        <!-- ClickHouse raw -->
+        <rect x="440" y="40" width="190" height="60" rx="10" class="at-store" />
+        <text x="535" y="68" text-anchor="middle" class="at-label">ClickHouse · raw</text>
+        <text x="535" y="84" text-anchor="middle" class="at-sub">ECS on EC2 · AWS CDK</text>
+
+        <!-- dbt -->
+        <rect x="670" y="40" width="200" height="60" rx="10" class="at-node-accent" />
+        <text x="770" y="68" text-anchor="middle" class="at-label">dbt ELT</text>
+        <text x="770" y="84" text-anchor="middle" class="at-sub">tenant-aware models + tests</text>
+
+        <!-- Marts -->
+        <rect x="670" y="160" width="200" height="60" rx="10" class="at-store" />
+        <text x="770" y="188" text-anchor="middle" class="at-label">ClickHouse · marts</text>
+        <text x="770" y="204" text-anchor="middle" class="at-sub">100+ tenants</text>
+
+        <!-- Consumers -->
+        <rect x="440" y="160" width="190" height="60" rx="10" class="at-node" />
+        <text x="535" y="188" text-anchor="middle" class="at-label">BI dashboards</text>
+        <text x="535" y="204" text-anchor="middle" class="at-sub">100+ migrated</text>
+
+        <rect x="440" y="260" width="190" height="60" rx="10" class="at-node" />
+        <text x="535" y="288" text-anchor="middle" class="at-label">MCP servers</text>
+        <text x="535" y="304" text-anchor="middle" class="at-sub">BI + ClickHouse tools</text>
+
+        <!-- Translator -->
+        <rect x="190" y="160" width="210" height="60" rx="10" class="at-node" />
+        <text x="295" y="188" text-anchor="middle" class="at-label">SQL translator</text>
+        <text x="295" y="204" text-anchor="middle" class="at-sub">legacy SQL → ClickHouse SQL</text>
+
+        <!-- Metrics / autoscaling -->
+        <rect x="20" y="260" width="210" height="60" rx="10" class="at-node" />
+        <text x="125" y="288" text-anchor="middle" class="at-label">CloudWatch</text>
+        <text x="125" y="304" text-anchor="middle" class="at-sub">slot-lag metric → step scaling</text>
+
+        <path class="at-arrow-accent" marker-end="url(#at-ah-saf)" d="M190 70 L230 70" />
+        <path class="at-arrow-accent" marker-end="url(#at-ah-saf)" d="M400 70 L440 70" />
+        <path class="at-arrow-accent" marker-end="url(#at-ah-saf)" d="M630 70 L670 70" />
+        <path class="at-arrow" marker-end="url(#at-ah)" d="M770 100 L770 160" />
+        <path class="at-arrow" marker-end="url(#at-ah)" d="M670 190 L630 190" />
+        <path class="at-arrow" marker-end="url(#at-ah)" d="M720 220 L630 280" />
+        <path class="at-arrow" marker-end="url(#at-ah)" d="M400 190 L440 190" />
+        <path class="at-metric" marker-end="url(#at-ah-mint)" d="M125 260 Q 125 150 260 100" />
+      </svg>
+    </ArchDiagram>
+    <p>
+      The dashed mint arrow is the scaling loop: replication-slot lag is published as a custom CloudWatch metric and drives step-scaling on the CDC workers — not CPU.
+    </p>
+
+    <h2 id="elt">ELT on ClickHouse + dbt</h2>
+    <p>
+      The old pipeline was imperative Python: extract, transform in memory, load row by row. I flipped it to ELT — land raw data in ClickHouse, then express every transformation as a dbt model that runs inside the engine. Transformations became versioned SQL with tests and lineage, and the heavy lifting moved to a columnar engine built for exactly this kind of scan-and-aggregate work.
+    </p>
+    <ul>
+      <li>Tenant-aware models so one codebase serves 100+ tenants instead of per-tenant scripts</li>
+      <li>Incremental models where the grain allows it, full rebuilds only where it doesn't</li>
+      <li>dbt tests as the contract between raw and mart layers</li>
+    </ul>
+
+    <BarChart
+      title="Nightly batch runtime"
+      rows={runtime}
+      caption="Same data, same outputs — 5 hours down to 15 minutes, a 20× speedup."
+    />
+
+    <BarChart
+      title="Analytical query latency"
+      rows={queryLatency}
+      caption="Dashboard queries went from 15+ seconds to 1–2 seconds once they hit columnar marts instead of row-store tables."
+    />
+
+    <h2 id="infra">Retiring the OLAP fleet</h2>
+    <p>
+      With analytics moved off Postgres, the <code>db.m7g.8xlarge</code> RDS instances that had been serving as the OLAP layer could be decommissioned. ClickHouse runs on AWS ECS, provisioned with AWS CDK and backed by EC2 capacity providers — so the cluster is code, reproducible, and sized for the workload rather than for the worst query.
+    </p>
+    <ul>
+      <li>Database costs down <strong>85%</strong> — roughly <strong>$25,000 / year</strong></li>
+      <li>Storage down <strong>75%</strong>, from ~1 TB to ~200 GB, from columnar compression alone</li>
+    </ul>
+
+    <BarChart
+      title="Storage footprint"
+      rows={storage}
+      caption="Columnar compression shrank the same dataset to about a fifth of its row-store size."
+    />
+
+    <h2 id="cdc">Zero-downtime CDC</h2>
+    <p>
+      Nightly batches alone meant analytics were always a day stale. I built a Postgres → ClickHouse change-data-capture pipeline with PeerDB running on ECS Fargate, mirroring 4 microservices' databases across multi-tenant mirrors — with no downtime on the source systems.
+    </p>
+    <h3>Scale on the signal that matters</h3>
+    <p>
+      CPU is the wrong autoscaling signal for CDC. A worker can sit at low CPU while its replication slot quietly falls behind — and on Postgres, a lagging slot holds WAL on the primary, so the risk lands on the production database, not the analytics side. I replaced CPU autoscaling with <strong>step-scaling driven by a custom CloudWatch metric for replication-slot lag</strong>, keeping lag under <strong>1 GB</strong> across all mirrors.
+    </p>
+
+    <h2 id="migration">Dashboard cutover</h2>
+    <p>
+      100+ client BI dashboards were written against the old Postgres schema and dialect. Rewriting them by hand would have been slow and error-prone, and a hard cutover would have put every client at risk at once.
+    </p>
+    <ul>
+      <li>A custom <strong>Python query-translation engine</strong> programmatically rewrites legacy Postgres SQL into ClickHouse SQL</li>
+      <li>An <strong>idempotent upsert migration framework</strong> applies dashboard and dataset changes so any step can be re-run safely</li>
+      <li>Dashboards cut over incrementally — seamless for clients, reversible for us</li>
+    </ul>
+
+    <h2 id="mcp">MCP servers</h2>
+    <p>
+      I built custom <strong>Model Context Protocol (MCP)</strong> servers for the BI layer and for ClickHouse, so AI agents can inspect dashboards, run live queries, and translate SQL directly. They turned the migration's long tail — odd queries, dialect edge cases, “why is this number different” debugging — into agentic workflows instead of manual digging.
+    </p>
+
+    <h2 id="results">Results</h2>
+    <ul>
+      <li>Nightly ELT: <strong>5 hours → 15 minutes</strong> (20×)</li>
+      <li>Analytical queries: <strong>15+ s → 1–2 s</strong></li>
+      <li>Database cost: <strong>−85%</strong> (~$25K / year)</li>
+      <li>Storage: <strong>1 TB → ~200 GB</strong> (−75%)</li>
+      <li>CDC replication-slot lag held under <strong>1 GB</strong> across multi-tenant mirrors</li>
+      <li><strong>100+</strong> client dashboards migrated with zero-downtime cutovers</li>
+    </ul>
+
+    <h2 id="next">What I'd add next</h2>
+    <ul>
+      <li>End-to-end freshness SLOs per tenant (source commit → mart availability)</li>
+      <li>Per-tenant query cost attribution on ClickHouse</li>
+      <li>Automated diffing of dashboard results between old and new stacks as a CI gate</li>
+    </ul>
+
+    <h2 id="stack">Stack</h2>
+    <ul>
+      <li>ClickHouse on AWS ECS (EC2 capacity providers), provisioned with AWS CDK</li>
+      <li>dbt for ELT models and tests</li>
+      <li>PeerDB on ECS Fargate for Postgres → ClickHouse CDC</li>
+      <li>PostgreSQL as the operational source of truth</li>
+      <li>CloudWatch custom metrics + step-scaling</li>
+      <li>Python for the query-translation engine and migration framework</li>
+      <li>Model Context Protocol (MCP) servers for BI + ClickHouse</li>
+    </ul>
+  </article>
+</Base>
