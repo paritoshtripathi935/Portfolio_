@@ -79,6 +79,9 @@ const mapItem = (raw: any): WakaItem => ({
   percent: raw.percent ?? 0,
 });
 
+// A hung API should fall back to null, not stall the build for minutes.
+const TIMEOUT_MS = 10_000;
+
 const authHeaders = (key: string) => ({
   // Wakatime personal API keys authenticate via Basic — Bearer is rejected.
   Authorization: `Basic ${Buffer.from(key).toString("base64")}`,
@@ -119,7 +122,7 @@ export const getWakatimeStats = async (
   try {
     const res = await fetch(
       `https://wakatime.com/api/v1/users/current/stats/${range}`,
-      { headers: authHeaders(key) },
+      { headers: authHeaders(key), signal: AbortSignal.timeout(TIMEOUT_MS) },
     );
     if (res.status === 404) {
       range404Misses.add(range);
@@ -191,7 +194,7 @@ export const getWakatimeAllTime = async (): Promise<WakatimeAllTime | null> => {
   try {
     const res = await fetch(
       `https://wakatime.com/api/v1/users/current/all_time_since_today`,
-      { headers: authHeaders(key) },
+      { headers: authHeaders(key), signal: AbortSignal.timeout(TIMEOUT_MS) },
     );
     if (!res.ok) {
       console.warn(`[wakatime] all_time -> ${res.status}`);
@@ -232,7 +235,6 @@ const bucketActivity = (seconds: number): 0 | 1 | 2 | 3 | 4 => {
   return 4; // 4 h+
 };
 
-let summariesCache: WakatimeDay[] | null = null;
 let summariesPromise: Promise<WakatimeDay[]> | null = null;
 
 const fetchSummaries = async (days: number): Promise<WakatimeDay[]> => {
@@ -246,7 +248,7 @@ const fetchSummaries = async (days: number): Promise<WakatimeDay[]> => {
   try {
     const res = await fetch(
       `https://wakatime.com/api/v1/users/current/summaries?start=${startStr}&end=${endStr}`,
-      { headers: authHeaders(key) },
+      { headers: authHeaders(key), signal: AbortSignal.timeout(TIMEOUT_MS) },
     );
     if (!res.ok) {
       console.warn(`[wakatime] summaries -> ${res.status}`);
@@ -265,18 +267,9 @@ const fetchSummaries = async (days: number): Promise<WakatimeDay[]> => {
   }
 };
 
-export const getWakatimeSummaries = async (
-  days: number = 365,
-): Promise<WakatimeDay[]> => {
-  if (summariesCache) return summariesCache;
-  if (!summariesPromise) {
-    summariesPromise = fetchSummaries(days).then((d) => {
-      summariesCache = d;
-      return d;
-    });
-  }
-  return summariesPromise;
-};
+// shortcut: memoized once per build, so a second call with a different `days` gets the first result.
+export const getWakatimeSummaries = (days: number = 365): Promise<WakatimeDay[]> =>
+  (summariesPromise ??= fetchSummaries(days));
 
 export const formatWakaDuration = (seconds: number): string => {
   if (!seconds || seconds < 0) return "0m";

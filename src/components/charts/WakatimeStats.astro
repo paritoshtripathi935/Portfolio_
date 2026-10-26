@@ -106,7 +106,7 @@ const activeDaysCount = sortedDays.filter((d) => d.totalSeconds > 0).length;
         project names redacted
       </div>
     </div>
-    <div class="font-mono text-[10px] uppercase tracking-wider text-[var(--color-ink-faint)] border border-[var(--color-border)] rounded-full px-2.5 py-1">
+    <div class="font-mono text-[11px] uppercase tracking-wider text-[var(--color-ink-faint)] border border-[var(--color-border)] rounded-full px-2.5 py-1">
       {labelForRange(stats.range)}
     </div>
   </div>
@@ -117,7 +117,7 @@ const activeDaysCount = sortedDays.filter((d) => d.totalSeconds > 0).length;
       <div class="title-heavy text-5xl text-[var(--color-saffron)] leading-none">
         {formatWakaDuration(stats.totalSeconds)}
       </div>
-      <div class="text-[10px] uppercase tracking-wider text-[var(--color-ink-faint)] mt-2">
+      <div class="text-[11px] uppercase tracking-wider text-[var(--color-ink-faint)] mt-2">
         total · {labelForRange(stats.range)}
       </div>
       <div class="mt-5 grid grid-cols-3 gap-3 text-xs">
@@ -125,7 +125,7 @@ const activeDaysCount = sortedDays.filter((d) => d.totalSeconds > 0).length;
           <div class="font-mono text-base text-[var(--color-ink)]">
             {formatWakaDuration(stats.dailyAverageSeconds)}
           </div>
-          <div class="text-[10px] uppercase tracking-wider text-[var(--color-ink-faint)] mt-0.5">
+          <div class="text-[11px] uppercase tracking-wider text-[var(--color-ink-faint)] mt-0.5">
             daily avg
           </div>
         </div>
@@ -133,7 +133,7 @@ const activeDaysCount = sortedDays.filter((d) => d.totalSeconds > 0).length;
           <div class="font-mono text-base text-[var(--color-ink)]">
             {formatWakaDuration(stats.bestDaySeconds)}
           </div>
-          <div class="text-[10px] uppercase tracking-wider text-[var(--color-ink-faint)] mt-0.5">
+          <div class="text-[11px] uppercase tracking-wider text-[var(--color-ink-faint)] mt-0.5">
             best day {bestDayLabel ? `· ${bestDayLabel}` : ""}
           </div>
         </div>
@@ -143,7 +143,7 @@ const activeDaysCount = sortedDays.filter((d) => d.totalSeconds > 0).length;
               ? `${Math.round(allTime.totalSeconds / 3600).toLocaleString()} h`
               : "—"}
           </div>
-          <div class="text-[10px] uppercase tracking-wider text-[var(--color-ink-faint)] mt-0.5">
+          <div class="text-[11px] uppercase tracking-wider text-[var(--color-ink-faint)] mt-0.5">
             all-time
           </div>
         </div>
@@ -192,7 +192,7 @@ const activeDaysCount = sortedDays.filter((d) => d.totalSeconds > 0).length;
         </text>
       </svg>
       <div class="flex-1 min-w-0">
-        <div class="text-[10px] uppercase tracking-wider text-[var(--color-ink-faint)] mb-2">
+        <div class="text-[11px] uppercase tracking-wider text-[var(--color-ink-faint)] mb-2">
           AI vs human authoring
         </div>
         <div class="space-y-1.5 text-xs">
@@ -216,7 +216,7 @@ const activeDaysCount = sortedDays.filter((d) => d.totalSeconds > 0).length;
             <div class="font-mono text-base text-[var(--color-mint)]">
               {stats.aiPromptEvents.toLocaleString()}
             </div>
-            <div class="text-[10px] uppercase tracking-wider text-[var(--color-ink-faint)] mt-0.5">
+            <div class="text-[11px] uppercase tracking-wider text-[var(--color-ink-faint)] mt-0.5">
               AI prompts
             </div>
           </div>
@@ -224,7 +224,7 @@ const activeDaysCount = sortedDays.filter((d) => d.totalSeconds > 0).length;
             <div class="font-mono text-base text-[var(--color-mint)]">
               {Math.round(stats.aiAugmentedPercent)}%
             </div>
-            <div class="text-[10px] uppercase tracking-wider text-[var(--color-ink-faint)] mt-0.5">
+            <div class="text-[11px] uppercase tracking-wider text-[var(--color-ink-faint)] mt-0.5">
               in AI editors
             </div>
           </div>
@@ -237,10 +237,10 @@ const activeDaysCount = sortedDays.filter((d) => d.totalSeconds > 0).length;
   {sortedDays.length > 0 && (
     <div class="mb-6">
       <div class="flex flex-wrap items-baseline justify-between gap-3 mb-3">
-        <div class="font-mono text-[10px] uppercase tracking-wider text-[var(--color-ink-faint)]">
+        <div class="font-mono text-[11px] uppercase tracking-wider text-[var(--color-ink-faint)]">
           Activity · {sortedDays.length} days · {activeDaysCount} active
         </div>
-        <div class="font-mono text-[10px] uppercase tracking-wider text-[var(--color-ink-faint)]">
+        <div class="font-mono text-[11px] uppercase tracking-wider text-[var(--color-ink-faint)]">
           {summariesTotalH.toLocaleString()} h coded
         </div>
       </div>
@@ -288,7 +288,7 @@ const activeDaysCount = sortedDays.filter((d) => d.totalSeconds > 0).length;
           )}
         </svg>
       </div>
-      <div class="mt-2 flex items-center justify-end gap-2 text-[10px] font-mono text-[var(--color-ink-faint)] uppercase tracking-wider">
+      <div class="mt-2 flex items-center justify-end gap-2 text-[11px] font-mono text-[var(--color-ink-faint)] uppercase tracking-wider">
         <span>Less</span>
         <svg width="62" height="11" viewBox="0 0 62 11" aria-hidden="true">
           <rect x="0" y="0" width="11" height="11" rx="2" class="wk-l-0" />
@@ -305,7 +305,7 @@ const activeDaysCount = sortedDays.filter((d) => d.totalSeconds > 0).length;
   {/* Languages | Editors */}
   <div class="grid md:grid-cols-2 gap-x-8 gap-y-6">
     <div>
-      <div class="font-mono text-[10px] uppercase tracking-wider text-[var(--color-ink-faint)] mb-3">
+      <div class="font-mono text-[11px] uppercase tracking-wider text-[var(--color-ink-faint)] mb-3">
         Languages · top {topLanguages.length}
       </div>
       <div class="space-y-3">
@@ -329,7 +329,7 @@ const activeDaysCount = sortedDays.filter((d) => d.totalSeconds > 0).length;
     </div>
 
     <div>
-      <div class="font-mono text-[10px] uppercase tracking-wider text-[var(--color-ink-faint)] mb-3">
+      <div class="font-mono text-[11px] uppercase tracking-wider text-[var(--color-ink-faint)] mb-3">
         Editors · top {topEditors.length}
       </div>
       <div class="space-y-3">
@@ -343,7 +343,7 @@ const activeDaysCount = sortedDays.filter((d) => d.totalSeconds > 0).length;
                     {e.name}
                   </span>
                   {ai && (
-                    <span class="font-mono text-[9px] uppercase tracking-wider text-[var(--color-mint)] border border-[var(--color-mint)]/40 rounded px-1 py-0.5">
+                    <span class="font-mono text-[11px] uppercase tracking-wider text-[var(--color-mint)] border border-[var(--color-mint)]/40 rounded px-1 py-0.5">
                       AI
                     </span>
                   )}

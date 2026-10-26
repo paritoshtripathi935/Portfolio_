@@ -101,7 +101,7 @@ const cases: Case[] = [
     eyebrow="Selected work"
     title="Six systems."
     titleAccent="End to end."
-    blurb="Each one designed, shipped, and run in production. Click in for architecture, decisions, and the numbers."
+    blurb="Each one designed, shipped and run in production. Open one for the architecture and the numbers."
   />
 
   <div class="sys-grid grid md:grid-cols-2 lg:grid-cols-3 gap-5" data-motion-grid>
@@ -119,7 +119,7 @@ const cases: Case[] = [
               <span class="sky-ridge"></span>
             </div>
             <div class="sys-top">
-              <span class="label-wide text-[10px]">{String(i + 1).padStart(2, "0")} · {c.domain}</span>
+              <span class="label-wide text-[11px]">{String(i + 1).padStart(2, "0")} · {c.domain}</span>
               <span class="sys-arrow" aria-hidden="true">↗</span>
             </div>
 
@@ -137,7 +137,7 @@ const cases: Case[] = [
               </dl>
 
               <div class="sys-stack">
-                {c.stack.map((s) => <span>{s}</span>)}
+                {c.stack.slice(0, 4).map((s) => <span>{s}</span>)}
               </div>
             </div>
           </a>
@@ -148,7 +148,7 @@ const cases: Case[] = [
     <div class="sys-card sys-cta md:col-span-2" style={skyStyle(skies.default)}>
       <div class="sky sky-full" aria-hidden="true"><span class="sky-ridge"></span></div>
       <div class="sys-body sys-cta-body">
-        <span class="label-wide text-[10px] text-[var(--color-cream)]/80">Short on time?</span>
+        <span class="label-wide text-[11px] text-[var(--color-cream)]/80">Short on time?</span>
         <p class="title-heavy text-3xl md:text-5xl text-[var(--color-cream)]">The 30-second version.</p>
         <div class="flex flex-wrap gap-3 mt-2">
           <a href="/recruiter" class="btn-pill">For recruiters</a>

@@ -12,7 +12,7 @@ const { items } = Astro.props;
   aria-label="Case study sections"
   class="hidden xl:block fixed left-[6.5rem] top-1/2 -translate-y-1/2 z-40 max-h-[70vh] overflow-y-auto pr-2"
 >
-  <div class="font-mono text-[10px] uppercase tracking-[0.2em] text-[var(--color-saffron)] mb-3">
+  <div class="font-mono text-[11px] uppercase tracking-[0.2em] text-[var(--color-saffron)] mb-3">
     On this page
   </div>
   <ul class="space-y-2 border-l border-[var(--color-border)]">
@@ -66,6 +66,8 @@ const { items } = Astro.props;
     };
     onScroll();
     window.addEventListener("scroll", onScroll, { passive: true });
+    // Page swaps re-run setup; drop this page's listener so they don't pile up.
+    document.addEventListener("astro:before-swap", () => window.removeEventListener("scroll", onScroll), { once: true });
   };
 
   setupCaseToc();

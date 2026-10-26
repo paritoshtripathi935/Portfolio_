@@ -52,7 +52,7 @@ const enriched = projects.map((p) => {
   };
 });
 
-const STARRED_CAP = 4;
+const STARRED_CAP = 3; // one full row of the 3-column grid
 const starred = enriched
   .filter((p) => p.stars > 0)
   .sort((a, b) => b.stars - a.stars)
@@ -76,7 +76,7 @@ const lastSync = new Date().toISOString();
     eyebrow="On GitHub"
     title="Side projects."
     titleAccent="Built after hours."
-    blurb="Last 12 months of activity across both my personal and work accounts, plus the personal repos I've pushed in my own time."
+    blurb="A year of commits across my personal and work accounts, plus what I build in my own time."
   />
 
   {
@@ -104,7 +104,7 @@ const lastSync = new Date().toISOString();
     <>
       <div class="mt-12 mb-6 flex items-baseline justify-between gap-4">
         <h3 class="title-heavy text-3xl md:text-4xl text-[var(--color-ink)]">Most starred</h3>
-        <span class="font-mono text-[10px] uppercase tracking-wider text-[var(--color-ink-faint)]">
+        <span class="font-mono text-[11px] uppercase tracking-wider text-[var(--color-ink-faint)]">
           sorted by stars desc
         </span>
       </div>
@@ -118,7 +118,7 @@ const lastSync = new Date().toISOString();
     <>
       <div class="mt-12 mb-6 flex items-baseline justify-between gap-4">
         <h3 class="title-heavy text-3xl md:text-4xl text-[var(--color-ink)]">Most recent</h3>
-        <span class="font-mono text-[10px] uppercase tracking-wider text-[var(--color-ink-faint)]">
+        <span class="font-mono text-[11px] uppercase tracking-wider text-[var(--color-ink-faint)]">
           sorted by last-pushed
         </span>
       </div>
