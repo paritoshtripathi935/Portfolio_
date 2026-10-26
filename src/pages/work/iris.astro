@@ -11,6 +11,7 @@ const tocItems = [
   { id: "decisions", label: "Three core decisions" },
   { id: "production", label: "What it ran in 12 months" },
   { id: "rebuilds", label: "Rebuild distribution" },
+  { id: "next", label: "What I'd add next" },
   { id: "stack", label: "Stack" },
 ];
 
@@ -213,6 +214,13 @@ const pipeline = [
       rows={rebuildDistribution}
       caption="The 20+ bucket includes the most-iterated environment, which absorbed 222 rebuilds at 100% success."
     />
+
+    <h2 id="next">What I'd add next</h2>
+    <ul>
+      <li>Auto-teardown of idle environments on a TTL, so cost tracks active PRs rather than open ones</li>
+      <li>Per-stage failure dashboards and automatic retries for transient AWS errors, to lift the 88.1% end-to-end success rate</li>
+      <li>Seeded, anonymized database snapshots per environment, so reviewers test against realistic data</li>
+    </ul>
 
     <h2 id="stack">Stack</h2>
     <ul>

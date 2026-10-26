@@ -10,6 +10,7 @@ const tocItems = [
   { id: "architecture", label: "Architecture" },
   { id: "production", label: "What it ran in production" },
   { id: "design", label: "Why the design held up" },
+  { id: "next", label: "What I'd add next" },
   { id: "stack", label: "Stack" },
 ];
 
@@ -205,6 +206,13 @@ const dataVolume = [
     <p>
       Downstream storage <em>will</em> fail. Writing the WAL and S3 backup before the primary sink means a MongoDB or BigQuery outage doesn't lose the message — when the downstream comes back, the WAL replays. 48 hours was chosen as the window where a human is reliably going to have noticed an outage.
     </p>
+
+    <h2 id="next">What I'd add next</h2>
+    <ul>
+      <li>Dry-run every config change against sample payloads in CI before it goes live</li>
+      <li>Versioned configs with one-click rollback, so a bad JSONPath edit is reversible in seconds</li>
+      <li>Per-client data-quality checks (row counts, freshness SLOs) alerting before a client notices</li>
+    </ul>
 
     <h2 id="stack">Stack</h2>
     <ul>

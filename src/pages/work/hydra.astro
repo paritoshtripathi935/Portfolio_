@@ -10,6 +10,7 @@ const tocItems = [
   { id: "decisions", label: "Three core decisions" },
   { id: "state", label: "State and config" },
   { id: "production", label: "What it ran" },
+  { id: "next", label: "What I'd add next" },
   { id: "stack", label: "Stack" },
 ];
 
@@ -178,6 +179,13 @@ const flow = [
       <li>Infrastructure capable of managing <strong>100+ connected devices</strong> across physical and virtual pools</li>
       <li>Frida instrumentation, network recording, and Appium / UIAutomator unified under one execution layer</li>
       <li>Captured execution logs, network traffic, and automation results piped to internal analytics</li>
+    </ul>
+
+    <h2 id="next">What I'd add next</h2>
+    <ul>
+      <li>Predictive warm pool: pre-warm devices from the queue forecast, not only on affinity hits</li>
+      <li>Validate and dry-run Frida scripts in CI before a job can inject them</li>
+      <li>Per-job device-minute cost attribution, to decide on-prem vs cloud capacity with data</li>
     </ul>
 
     <h2 id="stack">Stack</h2>
