@@ -12,6 +12,7 @@ const tocItems = [
   { id: "latency", label: "Latency budgets" },
   { id: "image-similarity", label: "ML image similarity" },
   { id: "dedup", label: "Datasheet de-duplication" },
+  { id: "next", label: "What I'd add next" },
   { id: "stack", label: "Stack" },
 ];
 
@@ -155,6 +156,13 @@ const rankingWeights = [
     <p>
       Products from different manufacturers often share the same underlying datasheet. Without de-duplication, the same logical product surfaces 3–4 times in a result set under different SKUs, hurting both relevance and the latency budget. The de-dup layer runs <strong>at index time</strong>, not query time — datasheet hashes are computed and consolidated cost / lead-time onto the canonical key, so the query path stays clean.
     </p>
+
+    <h2 id="next">What I'd add next</h2>
+    <ul>
+      <li>Learn ranking weights from click and quote data instead of hand-tuning the multipliers</li>
+      <li>An offline relevance test set (NDCG) as a CI gate, so a weight change can't silently regress results</li>
+      <li>Fuse text and image-vector results into one ranking (reciprocal rank fusion) instead of separate lists</li>
+    </ul>
 
     <h2 id="stack">Stack</h2>
     <ul>
