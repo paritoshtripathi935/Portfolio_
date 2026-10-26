@@ -53,6 +53,7 @@
       const dark = !document.documentElement.classList.contains("light");
       if (sun) sun.classList.toggle("hidden", dark);
       if (moon) moon.classList.toggle("hidden", !dark);
+      btn.setAttribute("aria-pressed", String(dark));
     };
     sync();
 

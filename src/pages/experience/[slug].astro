@@ -26,7 +26,7 @@ const [companyName, companyTag] = entry.company.split(/\s*\((.+)\)/);
     <div class="sys-card page-hero mt-6" style={skyStyle(skies[entry.slug] ?? skies.default)}>
       <div class="sky page-hero-sky" aria-hidden="true"><span class="sky-ridge"></span></div>
       <div class="sys-top">
-        <span class="label-wide text-[10px] md:text-xs" transition:name={`exp-${entry.slug}-period`}>
+        <span class="label-wide text-[11px] md:text-xs" transition:name={`exp-${entry.slug}-period`}>
           {entry.period}{entry.location && ` · ${entry.location}`}
         </span>
         {entry.current && <span class="tl-now"><span class="tl-now-dot" />Now</span>}
@@ -96,7 +96,7 @@ const [companyName, companyTag] = entry.company.split(/\s*\((.+)\)/);
                 >
                   <div class="sky mini-sky" aria-hidden="true"><span class="sky-ridge"></span></div>
                   <div class="sys-top">
-                    <span class="label-wide text-[10px]">Case study</span>
+                    <span class="label-wide text-[11px]">Case study</span>
                     <span class="sys-arrow" aria-hidden="true">↗</span>
                   </div>
                   <div class="sys-body">

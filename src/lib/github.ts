@@ -17,8 +17,10 @@ export type RepoStats = {
   archived: boolean;
 };
 
-let cache: Map<string, RepoStats> | null = null;
 let cachePromise: Promise<Map<string, RepoStats> | null> | null = null;
+
+// A hung third-party API should fall back to static data, not stall the build for minutes.
+const TIMEOUT_MS = 10_000;
 
 const USER = "paritoshtripathi935";
 
@@ -33,7 +35,7 @@ const fetchAllRepos = async (): Promise<Map<string, RepoStats> | null> => {
 
     const res = await fetch(
       `https://api.github.com/users/${USER}/repos?sort=updated&per_page=100&type=owner`,
-      { headers },
+      { headers, signal: AbortSignal.timeout(TIMEOUT_MS) },
     );
     if (!res.ok) {
       console.warn(`[github] ${res.status} ${res.statusText} — falling back to static data`);
@@ -65,21 +67,8 @@ const fetchAllRepos = async (): Promise<Map<string, RepoStats> | null> => {
   }
 };
 
-export const getReposByName = async (): Promise<Map<string, RepoStats> | null> => {
-  if (cache) return cache;
-  if (!cachePromise) {
-    cachePromise = fetchAllRepos().then((m) => {
-      cache = m;
-      return m;
-    });
-  }
-  return cachePromise;
-};
-
-export const getRepoStats = async (name: string): Promise<RepoStats | null> => {
-  const map = await getReposByName();
-  return map?.get(name.toLowerCase()) ?? null;
-};
+export const getReposByName = (): Promise<Map<string, RepoStats> | null> =>
+  (cachePromise ??= fetchAllRepos());
 
 /**
  * Per-day contribution counts pulled from the public
@@ -107,7 +96,7 @@ const fetchOne = async (
   try {
     const res = await fetch(
       `https://github-contributions-api.jogruber.de/v4/${username}?y=${year}`,
-      { headers: { "User-Agent": "paritosh-portfolio-build" } },
+      { headers: { "User-Agent": "paritosh-portfolio-build" }, signal: AbortSignal.timeout(TIMEOUT_MS) },
     );
     if (!res.ok) {
       console.warn(`[github] contributions ${username}/${year} -> ${res.status}`);

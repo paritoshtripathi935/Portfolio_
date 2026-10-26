@@ -10,8 +10,7 @@ export type Project = {
 export const projects: Project[] = [
   {
     name: "MiniPerplexity",
-    blurb:
-      "PaidPilot — dual-provider web-search assistant with live citation grounding, serving 100+ users. React, FastAPI, LLaMA 70B, RAG on Cloudflare AI Workers.",
+    blurb: "PaidPilot — a web-search assistant with live citations, used by 100+ people. LLaMA 70B RAG on Cloudflare Workers.",
     language: "TypeScript",
     stars: 6,
     href: "https://github.com/paritoshtripathi935/MiniPerplexity",
@@ -19,8 +18,7 @@ export const projects: Project[] = [
   },
   {
     name: "MiniHarvery",
-    blurb:
-      "Vidhi — domain RAG assistant for Indian law with a citation-regex hallucination guard, streaming the first token in under 2s. React, FastAPI, LLaMA 70B, SSE.",
+    blurb: "Vidhi — a research assistant for Indian law that checks its own citations and starts answering in under 2s.",
     language: "TypeScript",
     href: "https://github.com/paritoshtripathi935/MiniHarvery",
     liveUrl: "https://vidhi.paritosh.online/",

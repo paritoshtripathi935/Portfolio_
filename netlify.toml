@@ -19,7 +19,7 @@
 # keep these in case anyone bookmarks a path that no longer exists.
 [[redirects]]
   from = "/work/anakin"
-  to = "/work/generic-compiler"
+  to = "/work/proteus"
   status = 301
 
 # Caching for the immutable hashed assets Astro emits to /_astro/

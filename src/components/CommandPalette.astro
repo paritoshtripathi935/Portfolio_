@@ -19,6 +19,7 @@ const items: Item[] = [
   { id: "nav-timeline", title: "Timeline", subtitle: "Where I've been", group: "Navigation", href: "/#timeline", keywords: "experience companies history" },
   { id: "nav-projects", title: "Side projects", subtitle: "GitHub repos", group: "Navigation", href: "/#projects", keywords: "github" },
   { id: "nav-contact", title: "Contact", subtitle: "Get in touch", group: "Navigation", href: "/#contact", keywords: "email reach" },
+  { id: "nav-win95", title: "Windows 95 edition", subtitle: "The same portfolio, 1995 style", group: "Navigation", href: "/win95", keywords: "retro win95 windows classic desktop fun" },
   // Experience
   { id: "exp-sharpsell", title: "Sharpsell — Software Engineer II", subtitle: "Jun 2026 → present · ClickHouse + dbt", group: "Experience", href: "/experience/sharpsell", keywords: "current role sharpsell clickhouse dbt cdc peerdb mcp analytics" },
   { id: "exp-parspec", title: "Parspec — Software Engineer II", subtitle: "Apr 2025 → Jun 2026 · 43 epics", group: "Experience", href: "/experience/parspec", keywords: "parspec backend rest saga erp" },
@@ -50,7 +51,7 @@ const items: Item[] = [
     <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
   </svg>
   <span>Search</span>
-  <kbd class="font-mono text-[10px] px-1.5 py-0.5 rounded bg-[var(--color-surface-2)] text-[var(--color-ink-faint)] border border-[var(--color-border)]">⌘K</kbd>
+  <kbd class="font-mono text-[11px] px-1.5 py-0.5 rounded bg-[var(--color-surface-2)] text-[var(--color-ink-faint)] border border-[var(--color-border)]">⌘K</kbd>
 </button>
 
 <button
@@ -84,17 +85,21 @@ const items: Item[] = [
       <input
         id="cmdk-input"
         type="text"
+        role="combobox"
+        aria-label="Search pages and actions"
+        aria-controls="cmdk-results"
+        aria-expanded="true"
         autocomplete="off"
         spellcheck="false"
         placeholder="Type to search — pages, case studies, actions"
         class="flex-1 bg-transparent outline-none text-[var(--color-ink)] placeholder:text-[var(--color-ink-faint)] text-sm"
       />
-      <kbd class="font-mono text-[10px] px-1.5 py-0.5 rounded bg-[var(--color-surface-2)] text-[var(--color-ink-faint)] border border-[var(--color-border)]">esc</kbd>
+      <kbd class="font-mono text-[11px] px-1.5 py-0.5 rounded bg-[var(--color-surface-2)] text-[var(--color-ink-faint)] border border-[var(--color-border)]">esc</kbd>
     </div>
 
-    <div id="cmdk-results" class="flex-1 overflow-y-auto py-2"></div>
+    <div id="cmdk-results" role="listbox" aria-label="Results" class="flex-1 overflow-y-auto py-2"></div>
 
-    <div class="flex items-center justify-between px-4 py-2 border-t border-[var(--color-border)] text-[10px] font-mono text-[var(--color-ink-faint)] uppercase tracking-wider">
+    <div class="flex items-center justify-between px-4 py-2 border-t border-[var(--color-border)] text-[11px] font-mono text-[var(--color-ink-faint)] uppercase tracking-wider">
       <span class="flex items-center gap-3">
         <span class="flex items-center gap-1"><kbd class="px-1 rounded bg-[var(--color-surface-2)] border border-[var(--color-border)]">↑↓</kbd> nav</span>
         <span class="flex items-center gap-1"><kbd class="px-1 rounded bg-[var(--color-surface-2)] border border-[var(--color-border)]">↵</kbd> select</span>
@@ -114,7 +119,6 @@ const items: Item[] = [
     const triggers = [
       document.getElementById("cmdk-trigger"),
       document.getElementById("cmdk-trigger-mobile"),
-      ...Array.from(document.querySelectorAll<HTMLElement>("[data-cmdk-trigger]")),
     ].filter(Boolean);
 
     if (!overlay || !panel || !input || !list) return;
@@ -149,6 +153,9 @@ const items: Item[] = [
 
     const render = () => {
       list.innerHTML = "";
+      // Screen readers follow the highlighted row while focus stays in the input.
+      if (filtered.length) input.setAttribute("aria-activedescendant", `cmdk-opt-${active}`);
+      else input.removeAttribute("aria-activedescendant");
       if (filtered.length === 0) {
         const empty = document.createElement("div");
         empty.className = "px-4 py-8 text-center text-sm text-[var(--color-ink-faint)]";
@@ -162,13 +169,17 @@ const items: Item[] = [
           lastGroup = item.group;
           const h = document.createElement("div");
           h.className =
-            "px-4 pt-3 pb-1 font-mono text-[10px] uppercase tracking-wider text-[var(--color-ink-faint)]";
+            "px-4 pt-3 pb-1 font-mono text-[11px] uppercase tracking-wider text-[var(--color-ink-faint)]";
           h.textContent = item.group;
           list.appendChild(h);
         }
         const row = document.createElement("button");
         row.type = "button";
         row.dataset.index = String(i);
+        row.id = `cmdk-opt-${i}`;
+        row.setAttribute("role", "option");
+        row.setAttribute("aria-selected", String(i === active));
+        row.tabIndex = -1;
         row.className =
           "w-full flex items-center justify-between gap-3 px-4 py-2.5 text-left transition-colors " +
           (i === active
@@ -179,7 +190,7 @@ const items: Item[] = [
             <div class="text-sm truncate ${i === active ? "text-[var(--color-saffron)]" : ""}">${item.title}</div>
             <div class="text-xs text-[var(--color-ink-faint)] truncate">${item.subtitle}</div>
           </div>
-          <span class="font-mono text-[10px] text-[var(--color-ink-faint)] shrink-0">↵</span>
+          <span class="font-mono text-[11px] text-[var(--color-ink-faint)] shrink-0">↵</span>
         `;
         row.addEventListener("click", () => execute(i));
         row.addEventListener("mousemove", () => {
@@ -232,7 +243,9 @@ const items: Item[] = [
       }
     };
 
+    let returnFocus = null;
     const openPalette = () => {
+      returnFocus = document.activeElement;
       open = true;
       overlay.classList.remove("hidden");
       overlay.classList.add("flex");
@@ -244,11 +257,12 @@ const items: Item[] = [
       open = false;
       overlay.classList.add("hidden");
       overlay.classList.remove("flex");
+      returnFocus?.focus?.();
     };
 
     triggers.forEach((t) => t.addEventListener("click", openPalette));
 
-    document.addEventListener("keydown", (e) => {
+    const onKey = (e) => {
       const isMac = navigator.platform.toLowerCase().includes("mac");
       const cmd = isMac ? e.metaKey : e.ctrlKey;
       if (cmd && e.key.toLowerCase() === "k") {
@@ -260,6 +274,10 @@ const items: Item[] = [
       if (e.key === "Escape") {
         e.preventDefault();
         close();
+      } else if (e.key === "Tab") {
+        // Modal: keep focus in the search box; arrows move through results.
+        e.preventDefault();
+        input.focus();
       } else if (e.key === "ArrowDown") {
         e.preventDefault();
         active = Math.min(active + 1, filtered.length - 1);
@@ -274,7 +292,10 @@ const items: Item[] = [
         e.preventDefault();
         execute(active);
       }
-    });
+    };
+    document.addEventListener("keydown", onKey);
+    // Page swaps re-run setup; drop this page's listener so they don't pile up.
+    document.addEventListener("astro:before-swap", () => document.removeEventListener("keydown", onKey), { once: true });
 
     const scrollActive = () => {
       const row = list.querySelector(`button[data-index="${active}"]`);

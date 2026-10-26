@@ -1,0 +1,479 @@
+---
+// Windows 95 themed portfolio. Standalone page (no Base layout) so it ships no fonts/Tailwind — just this CSS + a tiny script.
+import { site } from "../data/site";
+import { experience } from "../data/experience";
+import { projects } from "../data/projects";
+
+const caseStudies = experience.flatMap((e) => (e.caseStudies ?? []).map((c) => ({ ...c, company: e.company })));
+
+// 32x32 pixel-style icons, drawn with crispEdges rects.
+const icons: Record<string, string> = {
+  computer: `<rect x="4" y="4" width="24" height="17" fill="#c0c0c0" stroke="#000"/><rect x="7" y="7" width="18" height="11" fill="#008080"/><rect x="11" y="22" width="10" height="3" fill="#808080"/><rect x="6" y="25" width="20" height="4" fill="#c0c0c0" stroke="#000"/>`,
+  folder: `<path d="M3 8h10l2 3h14v16H3z" fill="#ffd94a" stroke="#000"/><rect x="3" y="13" width="26" height="14" fill="#f8e58c" stroke="#000"/>`,
+  doc: `<path d="M7 3h13l6 6v20H7z" fill="#fff" stroke="#000"/><path d="M20 3v6h6" fill="#c0c0c0" stroke="#000"/><path d="M10 13h12M10 17h12M10 21h12M10 25h8" stroke="#000080"/>`,
+  mail: `<rect x="3" y="8" width="26" height="17" fill="#fff" stroke="#000"/><path d="M3 8l13 10 13-10" fill="none" stroke="#000"/><rect x="22" y="10" width="5" height="5" fill="#c00"/>`,
+  case: `<rect x="3" y="10" width="26" height="17" fill="#8b5a2b" stroke="#000"/><rect x="11" y="6" width="10" height="4" fill="none" stroke="#000" stroke-width="2"/><rect x="3" y="16" width="26" height="2" fill="#5a3a1a"/><rect x="14" y="15" width="4" height="4" fill="#ffd94a" stroke="#000"/>`,
+  pdf: `<path d="M7 3h13l6 6v20H7z" fill="#fff" stroke="#000"/><rect x="9" y="14" width="15" height="8" fill="#c00"/><path d="M11 16h3M11 18h2M16 16v4M19 16h3M19 18h2" stroke="#fff"/>`,
+  bin: `<path d="M8 9h16l-2 19H10z" fill="#e0e0e0" stroke="#000"/><rect x="6" y="6" width="20" height="3" fill="#c0c0c0" stroke="#000"/><path d="M13 12v13M16 12v13M19 12v13" stroke="#808080"/>`,
+  globe: `<circle cx="16" cy="16" r="12" fill="#3a7bd5" stroke="#000"/><path d="M8 11c4 1 5 4 3 7s2 6 0 8M20 6c-2 3 1 5 4 5s3 5 1 8" fill="none" stroke="#2e8b2e" stroke-width="3"/>`,
+};
+const icon = (name: string, size = 32) =>
+  `<svg width="${size}" height="${size}" viewBox="0 0 32 32" shape-rendering="crispEdges" aria-hidden="true">${icons[name]}</svg>`;
+
+const desktop = [
+  { id: "about", label: "About Me.txt", icon: "doc" },
+  { id: "experience", label: "Experience", icon: "computer" },
+  { id: "projects", label: "Projects", icon: "folder" },
+  { id: "cases", label: "Case Studies", icon: "case" },
+  { id: "contact", label: "Contact", icon: "mail" },
+  { id: "bin", label: "Recycle Bin", icon: "bin" },
+];
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content={`${site.name} — ${site.role}. Windows 95 edition.`} />
+    <link rel="icon" href="/favicon.svg" />
+    <title>{site.name} — Windows 95</title>
+    <script is:inline>
+      // Boot plays once per tab session; mark early so a seen boot never flashes.
+      try { if (sessionStorage.getItem("w95_booted")) document.documentElement.classList.add("booted"); } catch (_) {}
+    </script>
+  </head>
+  <body>
+    <div class="boot" id="boot" aria-hidden="true">
+      <p class="boot-text">Starting Windows 95...</p>
+      <div class="splash">
+        <div class="logo">
+          <svg width="72" height="64" viewBox="0 0 16 14" shape-rendering="crispEdges"><rect x="0" y="0" width="7" height="6" fill="#f00"/><rect x="8" y="0" width="7" height="6" fill="#0a0"/><rect x="0" y="7" width="7" height="6" fill="#00f"/><rect x="8" y="7" width="7" height="6" fill="#fd0"/></svg>
+          <div><small>Microsoft-ish</small><span>Paritosh<b>95</b></span></div>
+        </div>
+        <div class="bar"></div>
+      </div>
+    </div>
+    <main class="desktop" id="desktop">
+      <ul class="icons">
+        {desktop.map((d) => (
+          <li>
+            <button class="icon" data-open={d.id}>
+              <Fragment set:html={icon(d.icon)} />
+              <span>{d.label}</span>
+            </button>
+          </li>
+        ))}
+        <li>
+          <a class="icon" href={site.resume} target="_blank" rel="noopener">
+            <Fragment set:html={icon("pdf")} />
+            <span>Resume.pdf</span>
+          </a>
+        </li>
+      </ul>
+
+      <!-- About -->
+      <section class="win" id="win-about" data-title="About Me.txt - Notepad" data-icon="doc" style="--x:150px;--y:40px;--w:520px" hidden>
+        <div class="menubar"><span><u>F</u>ile</span><span><u>E</u>dit</span><span><u>S</u>earch</span><span><u>H</u>elp</span></div>
+        <div class="body notepad sunken">
+          <p><b>{site.name}</b> ({site.hindiName})</p>
+          <p>{site.role}<br />{site.status}</p>
+          <p>{site.now}</p>
+          <p>Previously: {experience.slice(1).map((e) => e.company).join(", ")}.</p>
+          <p>Open the icons on the desktop to look around, or hit Start.</p>
+          <p>Prefer the modern site? <a href="/">Go back to {new Date().getFullYear()} &rarr;</a></p>
+        </div>
+      </section>
+
+      <!-- Experience: explorer-style list + detail pane -->
+      <section class="win" id="win-experience" data-title="Experience" data-icon="computer" style="--x:200px;--y:70px;--w:760px;height:520px" hidden>
+        <div class="body split">
+          <ul class="tree sunken" role="tablist">
+            {experience.map((e, i) => (
+              <li><button role="tab" aria-selected={i === 0 ? "true" : "false"} data-tab={e.slug}><Fragment set:html={icon("folder", 16)} /> {e.company}</button></li>
+            ))}
+          </ul>
+          <div class="panes sunken">
+            {experience.map((e, i) => (
+              <article data-pane={e.slug} hidden={i !== 0}>
+                <h2>{e.role} — {e.company}</h2>
+                <p class="muted">{e.period}{e.location ? ` · ${e.location}` : ""}</p>
+                {e.highlights && (
+                  <div class="stats">
+                    {e.highlights.map((h) => <div class="stat raised"><b>{h.value}</b><span>{h.label}</span></div>)}
+                  </div>
+                )}
+                <p>{e.summary}</p>
+                <ul class="bullets">{e.bullets.map((b) => <li>{b}</li>)}</ul>
+                <p class="muted">Stack: {e.stack.join(", ")}</p>
+                <a href={`/experience/${e.slug}`} class="btn">Full details…</a>
+              </article>
+            ))}
+          </div>
+        </div>
+        <div class="statusbar"><span class="sunken">{experience.length} object(s)</span><span class="sunken">Since 2022</span></div>
+      </section>
+
+      <!-- Projects -->
+      <section class="win" id="win-projects" data-title="C:\Projects" data-icon="folder" style="--x:260px;--y:100px;--w:640px" hidden>
+        <div class="menubar"><span><u>F</u>ile</span><span><u>E</u>dit</span><span><u>V</u>iew</span><span><u>H</u>elp</span></div>
+        <div class="body sunken white">
+          <table class="details">
+            <thead><tr><th>Name</th><th>Description</th><th>Type</th><th>★</th></tr></thead>
+            <tbody>
+              {projects.map((p) => (
+                <tr>
+                  <td><a href={p.liveUrl ?? p.href} target="_blank" rel="noopener">{p.name}</a>{p.liveUrl && <> · <a href={p.href} target="_blank" rel="noopener">src</a></>}</td>
+                  <td>{p.blurb}</td>
+                  <td>{p.language}</td>
+                  <td>{p.stars ?? ""}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+        <div class="statusbar"><span class="sunken">{projects.length} object(s)</span><a class="sunken" href={site.github} target="_blank" rel="noopener">More on GitHub</a></div>
+      </section>
+
+      <!-- Case studies -->
+      <section class="win" id="win-cases" data-title="Case Studies" data-icon="case" style="--x:320px;--y:60px;--w:560px" hidden>
+        <div class="body sunken white">
+          <ul class="grid">
+            {caseStudies.map((c) => (
+              <li>
+                <a class="tile" href={c.href}>
+                  <Fragment set:html={icon("doc")} />
+                  <span><b>{c.name}</b> <small class="muted">({c.company})</small><br />{c.blurb}</span>
+                </a>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </section>
+
+      <!-- Contact -->
+      <section class="win" id="win-contact" data-title="New Message" data-icon="mail" style="--x:380px;--y:120px;--w:440px" hidden>
+        <div class="body">
+          <dl class="form">
+            <dt>To:</dt><dd class="sunken white"><a href={`mailto:${site.email}`}>{site.email}</a></dd>
+            <dt>GitHub:</dt><dd class="sunken white"><a href={site.github} target="_blank" rel="noopener">{site.github.replace("https://", "")}</a></dd>
+            <dt>LinkedIn:</dt><dd class="sunken white"><a href={site.linkedin} target="_blank" rel="noopener">{site.linkedin.replace("https://www.", "")}</a></dd>
+          </dl>
+          <div class="actions"><a class="btn" href={`mailto:${site.email}`}>Send…</a><a class="btn" href={site.resume} target="_blank" rel="noopener">Resume</a></div>
+        </div>
+      </section>
+
+      <!-- Recycle bin -->
+      <section class="win" id="win-bin" data-title="Recycle Bin" data-icon="bin" style="--x:420px;--y:160px;--w:420px" hidden>
+        <div class="body sunken white">
+          <ul class="bin">
+            <li><Fragment set:html={icon("doc", 16)} /> legacy_python_etl.py <span class="muted">(5h nightly runtime)</span></li>
+            <li><Fragment set:html={icon("doc", 16)} /> rds_db.m7g.8xlarge.tf <span class="muted">(~$25k/yr)</span></li>
+            <li><Fragment set:html={icon("doc", 16)} /> setup_env_manually.md <span class="muted">(multi-hour)</span></li>
+          </ul>
+        </div>
+      </section>
+    </main>
+
+    <!-- Start menu -->
+    <nav class="start-menu raised" id="start-menu" hidden>
+      <div class="brand"><span>Paritosh<b>95</b></span></div>
+      <ul>
+        {desktop.filter((d) => d.id !== "bin").map((d) => (
+          <li><button data-open={d.id}><Fragment set:html={icon(d.icon, 24)} />{d.label}</button></li>
+        ))}
+        <li><a href={site.resume} target="_blank" rel="noopener"><Fragment set:html={icon("pdf", 24)} />Resume.pdf</a></li>
+        <li class="sep"></li>
+        <li><a href="/"><Fragment set:html={icon("globe", 24)} />Shut Down… (modern site)</a></li>
+      </ul>
+    </nav>
+
+    <footer class="taskbar raised">
+      <button class="start btn" id="start-btn" aria-expanded="false" aria-controls="start-menu">
+        <svg width="16" height="14" viewBox="0 0 16 14" shape-rendering="crispEdges" aria-hidden="true"><rect x="0" y="0" width="7" height="6" fill="#f00"/><rect x="8" y="0" width="7" height="6" fill="#0a0"/><rect x="0" y="7" width="7" height="6" fill="#00f"/><rect x="8" y="7" width="7" height="6" fill="#fd0"/></svg>
+        <b>Start</b>
+      </button>
+      <div class="tasks" id="tasks"></div>
+      <div class="tray sunken"><time id="clock"></time></div>
+    </footer>
+
+    <style is:global>
+      :root {
+        --face: #c0c0c0; --hi: #fff; --lo: #808080; --dark: #000; --title: #000080; --title2: #1084d0;
+        --font: "MS Sans Serif", "Microsoft Sans Serif", Tahoma, Geneva, Verdana, sans-serif;
+        color-scheme: light;
+      }
+      * { box-sizing: border-box; }
+      html, body { margin: 0; height: 100%; overflow: hidden; }
+      body { background: #008080; font: 12px/1.4 var(--font); color: #000; -webkit-font-smoothing: none; }
+      a { color: #00e; }
+      button { font: inherit; color: inherit; }
+      [hidden] { display: none !important; }
+
+      .raised { background: var(--face); box-shadow: inset -1px -1px var(--dark), inset 1px 1px var(--hi), inset -2px -2px var(--lo), inset 2px 2px #dfdfdf; }
+      .sunken { box-shadow: inset -1px -1px var(--hi), inset 1px 1px var(--lo), inset -2px -2px #dfdfdf, inset 2px 2px var(--dark); }
+      .white { background: #fff; }
+      .muted { color: #555; }
+      .btn {
+        display: inline-flex; align-items: center; gap: 4px; min-height: 23px; padding: 3px 12px; border: 0; cursor: pointer;
+        background: var(--face); color: #000; text-decoration: none;
+        box-shadow: inset -1px -1px var(--dark), inset 1px 1px var(--hi), inset -2px -2px var(--lo), inset 2px 2px #dfdfdf;
+      }
+      .btn:active, .btn[aria-pressed="true"], .btn[aria-expanded="true"] { box-shadow: inset -1px -1px var(--hi), inset 1px 1px var(--dark), inset -2px -2px #dfdfdf, inset 2px 2px var(--lo); }
+      .btn[aria-pressed="true"] { background: repeating-conic-gradient(#fff 0 25%, var(--face) 0 50%) 0 0 / 2px 2px; font-weight: bold; }
+      :focus-visible { outline: 1px dotted #000; outline-offset: -4px; }
+
+      .desktop { position: fixed; inset: 0 0 28px 0; }
+      .icons { list-style: none; margin: 0; padding: 8px; display: grid; grid-auto-flow: column; grid-template-rows: repeat(auto-fill, 76px); gap: 4px; height: 100%; width: max-content; }
+      .icon { width: 76px; display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 4px 2px; background: none; border: 0; color: #fff; text-decoration: none; cursor: default; text-align: center; }
+      .icon span { padding: 0 2px; }
+      .icon:focus span, .icon.sel span { background: var(--title); outline: 1px dotted #ff0; }
+      .icon:focus svg, .icon.sel svg { filter: brightness(.6) sepia(1) hue-rotate(190deg) saturate(4); }
+
+      .win {
+        position: absolute; left: 0; top: 0; width: min(var(--w), calc(100vw - 16px)); max-width: calc(100vw - 16px); max-height: calc(100% - 16px);
+        min-width: 220px; min-height: 120px; display: flex; flex-direction: column; padding: 3px;
+        resize: both; overflow: hidden; /* native resize: browser-driven, so it stays smooth */
+        transform: translate3d(var(--x), var(--y), 0); will-change: transform;
+        animation: open .14s ease-out;
+      }
+      @keyframes open { from { opacity: 0; scale: .92; } }
+      .win.max { transform: none !important; width: 100% !important; height: 100% !important; max-width: none; max-height: none; resize: none; }
+      .win::-webkit-resizer { background: linear-gradient(135deg, transparent 45%, var(--lo) 45% 52%, var(--hi) 52% 60%, transparent 60% 68%, var(--lo) 68% 75%, var(--hi) 75% 83%, transparent 83%); }
+      .titlebar { display: flex; align-items: center; gap: 4px; height: 20px; padding: 0 2px 0 3px; color: #fff; font-weight: bold; background: linear-gradient(90deg, #808080, #b5b5b5); user-select: none; touch-action: none; }
+      .win.active .titlebar { background: linear-gradient(90deg, var(--title), var(--title2)); }
+      .titlebar .t { flex: 1; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+      .titlebar .btn { width: 16px; min-height: 14px; height: 14px; padding: 0; justify-content: center; font: bold 10px/1 monospace; }
+      .titlebar .btn + .btn[data-act="close"] { margin-left: 2px; }
+      .menubar { display: flex; gap: 2px; padding: 2px 0; }
+      .menubar span { padding: 1px 6px; }
+      .menubar span:hover { background: var(--title); color: #fff; }
+      .body { flex: 1; overflow: auto; padding: 10px 12px; margin-top: 2px; min-height: 0; }
+      .notepad { background: #fff; font-family: "Fixedsys", "Courier New", monospace; font-size: 13px; }
+      .notepad p { margin: 0 0 10px; }
+      .statusbar { display: flex; gap: 2px; margin-top: 2px; }
+      .statusbar > * { flex: 1; padding: 2px 4px; }
+
+      .split { display: grid; grid-template-columns: 170px 1fr; gap: 4px; padding: 0; }
+      .tree, .panes { margin: 0; overflow: auto; background: #fff; }
+      .tree { list-style: none; padding: 6px; }
+      .tree button { display: flex; align-items: center; gap: 4px; width: 100%; padding: 2px; border: 0; background: none; text-align: left; cursor: pointer; }
+      .tree button[aria-selected="true"] { background: var(--title); color: #fff; }
+      .panes { padding: 10px 14px; }
+      .panes h2 { font-size: 14px; margin: 0 0 2px; }
+      .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(90px, 1fr)); gap: 6px; margin: 10px 0; }
+      .stat { padding: 6px; text-align: center; }
+      .stat b { display: block; font-size: 16px; color: var(--title); }
+      .bullets { padding-left: 18px; }
+      .bullets li { margin-bottom: 6px; }
+
+      .details { width: 100%; border-collapse: collapse; }
+      .details th { position: sticky; top: -10px; text-align: left; font-weight: normal; padding: 2px 6px; background: var(--face); box-shadow: inset -1px -1px var(--dark), inset 1px 1px var(--hi); }
+      .details td { padding: 4px 6px; vertical-align: top; }
+      .details tr:hover td { background: #e8e8ff; }
+      .details td:first-child { white-space: nowrap; font-weight: bold; }
+
+      .grid { list-style: none; margin: 0; padding: 0; display: grid; gap: 4px; }
+      .tile { display: flex; gap: 10px; align-items: flex-start; padding: 6px; color: #000; text-decoration: none; }
+      .tile:hover, .tile:focus { background: var(--title); color: #fff; }
+      .tile:hover .muted, .tile:focus .muted { color: #ddd; }
+
+      .form { display: grid; grid-template-columns: auto 1fr; gap: 6px 8px; margin: 0 0 12px; align-items: center; }
+      .form dd { margin: 0; padding: 3px 6px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+      .actions { display: flex; gap: 6px; justify-content: flex-end; }
+      .bin { list-style: none; margin: 0; padding: 0; }
+      .bin li { display: flex; align-items: center; gap: 6px; padding: 3px 0; }
+
+      .taskbar { position: fixed; left: 0; right: 0; bottom: 0; height: 28px; display: flex; gap: 4px; align-items: center; padding: 2px; z-index: 10000; box-shadow: inset 0 1px #dfdfdf, inset 0 2px var(--hi); }
+      .tasks { flex: 1; display: flex; gap: 3px; min-width: 0; }
+      .tasks .btn { flex: 0 1 160px; min-width: 0; justify-content: flex-start; padding: 2px 6px; overflow: hidden; white-space: nowrap; }
+      .tasks .btn span { overflow: hidden; text-overflow: ellipsis; }
+      .tray { padding: 3px 10px; height: 22px; }
+
+      .start-menu { position: fixed; left: 2px; bottom: 28px; z-index: 10001; display: flex; padding: 3px; animation: slide .12s ease-out; }
+      @keyframes slide { from { transform: translateY(8px); opacity: 0; } }
+      .start-menu .brand { width: 22px; background: linear-gradient(0deg, var(--title), var(--title2)); color: #c0c0c0; display: flex; align-items: flex-end; }
+      .start-menu .brand span { writing-mode: vertical-rl; rotate: 180deg; font: bold 16px/22px var(--font); padding: 6px 0; }
+      .start-menu .brand b { color: #fff; }
+      .start-menu ul { list-style: none; margin: 0; padding: 0; min-width: 190px; }
+      .start-menu a, .start-menu button { display: flex; align-items: center; gap: 10px; width: 100%; padding: 4px 12px 4px 6px; border: 0; background: none; color: #000; text-decoration: none; cursor: pointer; text-align: left; }
+      .start-menu a:hover, .start-menu button:hover, .start-menu a:focus, .start-menu button:focus { background: var(--title); color: #fff; outline: 0; }
+      .sep { margin: 3px 2px; border-top: 1px solid var(--lo); border-bottom: 1px solid var(--hi); }
+
+      @media (max-width: 640px) {
+        .icons { grid-auto-flow: row; grid-template-columns: repeat(auto-fill, 76px); grid-template-rows: none; width: auto; }
+        .win { transform: none !important; width: 100% !important; height: 100% !important; max-width: none; max-height: none; resize: none; }
+        .win .btn[data-act="max"] { display: none; }
+        .split { grid-template-columns: 1fr; grid-template-rows: auto 1fr; }
+        .tree { display: flex; gap: 4px; overflow-x: auto; }
+        .tree button { white-space: nowrap; }
+        .tasks .btn { flex-basis: 90px; }
+        /* Finger-sized controls on phones; desktop keeps the authentic 16px buttons. */
+        .titlebar { height: 30px; }
+        .titlebar .btn { width: 28px; height: 24px; min-height: 24px; font-size: 13px; }
+        .desktop { bottom: 40px; }
+        .taskbar { height: 40px; }
+        .taskbar .btn, .tray { min-height: 32px; }
+        .start-menu { bottom: 40px; }
+        .start-menu a, .start-menu button { padding-block: 8px; }
+      }
+      .boot { position: fixed; inset: 0; z-index: 20000; background: #000; cursor: wait; transition: opacity .25s; }
+      .boot.out { opacity: 0; pointer-events: none; }
+      .booted .boot { display: none; }
+      .boot-text { margin: 0; padding: 16px; color: #c0c0c0; font: 16px/1 "Courier New", monospace; }
+      .splash {
+        position: absolute; inset: 0; display: grid; place-items: center; opacity: 0; animation: show 0s .45s forwards;
+        background: radial-gradient(ellipse 18% 8% at 22% 28%, #fff9 60%, transparent 62%), radial-gradient(ellipse 22% 9% at 74% 20%, #fffa 60%, transparent 62%),
+          radial-gradient(ellipse 26% 10% at 66% 78%, #fff8 60%, transparent 62%), radial-gradient(ellipse 16% 7% at 18% 74%, #fff7 60%, transparent 62%),
+          linear-gradient(#3d6fd6, #8fb6f0);
+      }
+      @keyframes show { to { opacity: 1; } }
+      .logo { display: flex; align-items: center; gap: 14px; color: #fff; text-shadow: 2px 2px #0006; }
+      .logo svg { transform: skewY(-6deg); filter: drop-shadow(3px 3px #0005); }
+      .logo small { display: block; font: italic 13px var(--font); }
+      .logo span { font: bold 44px/1 "Arial Black", Arial, sans-serif; letter-spacing: -1px; }
+      .logo b { color: #ffd94a; font-size: 30px; vertical-align: super; }
+      .bar { position: absolute; left: 0; right: 0; bottom: 0; height: 10px; background: repeating-linear-gradient(90deg, #1a3a8a 0 40px, #4a8aff 80px, #1a3a8a 120px) 0 0 / 240px 100%; animation: flow .6s linear infinite; }
+      @keyframes flow { to { background-position: 240px 0; } }
+      @media (prefers-reduced-motion: reduce) { .win, .start-menu, .bar { animation: none; } }
+    </style>
+
+    <script>
+      const $ = <T extends Element = HTMLElement>(s: string, r: ParentNode = document) => r.querySelector<T>(s)!;
+      const tasks = $("#tasks"), startBtn = $("#start-btn"), startMenu = $("#start-menu");
+      const iconSvg = (id: string) => $(`[data-open="${id}"] svg`)?.outerHTML.replace(/width="\d+" height="\d+"/, 'width="16" height="16"') ?? "";
+      let z = 10;
+
+      // Build title bars + taskbar buttons once.
+      document.querySelectorAll<HTMLElement>(".win").forEach((win) => {
+        const id = win.id.slice(4);
+        win.setAttribute("role", "dialog");
+        win.setAttribute("aria-label", win.dataset.title!);
+        win.classList.add("raised");
+        win.insertAdjacentHTML("afterbegin",
+          `<div class="titlebar">${iconSvg(id)}<span class="t">${win.dataset.title}</span>` +
+          `<button class="btn" data-act="min" aria-label="Minimize">_</button>` +
+          `<button class="btn" data-act="max" aria-label="Maximize">□</button>` +
+          `<button class="btn" data-act="close" aria-label="Close">×</button></div>`);
+        const tb = document.createElement("button");
+        tb.className = "btn"; tb.hidden = true; tb.dataset.task = id;
+        tb.innerHTML = `${iconSvg(id)}<span>${win.dataset.title}</span>`;
+        tb.onclick = () => (win.classList.contains("active") && !win.hidden ? minimize(win) : focus(win));
+        tasks.append(tb);
+      });
+
+      const taskBtn = (win: HTMLElement) => $(`[data-task="${win.id.slice(4)}"]`, tasks);
+      function focus(win: HTMLElement) {
+        win.hidden = false;
+        taskBtn(win).hidden = false;
+        win.style.zIndex = String(++z);
+        document.querySelectorAll(".win.active").forEach((w) => w.classList.remove("active"));
+        tasks.querySelectorAll("[aria-pressed]").forEach((b) => b.removeAttribute("aria-pressed"));
+        win.classList.add("active");
+        taskBtn(win).setAttribute("aria-pressed", "true");
+      }
+      function minimize(win: HTMLElement) {
+        win.hidden = true;
+        win.classList.remove("active");
+        taskBtn(win).removeAttribute("aria-pressed");
+      }
+      function close(win: HTMLElement) {
+        minimize(win);
+        taskBtn(win).hidden = true;
+        win.classList.remove("max");
+      }
+      const open = (id: string) => focus($(`#win-${id}`));
+      const toggleStart = (show = startMenu.hidden) => {
+        startMenu.hidden = !show;
+        startBtn.setAttribute("aria-expanded", String(show));
+      };
+
+      // Desktop icons: double-click on mouse (like 95), single tap on touch, Enter via keyboard click.
+      document.addEventListener("click", (e) => {
+        const t = e.target as HTMLElement;
+        const opener = t.closest<HTMLElement>("[data-open]");
+        if (opener) {
+          const isDesktopIcon = opener.classList.contains("icon");
+          if (!isDesktopIcon || e.detail === 0 || (e as PointerEvent).pointerType === "touch" || e.detail >= 2) open(opener.dataset.open!);
+          if (!isDesktopIcon) toggleStart(false);
+          return;
+        }
+        if (t.closest("#start-btn")) return toggleStart();
+        if (!t.closest("#start-menu")) toggleStart(false);
+        const act = t.closest<HTMLElement>("[data-act]");
+        if (act) {
+          const win = act.closest<HTMLElement>(".win")!;
+          if (act.dataset.act === "min") minimize(win);
+          else if (act.dataset.act === "close") close(win);
+          else win.classList.toggle("max");
+        }
+        const tab = t.closest<HTMLElement>("[data-tab]");
+        if (tab) {
+          const box = tab.closest(".win")!;
+          box.querySelectorAll("[data-tab]").forEach((b) => b.setAttribute("aria-selected", String(b === tab)));
+          box.querySelectorAll<HTMLElement>("[data-pane]").forEach((p) => (p.hidden = p.dataset.pane !== tab.dataset.tab));
+        }
+      });
+      document.addEventListener("keydown", (e) => {
+        if (e.key !== "Escape") return;
+        if (!startMenu.hidden) return toggleStart(false);
+        const active = $<HTMLElement>(".win.active");
+        if (active) close(active);
+      });
+
+      // Bring to front on press; drag by title bar. Position lives in --x/--y so CSS transform stays GPU-only.
+      document.addEventListener("pointerdown", (e) => {
+        const win = (e.target as HTMLElement).closest<HTMLElement>(".win");
+        if (!win) return;
+        if (!win.classList.contains("active")) focus(win);
+        const bar = (e.target as HTMLElement).closest(".titlebar");
+        if (!bar || (e.target as HTMLElement).closest("button") || win.classList.contains("max") || innerWidth <= 640) return;
+        const desk = $("#desktop").getBoundingClientRect();
+        const r = win.getBoundingClientRect();
+        const dx = e.clientX - r.left, dy = e.clientY - r.top;
+        let raf = 0, x = r.left, y = r.top;
+        bar.setPointerCapture(e.pointerId);
+        const move = (ev: PointerEvent) => {
+          // Keep at least the title bar grabbable on screen.
+          x = Math.min(Math.max(ev.clientX - dx, 40 - r.width), desk.width - 40);
+          y = Math.min(Math.max(ev.clientY - dy, 0), desk.height - 20);
+          raf ||= requestAnimationFrame(() => {
+            win.style.setProperty("--x", x + "px");
+            win.style.setProperty("--y", y + "px");
+            raf = 0;
+          });
+        };
+        const up = () => { bar.removeEventListener("pointermove", move as EventListener); bar.removeEventListener("pointerup", up); };
+        bar.addEventListener("pointermove", move as EventListener);
+        bar.addEventListener("pointerup", up);
+      });
+      document.addEventListener("dblclick", (e) => {
+        const bar = (e.target as HTMLElement).closest(".titlebar");
+        if (bar && !(e.target as HTMLElement).closest("button")) bar.closest(".win")!.classList.toggle("max");
+      });
+
+      const clock = $("#clock");
+      const tick = () => (clock.textContent = new Date().toLocaleTimeString([], { hour: "numeric", minute: "2-digit" }));
+      tick();
+      setInterval(tick, 10_000);
+
+      // Boot: ~1.8s, any click/key skips it. Window opens after so its zoom-in is visible.
+      const boot = $("#boot");
+      let booted = false;
+      const finish = () => {
+        if (booted) return;
+        booted = true;
+        try { sessionStorage.setItem("w95_booted", "1"); } catch (_) {}
+        boot.classList.add("out");
+        setTimeout(() => boot.remove(), 250);
+        open("about");
+      };
+      if (document.documentElement.classList.contains("booted")) finish();
+      else {
+        setTimeout(finish, 1800);
+        boot.addEventListener("pointerdown", finish);
+        addEventListener("keydown", finish, { once: true });
+      }
+    </script>
+  </body>
+</html>

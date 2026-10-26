@@ -59,7 +59,7 @@ const introName = "Paritosh Tripathi";
     </script>
   </head>
   <body class="grain min-h-screen">
-    <div class="bg-stage" aria-hidden="true">
+    <div class="bg-stage" aria-hidden="true" transition:persist>
       <div class="bg-blob bg-blob-1"></div>
       <div class="bg-blob bg-blob-2"></div>
       <div class="bg-blob bg-blob-3"></div>
@@ -95,10 +95,11 @@ const introName = "Paritosh Tripathi";
         </div>
       </div>
     )}
+    <a href="#main" class="skip-link">Skip to content</a>
     <Header />
     <SideRail />
     <div class="shell-main">
-      <slot />
+      <main id="main"><slot /></main>
       <Footer />
     </div>
 
@@ -148,11 +149,12 @@ const introName = "Paritosh Tripathi";
           let rafId = 0;
           let nextX = innerWidth / 2;
           let nextY = innerHeight / 2;
-          const root = document.documentElement;
+          // Set on the halo itself: setting it on <html> restyled the whole page per mousemove.
+          const halo = document.querySelector<HTMLElement>(".bg-spotlight")!;
           const apply = () => {
             rafId = 0;
-            root.style.setProperty("--cursor-x", `${nextX}px`);
-            root.style.setProperty("--cursor-y", `${nextY}px`);
+            halo.style.setProperty("--cursor-x", `${nextX}px`);
+            halo.style.setProperty("--cursor-y", `${nextY}px`);
           };
           window.addEventListener(
             "pointermove",
