@@ -62,7 +62,7 @@ const scenes = [
           <p class="kicker" data-a="up">{String(i + 2).padStart(2, "0")} · {j.period}</p>
           <h2 class="headline" data-a="up">{j.company}</h2>
           <p class="role" data-a="up">{j.role}{j.location && ` · ${j.location}`}</p>
-          <p class="lede" data-a="up">{j.summary}</p>
+          <p class="lede summary" data-a="up">{j.summary}</p>
           {j.highlights && (
             <dl class="metrics">
               {j.highlights.map((h) => (
@@ -121,7 +121,7 @@ const scenes = [
           <a href={`mailto:${site.email}`} class="btn-pill">Say hello</a>
           <a href={site.resume} target="_blank" rel="noopener" class="btn-ghost">Resume ↗</a>
           <a href="/" class="btn-ghost">Explore the site</a>
-          <button type="button" class="btn-ghost" data-replay>Replay ↺</button>
+          <button type="button" class="j-replay" data-replay>Replay ↺</button>
         </div>
       </div>
     </section>
@@ -270,12 +270,18 @@ const scenes = [
     margin-inline: auto;
     margin-top: 0;
   }
+  /* Supporting copy: the metrics below are the point of a company scene. */
+  .summary {
+    max-width: 40rem;
+    font-size: clamp(0.95rem, 1.4vw, 1.1rem);
+    color: rgba(253, 231, 208, 0.66);
+  }
   .metrics {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 1.25rem 2rem;
     margin-top: 2rem;
-    max-width: 52rem;
+    max-width: 56rem;
   }
   @media (min-width: 768px) {
     .metrics {
@@ -286,9 +292,10 @@ const scenes = [
     font-family: var(--font-heavy);
     font-weight: 800;
     letter-spacing: -0.03em;
-    font-size: clamp(2rem, 4.5vw, 3.25rem);
+    font-size: clamp(2rem, 3.6vw, 3rem);
     line-height: 1;
     font-variant-numeric: tabular-nums;
+    white-space: nowrap;
   }
   .metrics dd {
     margin-top: 0.4rem;
@@ -325,6 +332,10 @@ const scenes = [
       grid-template-columns: repeat(4, minmax(0, 1fr));
     }
   }
+  /* 7 tiles: the last spans two columns so neither the 2- nor 4-column grid leaves a hole. */
+  .case-grid li:last-child {
+    grid-column: span 2;
+  }
   .case-grid li {
     position: relative;
     display: flex;
@@ -345,13 +356,13 @@ const scenes = [
     font-stretch: 62.5%;
     font-variation-settings: "wdth" 62.5;
     text-transform: uppercase;
-    font-size: clamp(1.75rem, 3.6vw, 2.75rem);
+    font-size: clamp(1.5rem, 3.6vw, 2.75rem);
     line-height: 0.9;
   }
   .case-co {
     margin-top: 0.35rem;
     font-family: var(--font-mono);
-    font-size: 0.625rem;
+    font-size: 0.6875rem;
     letter-spacing: 0.2em;
     text-transform: uppercase;
     color: rgba(253, 231, 208, 0.75);
@@ -392,8 +403,20 @@ const scenes = [
     gap: 0.75rem;
     margin-top: 2.25rem;
   }
-  .cta button {
+  .j-replay {
+    flex-basis: 100%;
+    min-height: 44px;
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: rgba(253, 231, 208, 0.6);
+    text-decoration: underline;
+    text-underline-offset: 0.3em;
     cursor: pointer;
+  }
+  .j-replay:hover {
+    color: var(--color-saffron);
   }
 
   .j-close {
@@ -401,11 +424,14 @@ const scenes = [
     top: 1rem;
     right: 1rem;
     z-index: 2;
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
     font-family: var(--font-mono);
     font-size: 0.6875rem;
     letter-spacing: 0.2em;
     text-transform: uppercase;
-    padding: 0.5rem 0.75rem;
+    padding: 0 1rem;
     border: 1px solid rgba(253, 231, 208, 0.25);
     border-radius: 999px;
     color: rgba(253, 231, 208, 0.85);
@@ -428,8 +454,8 @@ const scenes = [
   }
   .j-play {
     flex: none;
-    width: 2.25rem;
-    height: 2.25rem;
+    width: 44px;
+    height: 44px;
     border-radius: 999px;
     border: 1px solid rgba(253, 231, 208, 0.3);
     background: rgba(0, 0, 0, 0.45);
@@ -449,14 +475,15 @@ const scenes = [
     position: relative;
     display: block;
     width: 100%;
-    padding: 0.6rem 0 0;
+    min-height: 44px;
+    padding: 1.35rem 0 0;
     cursor: pointer;
     text-align: left;
   }
   .j-segs button::before,
   .j-fill {
     position: absolute;
-    top: 0;
+    top: 0.85rem;
     left: 0;
     height: 3px;
     border-radius: 2px;
@@ -473,8 +500,9 @@ const scenes = [
   .j-label {
     display: block;
     font-family: var(--font-mono);
-    font-size: 0.5625rem;
-    letter-spacing: 0.14em;
+    font-size: 0.6875rem;
+    letter-spacing: 0.12em;
+    padding-right: 0.5rem;
     text-transform: uppercase;
     color: rgba(253, 231, 208, 0.45);
     white-space: nowrap;
@@ -484,7 +512,35 @@ const scenes = [
   .j-segs button[aria-current="step"] .j-label {
     color: var(--color-cream);
   }
+  /* Landscape phones: drop the supporting copy, the zoom fit below handles the rest. */
+  @media (max-height: 520px) {
+    .scene {
+      padding: 0.75rem 1rem 4rem;
+    }
+    .summary,
+    .chips {
+      display: none;
+    }
+    .headline {
+      font-size: clamp(2.25rem, 6vw, 3.5rem);
+    }
+    .skills {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 0.5rem 1.5rem;
+      margin-top: 1.25rem;
+    }
+    .skills div {
+      grid-template-columns: none;
+      padding-bottom: 0.5rem;
+    }
+  }
   @media (max-width: 640px) {
+    .skills {
+      gap: 0.6rem;
+    }
+    .skills div {
+      padding-bottom: 0.6rem;
+    }
     .j-label {
       display: none;
     }
@@ -513,6 +569,18 @@ const scenes = [
     const fills = [...root.querySelectorAll<HTMLElement>(".j-fill")];
     const segs = [...root.querySelectorAll<HTMLButtonElement>("[data-seek]")];
     const toggle = root.querySelector<HTMLButtonElement>("[data-toggle]")!;
+
+    // Shrink a scene that's taller than the space above the control bar instead of clipping it.
+    const fit = () =>
+      scenes.forEach((s) => {
+        const inner = s.querySelector<HTMLElement>(".scene-inner")!;
+        inner.style.zoom = "";
+        const cs = getComputedStyle(s);
+        const avail = s.clientHeight - parseFloat(cs.paddingTop) - parseFloat(cs.paddingBottom);
+        if (inner.offsetHeight > avail) inner.style.zoom = String(avail / inner.offsetHeight);
+      });
+    fit();
+    window.addEventListener("resize", fit);
 
     const tl = gsap.timeline({ paused: true, defaults: { ease: "power3.out" } });
     // Reduced motion keeps the sequence but drops the movement.
@@ -601,6 +669,7 @@ const scenes = [
       "astro:before-swap",
       () => {
         window.removeEventListener("keydown", onKey);
+        window.removeEventListener("resize", fit);
         tl.kill();
       },
       { once: true },
