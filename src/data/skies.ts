@@ -12,6 +12,7 @@ export const skies: Record<string, Sky> = {
   ariadne: ["#3a1c1f", "#e3a256", "40%"],
   proteus: ["#0d2a36", "#62a39d", "62%"],
   hydra: ["#1b2a22", "#b8a25a", "35%"],
+  daedalus: ["#2b1838", "#d6845a", "55%"],
 
   // Companies
   sharpsell: ["#151d4a", "#e0a05c", "72%"],

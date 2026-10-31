@@ -10,7 +10,7 @@ const tocItems = [
   { id: "architecture", label: "Architecture" },
   { id: "elt", label: "ELT on ClickHouse + dbt" },
   { id: "infra", label: "Retiring the OLAP fleet" },
-  { id: "cdc", label: "Zero-downtime CDC" },
+  { id: "cdc", label: "Continuous CDC" },
   { id: "migration", label: "Dashboard cutover" },
   { id: "mcp", label: "MCP servers" },
   { id: "results", label: "Results" },
@@ -19,15 +19,15 @@ const tocItems = [
 ];
 
 const stats = [
-  { value: "20×", label: "faster nightly ELT" },
+  { value: "20×", label: "faster per-tenant ELT" },
   { value: "85%", label: "DB cost cut" },
   { value: "100+", label: "tenants" },
   { value: "1–2s", label: "query latency" },
 ];
 
 const runtime = [
-  { label: "Legacy Python ETL", value: "5 h / night", fill: 1 },
-  { label: "ClickHouse + dbt", value: "15 min / night", fill: 15 / 300, accent: true },
+  { label: "Legacy Python ETL (queued)", value: "up to 5 h / tenant", fill: 1 },
+  { label: "ClickHouse + dbt (parallel)", value: "15 min / tenant", fill: 15 / 300, accent: true },
 ];
 
 const queryLatency = [
@@ -43,12 +43,12 @@ const storage = [
 
 <Base
   title="Atlas · Paritosh Tripathi"
-  description="Atlas — a multi-tenant ClickHouse + dbt analytics platform with zero-downtime Postgres CDC: nightly ELT 5h → 15min, queries 15s+ → 1–2s, 85% lower database cost."
+  description="Atlas — a multi-tenant ClickHouse + dbt analytics platform fed by Postgres CDC: per-tenant ELT 5h → 15min, queries 15s+ → 1–2s, 85% lower database cost."
 >
   <CaseStudyHeader
     slug="atlas"
     title="Atlas"
-    blurb="A multi-tenant analytics platform that replaced legacy Python ETLs and oversized row-store OLAP instances with ClickHouse + dbt, fed by a zero-downtime Postgres CDC pipeline — and migrated 100+ live client dashboards without a hard cutover."
+    blurb="A multi-tenant analytics platform that replaced legacy Python ETLs and oversized row-store OLAP instances with ClickHouse + dbt, fed by a Postgres CDC pipeline — and migrated 100+ live client dashboards side by side instead of in one hard cutover."
     stats={stats}
   />
 
@@ -56,7 +56,7 @@ const storage = [
   <article class="max-w-4xl mx-auto px-6 prose-invert">
     <h2 id="problem">The problem</h2>
     <p>
-      Analytics for 100+ tenants ran on a stack of legacy Python ETL scripts writing into large row-store Postgres (RDS) instances that doubled as the OLAP layer. It worked, but every part of it was straining: the nightly batch took around <strong>five hours</strong>, dashboard queries routinely took <strong>15+ seconds</strong>, and the only lever for performance was a bigger instance — the fleet had already reached <code>8xlarge</code> class.
+      Analytics for 100+ tenants ran on a stack of legacy Python ETL scripts writing into large row-store Postgres (RDS) instances that doubled as the OLAP layer. It worked, but every part of it was straining: tenant jobs ran one after another, so a single tenant could wait up to <strong>five hours</strong> for its report, dashboard queries routinely took <strong>15+ seconds</strong>, and the only lever for performance was a bigger instance — the fleet had already reached <code>8xlarge</code> class.
     </p>
     <p>
       The goal: move analytics onto a columnar engine, turn the ETL into declarative, testable models, keep data fresh without a nightly-only window, and do all of it without breaking the 100+ BI dashboards clients already relied on.
@@ -153,15 +153,17 @@ const storage = [
       The old pipeline was imperative Python: extract, transform in memory, load row by row. I flipped it to ELT — land raw data in ClickHouse, then express every transformation as a dbt model that runs inside the engine. Transformations became versioned SQL with tests and lineage, and the heavy lifting moved to a columnar engine built for exactly this kind of scan-and-aggregate work.
     </p>
     <ul>
-      <li>Tenant-aware models so one codebase serves 100+ tenants instead of per-tenant scripts</li>
+      <li><strong>114 dbt models</strong> across 9 business domains replaced ~160 bespoke Python job classes (~20K lines)</li>
+      <li><strong>20 shared cross-database macros</strong> for dates, JSON and type coercion, so every model handles ClickHouse's stricter typing the same way</li>
+      <li>Tenant-aware models and per-tenant runs in parallel, instead of every tenant queuing behind the last</li>
       <li>Incremental models where the grain allows it, full rebuilds only where it doesn't</li>
-      <li>dbt tests as the contract between raw and mart layers</li>
+      <li><strong>184 dbt data tests</strong> as the contract between raw and mart layers</li>
     </ul>
 
     <BarChart
-      title="Nightly batch runtime"
+      title="Per-tenant ELT runtime"
       rows={runtime}
-      caption="Same data, same outputs — 5 hours down to 15 minutes, a 20× speedup."
+      caption="Same outputs per tenant — up to 5 hours in the old queue, 15 minutes now (20×). The full 100+ tenant batch finishes in about 2 hours."
     />
 
     <BarChart
@@ -185,7 +187,7 @@ const storage = [
       caption="Columnar compression shrank the same dataset to about a fifth of its row-store size."
     />
 
-    <h2 id="cdc">Zero-downtime CDC</h2>
+    <h2 id="cdc">Continuous CDC</h2>
     <p>
       Nightly batches alone meant analytics were always a day stale. I built a Postgres → ClickHouse change-data-capture pipeline with PeerDB running on ECS Fargate, mirroring 4 microservices' databases across multi-tenant mirrors — with no downtime on the source systems.
     </p>
@@ -201,7 +203,13 @@ const storage = [
     <ul>
       <li>A custom <strong>Python query-translation engine</strong> programmatically rewrites legacy Postgres SQL into ClickHouse SQL</li>
       <li>An <strong>idempotent upsert migration framework</strong> applies dashboard and dataset changes so any step can be re-run safely</li>
-      <li>Dashboards cut over incrementally — seamless for clients, reversible for us</li>
+      <li>Dashboards cut over incrementally — originals stay untouched as <em>Legacy</em>, ClickHouse copies ship as <em>Next Gen</em>, and every stage is safe to re-run</li>
+    </ul>
+    <h3>Proving it, not assuming it</h3>
+    <ul>
+      <li>Before committing, I built a benchmark harness that replayed the real dashboard workload on Postgres, ClickHouse and Redshift: <strong>10–100×</strong> faster reads on ClickHouse, and ~20× slower single-row writes — which is why OLTP stays on Postgres</li>
+      <li>Parity tooling (row hashing, schema and execution checks) found a UUID-vs-String join-key mismatch across 12 models that was silently breaking joins. One fix took a client's passing dashboard queries from <strong>4/49 to 42/49</strong></li>
+      <li>Patched gaps in Superset's own ClickHouse support: SQL Lab query cancellation (the Stop button always failed) and direct CSV-to-ClickHouse uploads</li>
     </ul>
 
     <h2 id="mcp">MCP servers</h2>
@@ -212,7 +220,7 @@ const storage = [
     <h2 id="results">Results</h2>
     <ul>
       <li>CDC replication-slot lag held under <strong>1 GB</strong> across multi-tenant mirrors</li>
-      <li><strong>100+</strong> client dashboards migrated with zero-downtime cutovers</li>
+      <li><strong>100+</strong> client dashboards migrated side by side, with the Postgres originals kept as a fallback</li>
     </ul>
 
     <h2 id="next">What I'd add next</h2>
