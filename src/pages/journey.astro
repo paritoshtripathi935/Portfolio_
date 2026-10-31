@@ -42,31 +42,34 @@ const scenes = [
             </span>
           ))}
         </h1>
-        <p class="kicker kicker-end" data-a="up">The journey</p>
+        <p class="kicker kicker-end" data-a="scramble">The journey</p>
       </div>
     </section>
 
     <section class="scene" data-scene="education" data-hold={scenes[1].hold} aria-label="Education">
       <div class="sky sky-full scene-sky" style={skyStyle(skies.default)} data-a="sky" aria-hidden="true"><span class="sky-ridge"></span></div>
+      <span class="ghost" data-ghost aria-hidden="true">Bennett</span>
       <div class="scene-inner">
-        <p class="kicker" data-a="up">01 · Where it started</p>
-        <h2 class="headline" data-a="up">Bennett University</h2>
-        <p class="lede" data-a="up">B.Tech in Computer Science, specialising in Data Science.</p>
+        <p class="kicker" data-a="scramble">01 · Where it started</p>
+        <h2 class="headline" data-split="chars">Bennett University</h2>
+        <p class="lede" data-split="words">B.Tech in Computer Science, specialising in Data Science.</p>
+        <p class="chips" data-a="up"><span>Computer Science</span><span>Data Science</span></p>
       </div>
     </section>
 
     {jobs.map((j, i) => (
       <section class="scene" data-scene={j.slug} data-hold={scenes[2 + i].hold} aria-label={j.company}>
         <div class="sky sky-full scene-sky" style={skyStyle(skies[j.slug] ?? skies.default)} data-a="sky" aria-hidden="true"><span class="sky-ridge"></span></div>
+        <span class="ghost" data-ghost aria-hidden="true">{j.company.replace(/ \(.*\)/, "")}</span>
         <div class="scene-inner">
-          <p class="kicker" data-a="up">{String(i + 2).padStart(2, "0")} · {j.period}</p>
-          <h2 class="headline" data-a="up">{j.company}</h2>
+          <p class="kicker" data-a="scramble">{String(i + 2).padStart(2, "0")} · {j.period}</p>
+          <h2 class="headline" data-split="chars">{j.company}</h2>
           <p class="role" data-a="up">{j.role}{j.location && ` · ${j.location}`}</p>
-          <p class="lede summary" data-a="up">{j.summary}</p>
+          <p class="lede summary" data-split="words">{j.summary}</p>
           {j.highlights && (
             <dl class="metrics">
               {j.highlights.map((h) => (
-                <div data-a="up">
+                <div data-a="metric">
                   <dt data-count>{h.value}</dt>
                   <dd>{h.label}</dd>
                 </div>
@@ -84,12 +87,13 @@ const scenes = [
 
     <section class="scene" data-scene="work" data-hold={scenes.at(-3)!.hold} aria-label="Selected work">
       <div class="dawn dawn-soft" data-a="fade"></div>
+      <span class="ghost" data-ghost aria-hidden="true">Systems</span>
       <div class="scene-inner">
-        <p class="kicker" data-a="up">{String(jobs.length + 2).padStart(2, "0")} · Selected work</p>
-        <h2 class="headline" data-a="up">{cases.length} systems.<br /><span class="accent">End to end.</span></h2>
+        <p class="kicker" data-a="scramble">{String(jobs.length + 2).padStart(2, "0")} · Selected work</p>
+        <h2 class="headline" data-split="chars">{cases.length} systems.<br /><span class="accent">End to end.</span></h2>
         <ul class="case-grid">
           {cases.map((c) => (
-            <li data-a="up" style={skyStyle(skies[c.href.split("/").pop()!] ?? skies.default)}>
+            <li data-a="tile" style={skyStyle(skies[c.href.split("/").pop()!] ?? skies.default)}>
               <span class="case-name">{c.name}</span>
               <span class="case-co">{c.company}</span>
             </li>
@@ -100,12 +104,13 @@ const scenes = [
 
     <section class="scene" data-scene="skills" data-hold={scenes.at(-2)!.hold} aria-label="What I do">
       <div class="dawn dawn-soft" data-a="fade"></div>
+      <span class="ghost" data-ghost aria-hidden="true">Stack</span>
       <div class="scene-inner">
-        <p class="kicker" data-a="up">{String(jobs.length + 3).padStart(2, "0")} · What I do</p>
-        <h2 class="headline" data-a="up">Design. Ship.<br /><span class="accent">Scale.</span></h2>
+        <p class="kicker" data-a="scramble">{String(jobs.length + 3).padStart(2, "0")} · What I do</p>
+        <h2 class="headline" data-split="chars">Design. Ship.<br /><span class="accent">Scale.</span></h2>
         <dl class="skills">
           {skills.map((s) => (
-            <div data-a="up"><dt>{s.k}</dt><dd>{s.v}</dd></div>
+            <div data-a="row"><dt>{s.k}</dt><dd>{s.v}</dd></div>
           ))}
         </dl>
       </div>
@@ -115,7 +120,7 @@ const scenes = [
       <div class="dawn" data-a="fade"></div>
       <div class="scene-inner title-inner">
         <p class="kicker" data-a="up">{site.status}</p>
-        <h2 class="big-name outro-name" data-a="up">{site.name}</h2>
+        <h2 class="big-name outro-name" data-split="chars">{site.name}</h2>
         <p class="lede center" data-a="up">{site.role}</p>
         <div class="cta" data-a="up">
           <a href={`mailto:${site.email}`} class="btn-pill">Say hello</a>
@@ -126,9 +131,11 @@ const scenes = [
       </div>
     </section>
 
+    <div class="wipe" aria-hidden="true"><span class="wipe-a"></span><span class="wipe-b"></span></div>
     <a href="/" class="j-close" aria-label="Exit the journey">Esc ✕</a>
     <nav class="j-bar" aria-label="Presentation controls">
       <button type="button" class="j-play" data-toggle aria-label="Pause">❚❚</button>
+      <button type="button" class="j-sound" data-sound aria-pressed="false" aria-label="Sound">♪<span class="j-sound-label"> Sound off</span></button>
       <ol class="j-segs">
         {scenes.map((s, i) => (
           <li>
@@ -182,6 +189,43 @@ const scenes = [
   .scene-inner {
     position: relative;
     width: min(1100px, 100%);
+  }
+  /* Giant outlined word drifting behind each scene. */
+  .ghost {
+    position: absolute;
+    top: 50%;
+    left: 0;
+    translate: 0 -50%;
+    font-family: var(--font-display);
+    font-weight: 900;
+    font-stretch: 62.5%;
+    font-variation-settings: "wdth" 62.5;
+    text-transform: uppercase;
+    font-size: min(42vw, 70svh);
+    line-height: 0.8;
+    white-space: nowrap;
+    color: transparent;
+    -webkit-text-stroke: 1px rgba(253, 231, 208, 0.09);
+    pointer-events: none;
+    user-select: none;
+  }
+  /* Two-layer curtain between scenes: saffron leads, ink follows. */
+  .wipe {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    pointer-events: none;
+  }
+  .wipe span {
+    position: absolute;
+    inset: 0;
+    transform: scaleX(0);
+  }
+  .wipe-a {
+    background: var(--color-saffron);
+  }
+  .wipe-b {
+    background: #0b0908;
   }
   .title-inner {
     display: flex;
@@ -463,6 +507,25 @@ const scenes = [
     font-size: 0.7rem;
     cursor: pointer;
   }
+  .j-sound {
+    flex: none;
+    min-height: 44px;
+    padding: 0 0.9rem;
+    border-radius: 999px;
+    border: 1px solid rgba(253, 231, 208, 0.3);
+    background: rgba(0, 0, 0, 0.45);
+    color: rgba(253, 231, 208, 0.85);
+    font-family: var(--font-mono);
+    font-size: 0.6875rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    white-space: nowrap;
+    cursor: pointer;
+  }
+  .j-sound[aria-pressed="true"] {
+    border-color: var(--color-saffron);
+    color: var(--color-saffron);
+  }
   .j-segs {
     flex: 1;
     display: flex;
@@ -535,6 +598,13 @@ const scenes = [
     }
   }
   @media (max-width: 640px) {
+    .j-sound {
+      width: 44px;
+      padding: 0;
+    }
+    .j-sound-label {
+      display: none;
+    }
     .skills {
       gap: 0.6rem;
     }
@@ -552,6 +622,14 @@ const scenes = [
 
 <script>
   import { gsap } from "gsap";
+  import { SplitText } from "gsap/SplitText";
+  import { ScrambleTextPlugin } from "gsap/ScrambleTextPlugin";
+  import { createScore, type Score } from "../lib/journeyScore";
+
+  gsap.registerPlugin(SplitText, ScrambleTextPlugin);
+
+  const SOUND_KEY = "journey-sound";
+  const GLYPHS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
 
   const parseCount = (text: string) => {
     // Count up only values that start with a plain number, like "3.9M+" or "100+".
@@ -561,7 +639,7 @@ const scenes = [
     return { to: Number(raw.replace(/,/g, "")), decimals: raw.split(".")[1]?.length ?? 0, comma: raw.includes(","), suffix: m[2] };
   };
 
-  const start = () => {
+  const start = async () => {
     const root = document.getElementById("journey");
     if (!root) return;
     const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -569,6 +647,26 @@ const scenes = [
     const fills = [...root.querySelectorAll<HTMLElement>(".j-fill")];
     const segs = [...root.querySelectorAll<HTMLButtonElement>("[data-seek]")];
     const toggle = root.querySelector<HTMLButtonElement>("[data-toggle]")!;
+    const soundBtn = root.querySelector<HTMLButtonElement>("[data-sound]")!;
+    const [edge, curtain] = root.querySelectorAll<HTMLElement>(".wipe span");
+
+    // Split and measure against the real display font, not the fallback.
+    await (document.fonts?.ready ?? Promise.resolve());
+    if (!root.isConnected) return;
+
+    // Character and word masks are width-independent, so they survive a resize without re-splitting.
+    const splits = reduce
+      ? []
+      : [...root.querySelectorAll<HTMLElement>("[data-split]")].map((el) =>
+          el.dataset.split === "chars"
+            ? SplitText.create(el, { type: "words,chars", mask: "chars" })
+            : SplitText.create(el, { type: "words", mask: "words" }),
+        );
+    root.querySelectorAll<HTMLElement>("[data-a='scramble']").forEach((el) => {
+      el.dataset.text = el.textContent!.trim();
+      el.setAttribute("aria-label", el.dataset.text);
+      if (!reduce) el.textContent = "";
+    });
 
     // Shrink a scene that's taller than the space above the control bar instead of clipping it.
     const fit = () =>
@@ -582,38 +680,94 @@ const scenes = [
     fit();
     window.addEventListener("resize", fit);
 
+    let score: Score | null = null;
+    let soundOn = false;
     const tl = gsap.timeline({ paused: true, defaults: { ease: "power3.out" } });
-    // Reduced motion keeps the sequence but drops the movement.
-    const move = (v: gsap.TweenVars): gsap.TweenVars => (reduce ? {} : v);
+
+    // One cascade step per element in reading order; groups (tiles, rows, metrics) stagger as one.
+    const stage = (scene: HTMLElement, at: string) => {
+      const sky = scene.querySelector("[data-a='sky']");
+      if (sky) tl.fromTo(sky, { autoAlpha: 0 }, { autoAlpha: 0.55, duration: 1.4, ease: "power2.out" }, at);
+      scene.querySelectorAll("[data-a='fade']").forEach((el) =>
+        tl.fromTo(el, { autoAlpha: 0, yPercent: reduce ? 0 : 10 }, { autoAlpha: 1, yPercent: 0, duration: 1.3 }, at),
+      );
+      const ghost = scene.querySelector("[data-ghost]");
+      if (ghost) tl.fromTo(ghost, { autoAlpha: 0 }, { autoAlpha: 1, duration: 1.6, ease: "power1.out" }, at);
+
+      const seen = new Set<Element>();
+      let pos = at;
+      scene.querySelectorAll<HTMLElement>(".scene-inner [data-a], .scene-inner [data-split]").forEach((el) => {
+        if (seen.has(el)) return;
+        const kind = el.dataset.split && !reduce ? `split-${el.dataset.split}` : el.dataset.a ?? "up";
+        const group = ["tile", "row", "metric"].includes(kind)
+          ? [...el.parentElement!.children].filter((c) => (c as HTMLElement).dataset.a === kind)
+          : [el];
+        group.forEach((g) => seen.add(g));
+
+        if (reduce) {
+          tl.from(group, { autoAlpha: 0, duration: 0.6, stagger: 0.08 }, pos);
+        } else if (kind === "split-chars") {
+          tl.from(splits.find((sp) => sp.elements.includes(el))!.chars, { yPercent: 115, duration: 0.9, stagger: 0.028, ease: "expo.out" }, pos);
+        } else if (kind === "split-words") {
+          tl.from(splits.find((sp) => sp.elements.includes(el))!.words, { yPercent: 110, duration: 0.7, stagger: 0.012, ease: "power3.out" }, pos);
+        } else if (kind === "scramble") {
+          tl.to(el, { duration: 1, scrambleText: { text: el.dataset.text!, chars: GLYPHS, speed: 0.6, revealDelay: 0.15 }, ease: "none" }, pos);
+        } else if (kind === "rise") {
+          tl.from(scene.querySelectorAll("[data-a='rise']"), { yPercent: 110, duration: 0.8, stagger: 0.045, ease: "expo.out" }, pos);
+          scene.querySelectorAll("[data-a='rise']").forEach((c) => seen.add(c));
+        } else if (kind === "tile") {
+          tl.from(group, { autoAlpha: 0, y: 60, rotationX: -70, transformPerspective: 900, transformOrigin: "50% 0%", duration: 0.9, stagger: 0.07, ease: "back.out(1.3)" }, pos);
+        } else if (kind === "row") {
+          tl.from(group, { autoAlpha: 0, x: -48, duration: 0.7, stagger: 0.09 }, pos);
+        } else {
+          tl.from(group, { autoAlpha: 0, y: 28, duration: 0.8, stagger: 0.1 }, pos);
+        }
+
+        if (kind === "metric") {
+          group.forEach((m, k) => {
+            const dt = m.querySelector<HTMLElement>("[data-count]")!;
+            const c = parseCount(dt.textContent!.trim());
+            if (!c) return;
+            const o = { v: 0 };
+            const fmt = (v: number) => (c.comma ? Math.round(v).toLocaleString("en-US") : v.toFixed(c.decimals)) + c.suffix;
+            tl.to(o, { v: c.to, duration: 1.3, ease: "power2.out", onUpdate: () => (dt.textContent = fmt(o.v)) }, k === 0 ? "<" : "<0.1");
+          });
+        }
+        pos = ">-0.55";
+      });
+    };
 
     scenes.forEach((scene, i) => {
       tl.addLabel(`s${i}`);
-      tl.set(scene, { autoAlpha: 1 });
-      const sky = scene.querySelector("[data-a='sky']");
-      if (sky) tl.fromTo(sky, { autoAlpha: 0, ...move({ scale: 1.12 }) }, { autoAlpha: 0.55, scale: 1, duration: 1.6, ease: "power2.out" }, "<");
-      scene.querySelectorAll("[data-a='fade']").forEach((el) => tl.fromTo(el, { autoAlpha: 0, ...move({ yPercent: 8 }) }, { autoAlpha: 1, yPercent: 0, duration: 1.2 }, "<"));
-
-      const chars = scene.querySelectorAll("[data-a='rise']");
-      const ups = [...scene.querySelectorAll<HTMLElement>("[data-a='up']")];
-      if (chars.length) {
-        tl.from(ups[0], { autoAlpha: 0, ...move({ y: 18 }), duration: 0.7 }, "<0.15");
-        tl.from(chars, { ...(reduce ? { autoAlpha: 0 } : { yPercent: 110 }), duration: 0.75, stagger: 0.045, ease: "expo.out" }, "<0.1");
-        tl.from(ups.slice(1), { autoAlpha: 0, ...move({ y: 14 }), duration: 0.6 }, "-=0.2");
+      const t0 = tl.duration();
+      let at = ">";
+      if (i === 0) {
+        tl.set(scene, { autoAlpha: 1 });
+      } else if (reduce) {
+        tl.to(scenes[i - 1], { autoAlpha: 0, duration: 0.4 }).set(scene, { autoAlpha: 1 });
       } else {
-        tl.from(ups, { autoAlpha: 0, ...move({ y: 28 }), duration: 0.8, stagger: 0.12 }, "<0.25");
+        // Alternate the curtain's direction so consecutive scenes don't feel identical.
+        const [a, b] = i % 2 ? ["0% 50%", "100% 50%"] : ["100% 50%", "0% 50%"];
+        tl.call(() => score?.whoosh())
+          .set([edge, curtain], { transformOrigin: a })
+          .fromTo([edge, curtain], { scaleX: 0 }, { scaleX: 1, duration: 0.6, ease: "power4.inOut", stagger: 0.08 })
+          .set(scenes[i - 1], { autoAlpha: 0 })
+          .set(scene, { autoAlpha: 1 })
+          .set([edge, curtain], { transformOrigin: b })
+          .to([curtain, edge], { scaleX: 0, duration: 0.6, ease: "power4.inOut", stagger: 0.08 });
+        at = "<0.2";
       }
+      stage(scene, at);
+      tl.to({}, { duration: Number(scene.dataset.hold || 0) });
 
-      scene.querySelectorAll<HTMLElement>("[data-count]").forEach((el, k) => {
-        const c = parseCount(el.textContent!.trim());
-        if (!c) return;
-        const o = { v: 0 };
-        const fmt = (v: number) =>
-          (c.comma ? Math.round(v).toLocaleString("en-US") : v.toFixed(c.decimals)) + c.suffix;
-        tl.to(o, { v: c.to, duration: 1.2, ease: "power2.out", onUpdate: () => (el.textContent = fmt(o.v)) }, k === 0 ? "-=0.6" : "<0.08");
-      });
-
-      const hold = Number(scene.dataset.hold || 0);
-      if (i < scenes.length - 1) tl.to(scene, { autoAlpha: 0, ...move({ scale: 0.98 }), duration: 0.55, ease: "power2.in" }, `+=${hold}`);
+      // Camera drift across the whole scene: a slow push-in on the sky, the ghost word sliding across.
+      if (!reduce) {
+        const len = tl.duration() - t0 + 1.2;
+        const sky = scene.querySelector("[data-a='sky']");
+        if (sky) tl.fromTo(sky, { scale: 1.16 }, { scale: 1, duration: len, ease: "power1.out" }, t0);
+        const ghost = scene.querySelector("[data-ghost]");
+        if (ghost) tl.fromTo(ghost, { xPercent: i % 2 ? 6 : -30 }, { xPercent: i % 2 ? -30 : 6, duration: len, ease: "none" }, t0);
+      }
     });
 
     const starts = scenes.map((_, i) => tl.labels[`s${i}`]);
@@ -626,27 +780,53 @@ const scenes = [
       if (idx !== current) {
         current = idx;
         segs.forEach((b, i) => (i === idx ? b.setAttribute("aria-current", "step") : b.removeAttribute("aria-current")));
+        score?.chord(idx);
       }
     });
+
     const sync = () => {
       const playing = !tl.paused() && tl.progress() < 1;
       toggle.textContent = playing ? "❚❚" : "▶";
       toggle.setAttribute("aria-label", playing ? "Pause" : "Play");
+      soundBtn.querySelector(".j-sound-label")!.textContent = soundOn ? " Sound on" : " Sound off";
+      soundBtn.setAttribute("aria-pressed", String(soundOn));
     };
     tl.eventCallback("onComplete", sync);
+
+    const enableSound = async () => {
+      score ??= createScore();
+      if (!score) return;
+      score.mute(false);
+      soundOn = await score.start();
+      if (soundOn) score.chord(Math.max(current, 0));
+      sync();
+    };
+    soundBtn.addEventListener("click", () => {
+      if (soundOn) {
+        score?.mute(true);
+        soundOn = false;
+        try { localStorage.setItem(SOUND_KEY, "off"); } catch (_) {}
+        sync();
+      } else {
+        try { localStorage.removeItem(SOUND_KEY); } catch (_) {}
+        enableSound();
+      }
+    });
 
     const play = () => {
       if (tl.progress() >= 1) tl.restart();
       else tl.play();
+      score?.resume();
       sync();
     };
     const pause = () => {
       tl.pause();
+      score?.pause();
       sync();
     };
     const seek = (i: number) => {
-      const s = gsap.utils.clamp(0, scenes.length - 1, i);
-      tl.play(`s${s}`);
+      tl.play(`s${gsap.utils.clamp(0, scenes.length - 1, i)}`);
+      score?.resume();
       sync();
     };
 
@@ -654,6 +834,7 @@ const scenes = [
     segs.forEach((b) => b.addEventListener("click", () => seek(Number(b.dataset.seek))));
     root.querySelector("[data-replay]")?.addEventListener("click", () => {
       tl.restart();
+      score?.resume();
       sync();
     });
     const onKey = (e: KeyboardEvent) => {
@@ -671,15 +852,18 @@ const scenes = [
         window.removeEventListener("keydown", onKey);
         window.removeEventListener("resize", fit);
         tl.kill();
+        splits.forEach((sp) => sp.revert());
+        score?.dispose();
       },
       { once: true },
     );
 
-    // Wait for the display font so the letter rise doesn't jump when it swaps in.
-    (document.fonts?.ready ?? Promise.resolve()).then(() => {
-      tl.play();
-      sync();
-    });
+    tl.play();
+    sync();
+    // Arriving from the Journey button keeps the click's user activation, so sound can start right away.
+    let wantSound = true;
+    try { wantSound = localStorage.getItem(SOUND_KEY) !== "off"; } catch (_) {}
+    if (wantSound && navigator.userActivation?.hasBeenActive !== false) enableSound();
   };
 
   document.addEventListener("astro:page-load", start);
