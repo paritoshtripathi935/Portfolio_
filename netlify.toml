@@ -14,6 +14,8 @@
   # Required: WAKATIME_API_KEY (for the IDE activity panel)
   # Optional: GITHUB_TOKEN  (avoids the 60-req/hr unauth limit on the
   #                          GitHub heatmap + repo stats fetcher)
+  # Optional: BUILD_HOOK_URL (build hook for new_web; netlify/functions/
+  #                          daily-rebuild.mjs POSTs it daily to refresh stats)
 
 # SPA-style fallback isn't needed (Astro emits real .html files), but
 # keep these in case anyone bookmarks a path that no longer exists.
