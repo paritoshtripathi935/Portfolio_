@@ -15,7 +15,8 @@ const {
   description = "Backend / distributed-systems engineer — Software Engineer II at Sharpsell building a multi-tenant ClickHouse + dbt platform. Previously Parspec and Anakin (YC S21).",
 } = Astro.props;
 
-const isHome = Astro.url.pathname === "/";
+// build.format "file" renders the home page as /index.html
+const isHome = ["/", "/index.html"].includes(Astro.url.pathname);
 const introName = "Paritosh Tripathi";
 ---
 

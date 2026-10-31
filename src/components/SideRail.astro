@@ -2,7 +2,8 @@
 import { site } from "../data/site";
 
 const path = Astro.url.pathname;
-const isHome = path === "/";
+// build.format "file" renders the home page as /index.html
+const isHome = ["/", "/index.html"].includes(path);
 
 // `stage` ties an item to a home-page section so the active state follows scroll (see global.css).
 const items = [
