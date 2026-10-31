@@ -911,6 +911,8 @@ html.light .sys-card:hover { border-color: var(--color-border-strong); }
   transition: color 250ms ease;
 }
 .sys-featured .sys-title { font-size: clamp(4rem, 8vw, 6.25rem); }
+/* 8+ letter names overflow a single-column card at the default size */
+.sys-title-long { font-size: clamp(2.75rem, 5vw, 3.5rem); }
 .sys-card:hover .sys-title { color: var(--color-saffron); }
 .sys-sub {
   margin-top: 0.9rem;

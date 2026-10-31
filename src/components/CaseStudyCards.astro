@@ -18,15 +18,28 @@ const cases: Case[] = [
     href: "/work/atlas",
     title: "Atlas",
     domain: "Data platform",
-    subtitle: "Multi-tenant ClickHouse + dbt analytics platform fed by zero-downtime Postgres CDC — replaced legacy Python ETLs and oversized OLAP instances.",
+    subtitle: "Multi-tenant ClickHouse + dbt analytics platform fed by Postgres CDC — replaced legacy Python ETLs and oversized OLAP instances.",
     metrics: [
-      { v: "20×", l: "faster nightly ELT" },
+      { v: "20×", l: "faster per-tenant ELT" },
       { v: "1–2s", l: "query latency" },
       { v: "85%", l: "DB cost cut" },
       { v: "100+", l: "tenants" },
     ],
     stack: ["ClickHouse", "dbt", "PeerDB", "Postgres", "ECS", "AWS CDK", "MCP"],
     featured: true,
+  },
+  {
+    href: "/work/daedalus",
+    title: "Daedalus",
+    domain: "LLM agents",
+    subtitle: "Agents that build a CRM pipeline, seed it with believable demo data and edit it live by chat — approval, crash-safe writes and preview-before-apply in code.",
+    metrics: [
+      { v: "66/66", l: "leads verified" },
+      { v: "14", l: "edit endpoints" },
+      { v: "600+", l: "tests" },
+      { v: "8m → 1", l: "icon calls" },
+    ],
+    stack: ["Python", "LangChain", "PostgreSQL", "Evals"],
   },
   {
     href: "/work/iris",
@@ -99,7 +112,7 @@ const cases: Case[] = [
 <section id="work" class="max-w-6xl mx-auto px-6 py-24 scroll-mt-20">
   <SectionHeader
     eyebrow="Selected work"
-    title="Six systems."
+    title="Seven systems."
     titleAccent="End to end."
     blurb="Each one designed, shipped and run in production. Open one for the architecture and the numbers."
   />
@@ -124,7 +137,7 @@ const cases: Case[] = [
             </div>
 
             <div class="sys-body">
-              <h3 class="sys-title display-serif" transition:name={`card-${slug}-title`}>{c.title}</h3>
+              <h3 class:list={["sys-title display-serif", { "sys-title-long": !c.featured && c.title.length > 7 }]} transition:name={`card-${slug}-title`}>{c.title}</h3>
               <p class="sys-sub">{c.subtitle}</p>
 
               <dl class:list={["sys-metrics", { "sys-metrics-wide": c.featured }]}>
@@ -145,7 +158,7 @@ const cases: Case[] = [
       })
     }
 
-    <div class="sys-card sys-cta md:col-span-2" style={skyStyle(skies.default)}>
+    <div class="sys-card sys-cta md:col-span-2 lg:col-span-1" style={skyStyle(skies.default)}>
       <div class="sky sky-full" aria-hidden="true"><span class="sky-ridge"></span></div>
       <div class="sys-body sys-cta-body">
         <span class="label-wide text-[11px] text-[var(--color-cream)]/80">Short on time?</span>
