@@ -1,0 +1,617 @@
+---
+import Base from "../layouts/Base.astro";
+import { site } from "../data/site";
+import { experience } from "../data/experience";
+import { skies, skyStyle } from "../data/skies";
+
+// Oldest first: the journey reads forward in time.
+const jobs = [...experience].reverse();
+const cases = jobs.flatMap((j) => (j.caseStudies ?? []).map((c) => ({ ...c, company: j.company })));
+const nameLines = site.name.toUpperCase().split(" ");
+
+const skills = [
+  { k: "Languages", v: "Python · Go · Java · SQL" },
+  { k: "Backend", v: "Django · FastAPI · REST · gRPC · OpenAPI" },
+  { k: "Data", v: "PostgreSQL · ClickHouse · DynamoDB · OpenSearch · Redis · BigQuery" },
+  { k: "Distributed systems", v: "Sagas · distributed locks · event-driven design · idempotency · backpressure" },
+  { k: "Cloud", v: "AWS ECS · Lambda · SQS · Aurora · Docker · Kubernetes · Terraform" },
+  { k: "AI tooling", v: "LLM agents · MCP servers · evals · Claude Code" },
+];
+
+// Scene titles feed the progress bar labels; `hold` is seconds on screen after the scene has animated in.
+const scenes = [
+  { id: "title", label: "Intro", hold: 1.6 },
+  { id: "education", label: "Education", hold: 2.4 },
+  ...jobs.map((j) => ({ id: j.slug, label: j.company.replace(/ \(.*\)/, ""), hold: 3.2 })),
+  { id: "work", label: "Selected work", hold: 2.8 },
+  { id: "skills", label: "What I do", hold: 2.8 },
+  { id: "outro", label: "Say hello", hold: 0 },
+];
+---
+
+<Base title={`The journey · ${site.name}`} description={`${site.name}'s journey from university to ${jobs.at(-1)?.company}, as an automated presentation.`} bare>
+  <div id="journey" class="journey" aria-roledescription="presentation">
+    <section class="scene" data-scene="title" data-hold={scenes[0].hold} aria-label="Intro">
+      <div class="dawn" data-a="fade"></div>
+      <div class="scene-inner title-inner">
+        <p class="kicker" data-a="up"><span class="hi">{site.hindiName.split(" ")[0]}</span> presents</p>
+        <h1 class="big-name" aria-label={site.name}>
+          {nameLines.map((word) => (
+            <span class="line" aria-hidden="true">
+              <span class="line-inner">{[...word].map((ch) => <span class="ch" data-a="rise">{ch}</span>)}</span>
+            </span>
+          ))}
+        </h1>
+        <p class="kicker kicker-end" data-a="up">The journey</p>
+      </div>
+    </section>
+
+    <section class="scene" data-scene="education" data-hold={scenes[1].hold} aria-label="Education">
+      <div class="sky sky-full scene-sky" style={skyStyle(skies.default)} data-a="sky" aria-hidden="true"><span class="sky-ridge"></span></div>
+      <div class="scene-inner">
+        <p class="kicker" data-a="up">01 · Where it started</p>
+        <h2 class="headline" data-a="up">Bennett University</h2>
+        <p class="lede" data-a="up">B.Tech in Computer Science, specialising in Data Science.</p>
+      </div>
+    </section>
+
+    {jobs.map((j, i) => (
+      <section class="scene" data-scene={j.slug} data-hold={scenes[2 + i].hold} aria-label={j.company}>
+        <div class="sky sky-full scene-sky" style={skyStyle(skies[j.slug] ?? skies.default)} data-a="sky" aria-hidden="true"><span class="sky-ridge"></span></div>
+        <div class="scene-inner">
+          <p class="kicker" data-a="up">{String(i + 2).padStart(2, "0")} · {j.period}</p>
+          <h2 class="headline" data-a="up">{j.company}</h2>
+          <p class="role" data-a="up">{j.role}{j.location && ` · ${j.location}`}</p>
+          <p class="lede" data-a="up">{j.summary}</p>
+          {j.highlights && (
+            <dl class="metrics">
+              {j.highlights.map((h) => (
+                <div data-a="up">
+                  <dt data-count>{h.value}</dt>
+                  <dd>{h.label}</dd>
+                </div>
+              ))}
+            </dl>
+          )}
+          {j.caseStudies && (
+            <p class="chips" data-a="up">
+              {j.caseStudies.map((c) => <span>{c.name}</span>)}
+            </p>
+          )}
+        </div>
+      </section>
+    ))}
+
+    <section class="scene" data-scene="work" data-hold={scenes.at(-3)!.hold} aria-label="Selected work">
+      <div class="dawn dawn-soft" data-a="fade"></div>
+      <div class="scene-inner">
+        <p class="kicker" data-a="up">{String(jobs.length + 2).padStart(2, "0")} · Selected work</p>
+        <h2 class="headline" data-a="up">{cases.length} systems.<br /><span class="accent">End to end.</span></h2>
+        <ul class="case-grid">
+          {cases.map((c) => (
+            <li data-a="up" style={skyStyle(skies[c.href.split("/").pop()!] ?? skies.default)}>
+              <span class="case-name">{c.name}</span>
+              <span class="case-co">{c.company}</span>
+            </li>
+          ))}
+        </ul>
+      </div>
+    </section>
+
+    <section class="scene" data-scene="skills" data-hold={scenes.at(-2)!.hold} aria-label="What I do">
+      <div class="dawn dawn-soft" data-a="fade"></div>
+      <div class="scene-inner">
+        <p class="kicker" data-a="up">{String(jobs.length + 3).padStart(2, "0")} · What I do</p>
+        <h2 class="headline" data-a="up">Design. Ship.<br /><span class="accent">Scale.</span></h2>
+        <dl class="skills">
+          {skills.map((s) => (
+            <div data-a="up"><dt>{s.k}</dt><dd>{s.v}</dd></div>
+          ))}
+        </dl>
+      </div>
+    </section>
+
+    <section class="scene" data-scene="outro" data-hold="0" aria-label="Say hello">
+      <div class="dawn" data-a="fade"></div>
+      <div class="scene-inner title-inner">
+        <p class="kicker" data-a="up">{site.status}</p>
+        <h2 class="big-name outro-name" data-a="up">{site.name}</h2>
+        <p class="lede center" data-a="up">{site.role}</p>
+        <div class="cta" data-a="up">
+          <a href={`mailto:${site.email}`} class="btn-pill">Say hello</a>
+          <a href={site.resume} target="_blank" rel="noopener" class="btn-ghost">Resume ↗</a>
+          <a href="/" class="btn-ghost">Explore the site</a>
+          <button type="button" class="btn-ghost" data-replay>Replay ↺</button>
+        </div>
+      </div>
+    </section>
+
+    <a href="/" class="j-close" aria-label="Exit the journey">Esc ✕</a>
+    <nav class="j-bar" aria-label="Presentation controls">
+      <button type="button" class="j-play" data-toggle aria-label="Pause">❚❚</button>
+      <ol class="j-segs">
+        {scenes.map((s, i) => (
+          <li>
+            <button type="button" data-seek={i} aria-label={`Jump to ${s.label}`}>
+              <span class="j-fill"></span>
+              <span class="j-label">{s.label}</span>
+            </button>
+          </li>
+        ))}
+      </ol>
+    </nav>
+  </div>
+</Base>
+
+<style>
+  .journey {
+    position: fixed;
+    inset: 0;
+    z-index: 100;
+    overflow: hidden;
+    background: #050505;
+    color: var(--color-cream);
+  }
+  .scene {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    place-items: center;
+    visibility: hidden;
+    opacity: 0;
+    padding: 1.5rem 1rem 5rem;
+    overflow: hidden;
+  }
+  .scene-sky {
+    opacity: 0.55;
+  }
+  .scene-sky :global(.sky-ridge) {
+    height: 26%;
+    background: #050505;
+  }
+  .dawn {
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(ellipse 75% 55% at 50% 105%, rgba(255, 196, 120, 0.5), rgba(214, 102, 48, 0.25) 38%, transparent 72%),
+      radial-gradient(ellipse 60% 40% at 50% 0%, rgba(60, 72, 140, 0.35), transparent 70%);
+  }
+  .dawn-soft {
+    opacity: 0.6;
+  }
+  .scene-inner {
+    position: relative;
+    width: min(1100px, 100%);
+  }
+  .title-inner {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+  .kicker {
+    font-family: var(--font-mono);
+    text-transform: uppercase;
+    letter-spacing: 0.32em;
+    font-size: clamp(0.6875rem, 1.3vw, 0.95rem);
+    color: rgba(253, 231, 208, 0.8);
+  }
+  .kicker-end {
+    margin-top: 1.25rem;
+    color: var(--color-saffron);
+  }
+  .hi {
+    font-family: var(--font-serif);
+    font-style: italic;
+    letter-spacing: 0;
+    text-transform: none;
+    font-size: 1.35em;
+    color: var(--color-saffron);
+    margin-right: 0.35em;
+  }
+  .big-name {
+    --fs: min(17vw, 20svh);
+    font-family: var(--font-display);
+    font-weight: 900;
+    font-stretch: 62.5%;
+    font-variation-settings: "wdth" 62.5;
+    font-size: var(--fs);
+    line-height: 0.8;
+    margin-top: 0.75rem;
+  }
+  .line {
+    display: block;
+    overflow: hidden;
+    height: calc(var(--fs) * 0.8 * 1.6);
+  }
+  .line-inner {
+    display: inline-block;
+    white-space: nowrap;
+    transform: scaleY(1.6);
+    transform-origin: 50% 0;
+  }
+  .ch {
+    display: inline-block;
+  }
+  .outro-name {
+    --fs: min(10vw, 18svh);
+    text-transform: uppercase;
+    white-space: nowrap;
+    line-height: 0.9;
+    margin: 1rem 0 1.25rem;
+  }
+  .headline {
+    font-family: var(--font-heavy);
+    font-weight: 800;
+    letter-spacing: -0.035em;
+    line-height: 0.95;
+    font-size: clamp(2.75rem, 8vw, 6.5rem);
+    margin-top: 0.9rem;
+  }
+  .accent {
+    color: var(--color-saffron);
+  }
+  .role {
+    margin-top: 1rem;
+    font-family: var(--font-mono);
+    text-transform: uppercase;
+    letter-spacing: 0.2em;
+    font-size: clamp(0.7rem, 1.2vw, 0.9rem);
+    color: var(--color-saffron);
+  }
+  .lede {
+    margin-top: 1.25rem;
+    max-width: 46rem;
+    font-size: clamp(1rem, 1.7vw, 1.3rem);
+    line-height: 1.55;
+    color: rgba(253, 231, 208, 0.78);
+  }
+  .center {
+    margin-inline: auto;
+    margin-top: 0;
+  }
+  .metrics {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1.25rem 2rem;
+    margin-top: 2rem;
+    max-width: 52rem;
+  }
+  @media (min-width: 768px) {
+    .metrics {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+  }
+  .metrics dt {
+    font-family: var(--font-heavy);
+    font-weight: 800;
+    letter-spacing: -0.03em;
+    font-size: clamp(2rem, 4.5vw, 3.25rem);
+    line-height: 1;
+    font-variant-numeric: tabular-nums;
+  }
+  .metrics dd {
+    margin-top: 0.4rem;
+    font-family: var(--font-mono);
+    text-transform: uppercase;
+    letter-spacing: 0.16em;
+    font-size: 0.6875rem;
+    color: rgba(253, 231, 208, 0.65);
+  }
+  .chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-top: 1.75rem;
+  }
+  .chips span {
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    padding: 0.35rem 0.7rem;
+    border: 1px solid rgba(253, 231, 208, 0.3);
+    border-radius: 999px;
+    background: rgba(0, 0, 0, 0.35);
+  }
+  .case-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.75rem;
+    margin-top: 2rem;
+  }
+  @media (min-width: 768px) {
+    .case-grid {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+  }
+  .case-grid li {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    min-height: clamp(5.5rem, 14vh, 8rem);
+    padding: 0.9rem 1rem;
+    border-radius: 0.9rem;
+    border: 1px solid rgba(253, 231, 208, 0.14);
+    background:
+      radial-gradient(ellipse 70% 90% at var(--sun-x) 120%, rgba(255, 220, 160, 0.55), transparent 70%),
+      linear-gradient(180deg, var(--sky-a), var(--sky-b));
+    overflow: hidden;
+  }
+  .case-name {
+    font-family: var(--font-display);
+    font-weight: 900;
+    font-stretch: 62.5%;
+    font-variation-settings: "wdth" 62.5;
+    text-transform: uppercase;
+    font-size: clamp(1.75rem, 3.6vw, 2.75rem);
+    line-height: 0.9;
+  }
+  .case-co {
+    margin-top: 0.35rem;
+    font-family: var(--font-mono);
+    font-size: 0.625rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: rgba(253, 231, 208, 0.75);
+  }
+  .skills {
+    margin-top: 2rem;
+    display: grid;
+    gap: 0.9rem;
+    max-width: 52rem;
+  }
+  .skills div {
+    display: grid;
+    gap: 0.25rem;
+    padding-bottom: 0.9rem;
+    border-bottom: 1px solid rgba(253, 231, 208, 0.12);
+  }
+  @media (min-width: 768px) {
+    .skills div {
+      grid-template-columns: 14rem 1fr;
+      align-items: baseline;
+    }
+  }
+  .skills dt {
+    font-family: var(--font-mono);
+    text-transform: uppercase;
+    letter-spacing: 0.2em;
+    font-size: 0.75rem;
+    color: var(--color-saffron);
+  }
+  .skills dd {
+    font-size: clamp(0.95rem, 1.5vw, 1.15rem);
+    color: rgba(253, 231, 208, 0.85);
+  }
+  .cta {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.75rem;
+    margin-top: 2.25rem;
+  }
+  .cta button {
+    cursor: pointer;
+  }
+
+  .j-close {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    z-index: 2;
+    font-family: var(--font-mono);
+    font-size: 0.6875rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    padding: 0.5rem 0.75rem;
+    border: 1px solid rgba(253, 231, 208, 0.25);
+    border-radius: 999px;
+    color: rgba(253, 231, 208, 0.85);
+    background: rgba(0, 0, 0, 0.4);
+  }
+  .j-close:hover {
+    border-color: var(--color-saffron);
+    color: var(--color-saffron);
+  }
+  .j-bar {
+    position: absolute;
+    left: 50%;
+    bottom: clamp(0.75rem, 3vh, 1.5rem);
+    transform: translateX(-50%);
+    z-index: 2;
+    width: min(880px, calc(100% - 2rem));
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+  .j-play {
+    flex: none;
+    width: 2.25rem;
+    height: 2.25rem;
+    border-radius: 999px;
+    border: 1px solid rgba(253, 231, 208, 0.3);
+    background: rgba(0, 0, 0, 0.45);
+    color: var(--color-cream);
+    font-size: 0.7rem;
+    cursor: pointer;
+  }
+  .j-segs {
+    flex: 1;
+    display: flex;
+    gap: 0.35rem;
+  }
+  .j-segs li {
+    flex: 1;
+  }
+  .j-segs button {
+    position: relative;
+    display: block;
+    width: 100%;
+    padding: 0.6rem 0 0;
+    cursor: pointer;
+    text-align: left;
+  }
+  .j-segs button::before,
+  .j-fill {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 3px;
+    border-radius: 2px;
+  }
+  .j-segs button::before {
+    content: "";
+    right: 0;
+    background: rgba(253, 231, 208, 0.18);
+  }
+  .j-fill {
+    width: 0;
+    background: var(--color-saffron);
+  }
+  .j-label {
+    display: block;
+    font-family: var(--font-mono);
+    font-size: 0.5625rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: rgba(253, 231, 208, 0.45);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .j-segs button[aria-current="step"] .j-label {
+    color: var(--color-cream);
+  }
+  @media (max-width: 640px) {
+    .j-label {
+      display: none;
+    }
+    .metrics dd {
+      letter-spacing: 0.1em;
+    }
+  }
+</style>
+
+<script>
+  import { gsap } from "gsap";
+
+  const parseCount = (text: string) => {
+    // Count up only values that start with a plain number, like "3.9M+" or "100+".
+    const m = text.match(/^(\d[\d,]*(?:\.\d+)?)(.*)$/);
+    if (!m || /^[–\-/→]/.test(m[2])) return null;
+    const raw = m[1];
+    return { to: Number(raw.replace(/,/g, "")), decimals: raw.split(".")[1]?.length ?? 0, comma: raw.includes(","), suffix: m[2] };
+  };
+
+  const start = () => {
+    const root = document.getElementById("journey");
+    if (!root) return;
+    const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const scenes = [...root.querySelectorAll<HTMLElement>(".scene")];
+    const fills = [...root.querySelectorAll<HTMLElement>(".j-fill")];
+    const segs = [...root.querySelectorAll<HTMLButtonElement>("[data-seek]")];
+    const toggle = root.querySelector<HTMLButtonElement>("[data-toggle]")!;
+
+    const tl = gsap.timeline({ paused: true, defaults: { ease: "power3.out" } });
+    // Reduced motion keeps the sequence but drops the movement.
+    const move = (v: gsap.TweenVars): gsap.TweenVars => (reduce ? {} : v);
+
+    scenes.forEach((scene, i) => {
+      tl.addLabel(`s${i}`);
+      tl.set(scene, { autoAlpha: 1 });
+      const sky = scene.querySelector("[data-a='sky']");
+      if (sky) tl.fromTo(sky, { autoAlpha: 0, ...move({ scale: 1.12 }) }, { autoAlpha: 0.55, scale: 1, duration: 1.6, ease: "power2.out" }, "<");
+      scene.querySelectorAll("[data-a='fade']").forEach((el) => tl.fromTo(el, { autoAlpha: 0, ...move({ yPercent: 8 }) }, { autoAlpha: 1, yPercent: 0, duration: 1.2 }, "<"));
+
+      const chars = scene.querySelectorAll("[data-a='rise']");
+      const ups = [...scene.querySelectorAll<HTMLElement>("[data-a='up']")];
+      if (chars.length) {
+        tl.from(ups[0], { autoAlpha: 0, ...move({ y: 18 }), duration: 0.7 }, "<0.15");
+        tl.from(chars, { ...(reduce ? { autoAlpha: 0 } : { yPercent: 110 }), duration: 0.75, stagger: 0.045, ease: "expo.out" }, "<0.1");
+        tl.from(ups.slice(1), { autoAlpha: 0, ...move({ y: 14 }), duration: 0.6 }, "-=0.2");
+      } else {
+        tl.from(ups, { autoAlpha: 0, ...move({ y: 28 }), duration: 0.8, stagger: 0.12 }, "<0.25");
+      }
+
+      scene.querySelectorAll<HTMLElement>("[data-count]").forEach((el, k) => {
+        const c = parseCount(el.textContent!.trim());
+        if (!c) return;
+        const o = { v: 0 };
+        const fmt = (v: number) =>
+          (c.comma ? Math.round(v).toLocaleString("en-US") : v.toFixed(c.decimals)) + c.suffix;
+        tl.to(o, { v: c.to, duration: 1.2, ease: "power2.out", onUpdate: () => (el.textContent = fmt(o.v)) }, k === 0 ? "-=0.6" : "<0.08");
+      });
+
+      const hold = Number(scene.dataset.hold || 0);
+      if (i < scenes.length - 1) tl.to(scene, { autoAlpha: 0, ...move({ scale: 0.98 }), duration: 0.55, ease: "power2.in" }, `+=${hold}`);
+    });
+
+    const starts = scenes.map((_, i) => tl.labels[`s${i}`]);
+    const ends = starts.map((s, i) => starts[i + 1] ?? tl.duration());
+    let current = -1;
+    tl.eventCallback("onUpdate", () => {
+      const t = tl.time();
+      fills.forEach((f, i) => (f.style.width = `${gsap.utils.clamp(0, 100, ((t - starts[i]) / (ends[i] - starts[i] || 1)) * 100)}%`));
+      const idx = starts.findLastIndex((s) => t >= s);
+      if (idx !== current) {
+        current = idx;
+        segs.forEach((b, i) => (i === idx ? b.setAttribute("aria-current", "step") : b.removeAttribute("aria-current")));
+      }
+    });
+    const sync = () => {
+      const playing = !tl.paused() && tl.progress() < 1;
+      toggle.textContent = playing ? "❚❚" : "▶";
+      toggle.setAttribute("aria-label", playing ? "Pause" : "Play");
+    };
+    tl.eventCallback("onComplete", sync);
+
+    const play = () => {
+      if (tl.progress() >= 1) tl.restart();
+      else tl.play();
+      sync();
+    };
+    const pause = () => {
+      tl.pause();
+      sync();
+    };
+    const seek = (i: number) => {
+      const s = gsap.utils.clamp(0, scenes.length - 1, i);
+      tl.play(`s${s}`);
+      sync();
+    };
+
+    toggle.addEventListener("click", () => (tl.paused() || tl.progress() >= 1 ? play() : pause()));
+    segs.forEach((b) => b.addEventListener("click", () => seek(Number(b.dataset.seek))));
+    root.querySelector("[data-replay]")?.addEventListener("click", () => {
+      tl.restart();
+      sync();
+    });
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === " ") {
+        e.preventDefault();
+        tl.paused() || tl.progress() >= 1 ? play() : pause();
+      } else if (e.key === "ArrowRight") seek(current + 1);
+      else if (e.key === "ArrowLeft") seek(current - 1);
+      else if (e.key === "Escape") root.querySelector<HTMLAnchorElement>(".j-close")!.click();
+    };
+    window.addEventListener("keydown", onKey);
+    document.addEventListener(
+      "astro:before-swap",
+      () => {
+        window.removeEventListener("keydown", onKey);
+        tl.kill();
+      },
+      { once: true },
+    );
+
+    // Wait for the display font so the letter rise doesn't jump when it swaps in.
+    (document.fonts?.ready ?? Promise.resolve()).then(() => {
+      tl.play();
+      sync();
+    });
+  };
+
+  document.addEventListener("astro:page-load", start);
+</script>
