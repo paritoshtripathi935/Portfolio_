@@ -8,11 +8,14 @@ import SideRail from "../components/SideRail.astro";
 type Props = {
   title?: string;
   description?: string;
+  /** Full-screen pages (the journey) skip the header, rail and footer. */
+  bare?: boolean;
 };
 
 const {
   title = "Paritosh Tripathi — Backend / distributed systems engineer",
   description = "Backend / distributed-systems engineer — Software Engineer II at Sharpsell building a multi-tenant ClickHouse + dbt platform. Previously Parspec and Anakin (YC S21).",
+  bare = false,
 } = Astro.props;
 
 // build.format "file" renders the home page as /index.html
@@ -96,13 +99,19 @@ const introName = "Paritosh Tripathi";
         </div>
       </div>
     )}
-    <a href="#main" class="skip-link">Skip to content</a>
-    <Header />
-    <SideRail />
-    <div class="shell-main">
+    {bare ? (
       <main id="main"><slot /></main>
-      <Footer />
-    </div>
+    ) : (
+      <>
+        <a href="#main" class="skip-link">Skip to content</a>
+        <Header />
+        <SideRail />
+        <div class="shell-main">
+          <main id="main"><slot /></main>
+          <Footer />
+        </div>
+      </>
+    )}
 
     <script>
       import { initFitText } from "../lib/fitText";
