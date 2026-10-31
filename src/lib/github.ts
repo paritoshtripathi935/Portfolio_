@@ -71,8 +71,8 @@ export const getReposByName = (): Promise<Map<string, RepoStats> | null> =>
   (cachePromise ??= fetchAllRepos());
 
 /**
- * Per-day contribution counts pulled from the public
- * github-contributions-api.jogruber.de endpoint (no auth required).
+ * Per-day contribution counts from GitHub's GraphQL API when GITHUB_TOKEN is set,
+ * else from the public github-contributions-api.jogruber.de endpoint (rate-limits hard).
  * Multiple usernames are fetched in parallel and merged by date — sums
  * the counts, then re-buckets the level so the heatmap reflects the
  * combined activity across all accounts.
@@ -93,6 +93,12 @@ const fetchOne = async (
 ): Promise<ContributionDay[]> => {
   const key = `${username}@${year}`;
   if (contribCache.has(key)) return contribCache.get(key)!;
+  const token = process.env.GITHUB_TOKEN;
+  if (token) {
+    const days = await fetchOneGraphql(username, year, token);
+    if (days) contribCache.set(key, days);
+    return days ?? [];
+  }
   try {
     const res = await fetch(
       `https://github-contributions-api.jogruber.de/v4/${username}?y=${year}`,
@@ -113,6 +119,45 @@ const fetchOne = async (
   } catch (err) {
     console.warn(`[github] contributions ${username}/${year} failed:`, err);
     return [];
+  }
+};
+
+const fetchOneGraphql = async (
+  username: string,
+  year: string,
+  token: string,
+): Promise<ContributionDay[] | null> => {
+  const now = new Date();
+  // GraphQL caps a contributions window at one year.
+  const from = year === "last" ? new Date(now.getTime() - 365 * 864e5) : new Date(`${year}-01-01T00:00:00Z`);
+  const end = year === "last" ? now : new Date(`${year}-12-31T23:59:59Z`);
+  const to = end > now ? now : end;
+  try {
+    const res = await fetch("https://api.github.com/graphql", {
+      method: "POST",
+      headers: { Authorization: `Bearer ${token}`, "User-Agent": "paritosh-portfolio-build" },
+      body: JSON.stringify({
+        query: `query($u: String!, $from: DateTime!, $to: DateTime!) {
+          user(login: $u) { contributionsCollection(from: $from, to: $to) {
+            contributionCalendar { weeks { contributionDays { date contributionCount } } }
+          } }
+        }`,
+        variables: { u: username, from: from.toISOString(), to: to.toISOString() },
+      }),
+      signal: AbortSignal.timeout(TIMEOUT_MS),
+    });
+    const data = await res.json();
+    const weeks = data?.data?.user?.contributionsCollection?.contributionCalendar?.weeks;
+    if (!res.ok || !weeks) {
+      console.warn(`[github] contributions ${username}/${year} -> ${res.status}`, data?.errors?.[0]?.message ?? "");
+      return null;
+    }
+    return weeks.flatMap((w: any) =>
+      w.contributionDays.map((d: any) => ({ date: d.date, count: d.contributionCount, level: bucketLevel(d.contributionCount) })),
+    );
+  } catch (err) {
+    console.warn(`[github] contributions ${username}/${year} failed:`, err);
+    return null;
   }
 };
 
