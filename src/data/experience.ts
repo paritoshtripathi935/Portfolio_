@@ -52,7 +52,7 @@ export const experience: Experience[] = [
       {
         name: "Daedalus",
         href: "/work/daedalus",
-        blurb: "LLM agents that build, seed and live-edit client CRM pipelines — plan approval, crash-safe writes, preview-before-apply.",
+        blurb: "Sales demos in one conversation — agents build, seed and live-edit a prospect's CRM pipeline, with deterministic code behind every write.",
       },
     ],
   },

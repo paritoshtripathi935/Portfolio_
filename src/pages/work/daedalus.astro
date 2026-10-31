@@ -6,62 +6,78 @@ import BarChart from "../../components/charts/BarChart.astro";
 import ArchDiagram from "../../components/charts/ArchDiagram.astro";
 
 const tocItems = [
-  { id: "problem", label: "The problem" },
-  { id: "architecture", label: "Architecture" },
-  { id: "seeder", label: "The demo-data seeder" },
-  { id: "edit", label: "Editing a live pipeline" },
-  { id: "speed", label: "Making it fast" },
+  { id: "business", label: "The business case" },
+  { id: "use-case", label: "The use case" },
+  { id: "work", label: "The work" },
+  { id: "orchestration", label: "Orchestration" },
+  { id: "deterministic", label: "Making it deterministic" },
   { id: "results", label: "Results" },
-  { id: "next", label: "What I'd add next" },
+  { id: "next", label: "What's next" },
   { id: "stack", label: "Stack" },
 ];
 
 const stats = [
+  { value: "1 chat", label: "company → live demo" },
   { value: "66/66", label: "demo leads verified" },
-  { value: "14", label: "edit API endpoints" },
-  { value: "600+", label: "tests" },
-  { value: "8 min → 1", label: "call for icons" },
+  { value: "<30 min", label: "full demo seed" },
+  { value: "Dry run", label: "default for every edit" },
 ];
 
 const iconStep = [
   { label: "Model picks icons one by one", value: "~8 min · 52 turns", fill: 1 },
   { label: "One batched tool call", value: "1 call", fill: 0.04, accent: true },
 ];
-
-const suite = [
-  { label: "Seeder test suite, before", value: "92 s", fill: 1 },
-  { label: "After fixing the test rig", value: "26 s", fill: 26 / 92, accent: true },
-];
 ---
 
 <Base
   title="Daedalus · Paritosh Tripathi"
-  description="Daedalus — LLM agents that build a client's CRM pipeline, fill it with believable demo data and edit it live by conversation, with plan approval, crash-safe writes and preview-before-apply enforced in code."
+  description="Daedalus — an agentic pipe that turns a prospect's description into a configured, populated CRM pipeline for a sales demo, with LLMs for judgment and deterministic code for every write."
 >
   <CaseStudyHeader
     slug="daedalus"
     title="Daedalus"
-    blurb="LLM agents that turn a description of a company into a working CRM pipeline, fill it with a believable team and leads at every stage, and then change it live by conversation — safe to run against real customer tenants."
+    blurb="An agentic pipe that turns a description of a prospect's business into a configured CRM pipeline, populated with a believable sales team and leads at every stage — ready to demo, and editable live by conversation."
     stats={stats}
-    ownership="Team project · I owned the seeder, seed agent, edit agent and edit API"
+    ownership="Built on Sharpsell's in-house agent framework"
   />
 
   <CaseStudyTOC items={tocItems} />
   <article class="max-w-4xl mx-auto px-6 prose-invert">
-    <h2 id="problem">The problem</h2>
+    <h2 id="business">The business case</h2>
     <p>
-      Every client configures the lead-management product as <strong>pipelines</strong>: stages, the moves allowed between them, entry rules, activities like calls and visits, forms and field writes. Getting one ready for a sales demo was slow manual work. Someone authored a large manifest by hand, then spent <strong>hours</strong> creating users, a reporting hierarchy and dozens of leads, walking each lead through real actions so it sat in the right stage with a believable history. Changing the pipeline afterwards meant admin-UI work or re-importing the manifest, with real risk of breaking leads already in it.
+      Sharpsell sells a lead-management product that every client configures for their own sales motion. Winning a deal starts with a demo, and a demo only lands if the prospect sees <strong>their</strong> process: their stages, their activities, their team, with leads already moving through it.
     </p>
     <p>
-      The goal: one conversation. Describe the company; agents research it, build and import the pipeline, seed demo data, and keep editing it on request.
+      Building that by hand took <strong>days</strong>. Someone authored a large pipeline manifest, then spent hours creating users, a reporting hierarchy and dozens of leads, walking each one through real actions so it sat in the right stage with a believable history. Every prospect paid that cost before the first meeting, and any change requested in the room meant going back to the admin UI.
+    </p>
+    <p>
+      The goal: compress setup to <strong>one conversation</strong>, so pre-sales can show a tailored, working pipeline the same day — and change it live while the prospect watches.
     </p>
 
-    <h2 id="architecture">Architecture</h2>
+    <h2 id="use-case">The use case</h2>
+    <ol>
+      <li><strong>Describe the company.</strong> "A regional insurer whose agents sell policies door to door."</li>
+      <li><strong>Research.</strong> An agent works out the sales process and writes a handoff: pipelines, stages, activities, the org chart, personas, and a demo story — how many leads each rep owns, at which stage, and a few featured leads with a scripted history.</li>
+      <li><strong>Build and import.</strong> An agent turns the handoff into a pipeline manifest and imports it into the client's tenant.</li>
+      <li><strong>Seed.</strong> On a yes, an agent creates the team and walks every lead through real actions until it sits where the story says, then audits the result.</li>
+      <li><strong>Edit live.</strong> "Add a site-visit stage after the demo." The change is previewed in plain language, applied on approval, and existing leads are protected.</li>
+    </ol>
+
+    <h2 id="work">The work</h2>
+    <ul>
+      <li><strong>Demo-data seeder</strong> — a ~29,700-line Python library with 529 tests that compiles the demo story into an exact seeding plan, executes it against the live LMS and Core APIs, and judges the outcome</li>
+      <li><strong>Seed agent</strong> — wraps the seeder in the agent framework: stateless per request, with its workspace snapshotted to session storage after every write so a turn can resume on another worker</li>
+      <li><strong>Edit agent</strong> — 15 tools for reading and changing a live pipeline, with readable previews and code-enforced approval</li>
+      <li><strong>Agent edit API</strong> — 2 read and 12 write endpoints on the LMS backend for stages, transitions, activities and actions</li>
+      <li><strong>Orchestration</strong> — routing between the four agents, the hand-offs between them, and eval graders that check tool calls, not just answers</li>
+    </ul>
+
+    <h2 id="orchestration">Orchestration</h2>
     <ArchDiagram
       title="Daedalus · orchestrator → research → create → seed / edit"
-      caption="Research → create → seed are deterministic graph hops, not LLM routing decisions. Edits go through a backend API that reuses the existing pipeline importer."
+      caption="Orange arrows are hand-offs taken by code, not by a model's routing decision. The orchestrator's LLM only routes free-form requests: questions, edits, more users or leads."
     >
-      <svg viewBox="0 0 920 330" class="w-full h-auto" role="img" aria-label="Daedalus architecture">
+      <svg viewBox="0 0 920 330" class="w-full h-auto" role="img" aria-label="Daedalus orchestration">
         <style>
           .dd-node { fill: #1a1a1a; stroke: rgba(255,255,255,0.12); }
           .dd-node-accent { fill: #1a1a1a; stroke: #ff8c00; }
@@ -86,7 +102,7 @@ const suite = [
 
         <rect x="20" y="40" width="170" height="60" rx="10" class="dd-node" />
         <text x="105" y="68" text-anchor="middle" class="dd-label">Orchestrator</text>
-        <text x="105" y="84" text-anchor="middle" class="dd-sub">routes the chat</text>
+        <text x="105" y="84" text-anchor="middle" class="dd-sub">routes free-form asks</text>
 
         <rect x="230" y="40" width="170" height="60" rx="10" class="dd-node" />
         <text x="315" y="68" text-anchor="middle" class="dd-label">Research agent</text>
@@ -98,9 +114,9 @@ const suite = [
 
         <rect x="670" y="40" width="200" height="60" rx="10" class="dd-node-accent" />
         <text x="770" y="68" text-anchor="middle" class="dd-label">Seed agent</text>
-        <text x="770" y="84" text-anchor="middle" class="dd-sub">plan → approve → run</text>
+        <text x="770" y="84" text-anchor="middle" class="dd-sub">compile → approve → run</text>
 
-        <rect x="230" y="170" width="170" height="60" rx="10" class="dd-node-accent" />
+        <rect x="230" y="170" width="170" height="60" rx="10" class="dd-node" />
         <text x="315" y="198" text-anchor="middle" class="dd-label">Edit agent</text>
         <text x="315" y="214" text-anchor="middle" class="dd-sub">preview before apply</text>
 
@@ -127,77 +143,78 @@ const suite = [
       </svg>
     </ArchDiagram>
     <p>
-      Orange marks the parts I owned. The session is the security boundary: agents never take a pipeline id, bucket or file path from the model, so a chat can only ever touch the pipeline it created.
-    </p>
-
-    <h2 id="seeder">The demo-data seeder</h2>
-    <p>
-      The seeder reads the research handoff — pipelines plus a "demo story": org chart, personas, lead counts per owner and stage, featured leads with a scripted history — and compiles it into an exact, immutable plan. It's ~29,700 lines of Python with 529 tests, built to be safe on real customer tenants rather than as a one-off script.
+      Each specialist is a sub-agent on one LangGraph graph. When a sub-agent finishes, an <code>on_sub_agent_return</code> hook decides what happens next — in code:
     </p>
     <ul>
-      <li><strong>Plan → approve → run.</strong> Nothing writes until the signed-in user approves the exact plan id, and approval only succeeds if the plan's counts match the story</li>
-      <li><strong>Durable write ledger.</strong> Every write intent and outcome is journalled, so resume never repeats a write. Tests cover a crash at every ledger boundary, a torn ledger tail and an HTTP 500 that still returned an id</li>
-      <li><strong>Leads move through real actions</strong>, as a user would move them, so stage rules, required forms and histories all behave exactly as in production</li>
-      <li><strong>Write guards at the trust boundary:</strong> no real-looking phone numbers or emails, every contact aliased to the operator's own address, secrets redacted from tool results</li>
-      <li><strong>The judge</strong> audits the live tenant with GET requests only and scores every featured lead's history against the story</li>
+      <li><strong>Research → create.</strong> When research registers a handoff file for the session, the graph jumps straight into the create agent with a fixed instruction. No model turn decides it.</li>
+      <li><strong>Create → seed.</strong> When the import succeeds and a pipeline id is registered, the graph asks one button question — create demo data now? — and only on yes jumps into the seed agent.</li>
+      <li><strong>Seed → release.</strong> A seed turn that ran the judge releases the chat even if the model forgot to hand back, so the next request is routed instead of refused.</li>
     </ul>
+    <p>
+      The flags behind those hops live in session storage and are <em>taken</em> exactly once. The create → seed hop peeks at its flag before asking and only takes it after the answer, because resuming an interrupt re-runs the node from the top — taking it first would spend the hop on the question itself.
+    </p>
+    <p>
+      The session is the security boundary. Agents never accept a pipeline id, storage path or file name from the model; they resolve them from the session's own state, so a chat can only touch the pipeline it created.
+    </p>
 
-    <h2 id="edit">Editing a live pipeline</h2>
+    <h2 id="deterministic">Making it deterministic</h2>
     <p>
-      After import, users can say "add a stage after demo" or "let reps skip the approval" and the edit agent does it. I built both the agent and the backend API behind it: 2 read and 12 write endpoints for stages, transitions, activities and actions.
+      The rule throughout: <strong>models make judgments, code makes writes.</strong> The LLM researches, routes and talks; everything that touches a customer tenant goes through a compiled, reviewed path.
     </p>
-    <h3>One write path</h3>
-    <p>
-      Every edit is an <em>update import</em> of a modified copy of the stored manifest, run through the existing importer. That gives each edit the importer's validation, diff, cache invalidation and publish for free, instead of re-implementing them per endpoint.
-    </p>
+
+    <h3>The seed plan is compiled, not generated</h3>
     <ul>
-      <li><strong>Dry run by default</strong>, returning the planned diff so the agent can show a preview first</li>
-      <li><strong>Postgres advisory lock per pipeline</strong>, so two overlapping edits can't both start from the old baseline and silently undo each other</li>
-      <li><strong>Refuses to remove a stage that still holds active leads</strong> — those leads would otherwise be stranded with no way to move</li>
+      <li>The seeder reads the manifest's own stage rules and simulates every action against them. To place a lead, a breadth-first search explores action paths to the target stage, expanding steps in sorted order — the same story and manifest always give the same path</li>
+      <li>Rule expressions that can't be replayed are refused: <code>$random</code> and <code>$millis</code> are rejected outright, and <code>$now()</code> is replaced with a fixed clock</li>
+      <li>The finished plan is sealed with a <strong>content hash as its id</strong>. Nothing writes until the signed-in user approves that exact id, and approval only succeeds if the plan's counts match the story</li>
     </ul>
-    <h3>Safety in code, not in the prompt</h3>
+
+    <h3>Execution is replayable</h3>
+    <ul>
+      <li>Every write intent and outcome goes to a durable ledger. Resume never repeats a write — tested with a crash at every ledger boundary, a torn ledger tail, and an HTTP 500 that still returned an id</li>
+      <li>An unknown outcome stays failed rather than being guessed into success, and demo identities are namespaced (<code>SYN-demo_&lt;uuid&gt;</code>) so two demos in one tenant never collide</li>
+      <li>The judge then audits the live tenant with GET requests only and scores every featured lead's history against the story</li>
+    </ul>
+
+    <h3>Edits have one write path and a code-enforced preview</h3>
+    <ul>
+      <li>Every edit is an update import of a modified copy of the stored manifest, through the existing importer — the same validation, diff and publish as a normal import</li>
+      <li>Writes default to a dry run. An apply is refused in code unless the user's previous turn was shown its preview; the prompt says the same, but doesn't have to be obeyed for the guard to hold</li>
+      <li>A per-pipeline Postgres advisory lock serialises edits, and the importer refuses to remove a stage that still holds active leads</li>
+      <li>Backend diffs full of UUIDs are rewritten into lines like <code>add transition 'Demo fixed' → 'Meeting done'</code>, so the person approving actually knows what they're approving</li>
+    </ul>
+
+    <h3>Evals check behaviour, not wording</h3>
     <p>
-      The agent can't apply a change unless the user's previous turn showed its preview — enforced in code, not left to the prompt. Backend diffs full of UUIDs are rewritten into lines like <code>add transition 'Demo fixed' → 'Meeting done'</code>, and ids from the model are checked before they reach a URL path.
+      Custom graders assert on tool calls — for example, that a write tool was previewed with <code>dry_run=True</code> but never applied — across routing, stage, action and full-flow cases.
     </p>
 
-    <h2 id="speed">Making it fast</h2>
-    <p>
-      Each speed-up came from profiling a real seed run, and each fix ships with a regression test named after the run that found it.
-    </p>
+    <h2 id="results">Results</h2>
+    <ul>
+      <li>Prospect description to a configured, populated demo pipeline in <strong>one conversation</strong>, instead of days of setup and data entry</li>
+      <li>A real seed, independently verified with GET requests: <strong>66/66</strong> story leads, 17 synthetic users, reporting links intact, zero duplicate phones</li>
+      <li>Profiling real runs removed the biggest costs: icon selection went from ~8 minutes of a 27-minute seed to one batched call, and users are created four at a time per org level</li>
+      <li>600+ tests across the seeder and agents</li>
+    </ul>
     <BarChart
       title="Icon selection in a 27-minute seed"
       rows={iconStep}
       caption="107 searches and 18 picks over 52 model turns, replaced by one batched call with a one-by-one fallback."
     />
-    <ul>
-      <li>Users set up <strong>4 at a time</strong> per org level, managers first — 12 users had taken ~2.5 minutes one by one</li>
-      <li>Independent leads seeded 4 at a time on a thread-safe ledger, paced to 6 requests/s and waiting out HTTP 429s instead of failing</li>
-    </ul>
-    <BarChart
-      title="Seeder test suite runtime"
-      rows={suite}
-      caption="Three tests took 65 of the 92 seconds because a test rig skipped the request-pacing override."
-    />
 
-    <h2 id="results">Results</h2>
+    <h2 id="next">What's next</h2>
     <ul>
-      <li>A real seed, independently verified with GET requests: <strong>66/66</strong> story leads, 17 synthetic users, reporting links restored, zero duplicate phones</li>
-      <li>Demo prep went from manual configuration plus hours of data entry to <strong>one conversation</strong></li>
-      <li>600+ tests and custom eval graders across the seeder, seed agent and edit agent</li>
-    </ul>
-
-    <h2 id="next">What I'd add next</h2>
-    <ul>
-      <li>Run the test suites in CI — today they run by hand</li>
-      <li>Undo for applied edits, using the stored baseline each edit already starts from</li>
+      <li>Run the test suites in CI</li>
+      <li>Undo for applied edits, from the stored baseline each edit already starts from</li>
       <li>Judge scores tracked over time as an eval dashboard</li>
     </ul>
 
     <h2 id="stack">Stack</h2>
     <ul>
-      <li>Python, LangChain deep agents on the in-house agent framework</li>
-      <li>Python backend with PostgreSQL advisory locks</li>
-      <li>Cloud Tasks workers with the workspace snapshotted to session storage after every write</li>
+      <li>Python, LangGraph / LangChain deep agents on Sharpsell's agent framework</li>
+      <li>JSONata rule simulation for stage placement</li>
+      <li>PostgreSQL advisory locks in the LMS backend</li>
+      <li>Cloud Tasks workers with session-storage snapshots</li>
       <li>pytest plus custom eval graders</li>
     </ul>
   </article>
