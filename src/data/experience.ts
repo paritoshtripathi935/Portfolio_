@@ -41,7 +41,7 @@ export const experience: Experience[] = [
       { value: "20×", label: "faster per-tenant ELT" },
       { value: "85%", label: "DB cost cut" },
       { value: "100+", label: "tenants" },
-      { value: "66/66", label: "demo leads verified" },
+      { value: "1–2s", label: "query latency" },
     ],
     caseStudies: [
       {
