@@ -11,20 +11,27 @@ const tocItems = [
   { id: "work", label: "The work" },
   { id: "orchestration", label: "Orchestration" },
   { id: "deterministic", label: "Making it deterministic" },
+  { id: "fast", label: "Making it fast" },
   { id: "results", label: "Results" },
   { id: "next", label: "What's next" },
   { id: "stack", label: "Stack" },
 ];
 
 const stats = [
-  { value: "<30 min", label: "full demo seed" },
+  { value: "<30 min", label: "demo data, was hours" },
+  { value: "8 min → 1", label: "slowest step, now one call" },
+  { value: "600+", label: "tests · 22 eval cases" },
   { value: "14", label: "edit API endpoints" },
-  { value: "Dry run", label: "default for every edit" },
 ];
 
 const iconStep = [
   { label: "Model picks icons one by one", value: "~8 min · 52 turns", fill: 1 },
   { label: "One batched tool call", value: "1 call", fill: 0.04, accent: true },
+];
+
+const suite = [
+  { label: "Seeder test suite, before", value: "92 s", fill: 1 },
+  { label: "After fixing the test rig", value: "26 s", fill: 26 / 92, accent: true },
 ];
 ---
 
@@ -142,6 +149,19 @@ const iconStep = [
       </svg>
     </ArchDiagram>
     <p>
+      Every agent is a <strong>LangChain deep agent</strong> (<code>create_deep_agent</code>) running on <strong>LangGraph</strong>, inside Sharpsell's in-house agent framework. The framework wraps each one in a mandatory middleware stack, so none of these guarantees depend on a prompt:
+    </p>
+    <ul>
+      <li><strong>PII tokenisation</strong> — personal data is swapped for tokens before it reaches the model</li>
+      <li><strong>Prompt-injection and input validation</strong> on what comes in, and argument checks on every tool call going out</li>
+      <li><strong>Per-turn model- and tool-call budgets</strong> — 80 model calls for an edit turn, 150 for a seed, 450 for the whole pipe — so a looping agent stops instead of burning tokens</li>
+      <li><strong>Tool-failure handling and interrupt guards</strong> — a failed tool returns a readable error, and a sub-agent can't ask a question after it has handed back</li>
+      <li><strong>Structured logging and conversation summarisation</strong> for long runs</li>
+    </ul>
+    <p>
+      The orchestrator and edit agent run on an OpenAI reasoning model at low effort; the seed agent's effort is configurable, and cheap sub-tasks go to a fast model.
+    </p>
+    <p>
       Each specialist is a sub-agent on one LangGraph graph. When a sub-agent finishes, an <code>on_sub_agent_return</code> hook decides what happens next — in code:
     </p>
     <ul>
@@ -188,18 +208,33 @@ const iconStep = [
       Custom graders assert on tool calls — for example, that a write tool was previewed with <code>dry_run=True</code> but never applied — across routing, stage, action and full-flow cases.
     </p>
 
-    <h2 id="results">Results</h2>
-    <ul>
-      <li>Prospect description to a configured, populated demo pipeline in <strong>one conversation</strong>, instead of days of setup and data entry</li>
-      <li>A real seed, independently verified with GET requests: <strong>66/66</strong> story leads, 17 synthetic users, reporting links intact, zero duplicate phones</li>
-      <li>Profiling real runs removed the biggest costs: icon selection went from ~8 minutes of a 27-minute seed to one batched call, and users are created four at a time per org level</li>
-      <li>600+ tests across the seeder and agents</li>
-    </ul>
+    <h2 id="fast">Making it fast</h2>
+    <p>
+      Every speed-up came from profiling a real seed run, and each fix ships with a regression test named after the run that found it. The rule: anything a model does repeatedly and mechanically becomes one tool call.
+    </p>
     <BarChart
       title="Icon selection in a 27-minute seed"
       rows={iconStep}
-      caption="107 searches and 18 picks over 52 model turns, replaced by one batched call with a one-by-one fallback."
+      caption="107 searches and 18 picks over 52 model turns — the model choosing icons one by one — replaced by one batched call with a one-by-one fallback."
     />
+    <ul>
+      <li><strong>Users in parallel by org level.</strong> 12 users took ~2.5 minutes one at a time; now they're created 4 at a time per level, managers first, so reporting links never point at someone who doesn't exist yet</li>
+      <li><strong>Leads in parallel between hierarchy relinks</strong>, 4 at a time, on a thread-safe ledger so resume still never repeats a write</li>
+      <li><strong>Paced, not throttled into failure.</strong> Up to 6 requests a second, and an HTTP 429 waits out <code>Retry-After</code> instead of failing the step</li>
+      <li><strong>Fewer model turns.</strong> Tools return names, not UUIDs, and bounded results, so the model spends turns deciding rather than parsing</li>
+    </ul>
+    <BarChart
+      title="Seeder test suite runtime"
+      rows={suite}
+      caption="A per-test coverage audit found three tests taking 65 of 92 seconds because a test rig skipped the request-pacing override."
+    />
+
+    <h2 id="results">Results</h2>
+    <ul>
+      <li>Prospect description to a configured, populated demo pipeline in <strong>one conversation</strong> — demo data in under 30 minutes instead of hours of manual entry</li>
+      <li>A real seed, independently verified with GET requests: all 66 story leads in the right stage, 17 synthetic users, reporting links intact, zero duplicate phones</li>
+      <li>600+ tests across the seeder and agents, plus 22 eval cases graded on tool calls</li>
+    </ul>
 
     <h2 id="next">What's next</h2>
     <ul>
@@ -210,7 +245,8 @@ const iconStep = [
 
     <h2 id="stack">Stack</h2>
     <ul>
-      <li>Python, LangGraph / LangChain deep agents on Sharpsell's agent framework</li>
+      <li>Python, LangChain deep agents on LangGraph, inside Sharpsell's agent framework and its middleware stack</li>
+      <li>OpenAI reasoning models, with a fast model for sub-tasks</li>
       <li>JSONata rule simulation for stage placement</li>
       <li>PostgreSQL advisory locks in the LMS backend</li>
       <li>Cloud Tasks workers with session-storage snapshots</li>

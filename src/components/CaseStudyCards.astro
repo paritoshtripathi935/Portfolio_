@@ -34,12 +34,12 @@ const cases: Case[] = [
     domain: "LLM agents",
     subtitle: "Sales demos in one conversation: agents build a prospect's CRM pipeline, fill it with a believable team and leads, and edit it live. Models judge, code writes.",
     metrics: [
-      { v: "<30 min", l: "full seed" },
-      { v: "14", l: "edit endpoints" },
+      { v: "<30 min", l: "demo data, was hours" },
+      { v: "8m → 1", l: "slowest step" },
       { v: "600+", l: "tests" },
-      { v: "Dry run", l: "edit default" },
+      { v: "22", l: "eval cases" },
     ],
-    stack: ["Python", "LangChain", "PostgreSQL", "Evals"],
+    stack: ["LangChain", "LangGraph", "Python", "PostgreSQL"],
   },
   {
     href: "/work/iris",
